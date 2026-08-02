@@ -47,23 +47,32 @@ npm run draft -- --photos front.jpg,back.jpg,tag.jpg --notes "small stain on lef
 
 Writes `draft.json` and prints the price and both listings. Review it.
 
+The draft step also resolves the eBay leaf category and fills item specifics
+automatically (Taxonomy API), so `post` no longer needs `--category`.
+
 Post the eBay listing:
 
 ```
 npm run post -- --draft draft.json \
   --images https://your-host/img1.jpg,https://your-host/img2.jpg \
-  --category 15687 \
   --location my-location-key \
   --fulfillment <id> --payment <id> --return <id>
 ```
+
+`--category <id>` is now optional — pass it only to override the auto-resolved one.
 
 Image URLs must be publicly reachable (eBay pulls them). Host them somewhere first.
 
 ## Design notes
 
 - Pricing uses sold comps when available. Sold data needs the Marketplace Insights API,
-  which is separately gated. Until you have it, the tool falls back to active-listing
-  asks discounted 15 percent. `getSoldComps` in `src/ebay/browse.ts` is the hook.
+  which is separately gated. `getSoldComps` in `src/ebay/browse.ts` is fully wired but
+  dormant: once eBay approves the `buy.marketplace.insights` scope for your app, set
+  `EBAY_INSIGHTS=1` and it turns on with no code change. Until then the tool falls back
+  to active-listing asks discounted 15 percent.
+- Category and item specifics are resolved at draft time via the Taxonomy API
+  (`src/ebay/taxonomy.ts` + `src/brain/aspects.ts`). Best-effort: if eBay can't suggest
+  a category, the draft still builds and you pass `--category` on `post`.
 - All the platform-specific eBay posting logic is in `src/ebay/sell.ts`. Swap in a
   Poshmark automation module later behind the same `ListingDraft` shape if you go there.
 - The brain modules only depend on the Anthropic client, so you can reuse them headless.
@@ -81,9 +90,11 @@ src/
     extract.ts      photos -> attributes (vision)
     price.ts        comps -> price (trimmed stats)
     listing.ts      attributes -> platform-tuned copy
+    aspects.ts      attributes -> eBay item specifics
   ebay/
-    auth.ts         app token, user consent, refresh
-    browse.ts       active comps (sold comps stub)
+    auth.ts         app token (per-scope), user consent, refresh
+    browse.ts       active comps + sold comps (dormant, EBAY_INSIGHTS)
+    taxonomy.ts     category suggestion + required aspects
     sell.ts         inventory item -> offer -> publish
 ```
 

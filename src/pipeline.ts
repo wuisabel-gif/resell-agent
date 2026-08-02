@@ -1,7 +1,9 @@
 import { extractAttributes } from "./brain/extract.js";
 import { priceFromComps } from "./brain/price.js";
 import { generateListing } from "./brain/listing.js";
+import { fillAspects } from "./brain/aspects.js";
 import { getActiveComps, getSoldComps } from "./ebay/browse.js";
+import { suggestCategory, getRequiredAspects } from "./ebay/taxonomy.js";
 import type { DraftBundle, Platform } from "./types.js";
 
 // photos + notes  ->  attributes  ->  comps  ->  price  ->  listings.
@@ -24,6 +26,17 @@ export async function buildDraft(
   const listings = await Promise.all(
     platforms.map((p) => generateListing(attributes, price, p))
   );
+
+  // Enrich the eBay listing with a resolved category + item specifics so `post`
+  // needs no manual --category and buyers get eBay's search-weighted aspects.
+  const ebay = listings.find((l) => l.platform === "ebay");
+  if (ebay) {
+    const cat = await suggestCategory(ebay.title);
+    if (cat) {
+      ebay.categoryId = cat.categoryId;
+      ebay.itemSpecifics = await fillAspects(attributes, await getRequiredAspects(cat.categoryId));
+    }
+  }
 
   return { attributes, price, comps, listings };
 }

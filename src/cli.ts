@@ -28,6 +28,12 @@ async function cmdDraft() {
   console.log(`Basis: ${bundle.price.basis}`);
   for (const l of bundle.listings) {
     console.log(`\n--- ${l.platform} ---\n${l.title}\n${l.description}`);
+    if (l.platform === "ebay") {
+      console.log(`category: ${l.categoryId ?? "(unresolved — pass --category on post)"}`);
+      const specs = l.itemSpecifics ?? {};
+      const n = Object.keys(specs).length;
+      if (n) console.log(`item specifics (${n}): ${Object.entries(specs).map(([k, v]) => `${k}=${v.join("/")}`).join(", ")}`);
+    }
   }
   console.log(`\nSaved ${out}. Review it, then use \`post\` to publish to eBay.`);
 }
@@ -42,7 +48,8 @@ async function cmdPost() {
   const opts: PostOptions = {
     sku: arg("--sku") ?? `resell-${Date.now()}`,
     imageUrls: (arg("--images") ?? "").split(",").map((s) => s.trim()).filter(Boolean),
-    categoryId: arg("--category") ?? "",
+    // Draft resolves this automatically; --category is now just an override.
+    categoryId: arg("--category") ?? ebay.categoryId ?? "",
     merchantLocationKey: arg("--location") ?? "",
     fulfillmentPolicyId: arg("--fulfillment") ?? "",
     paymentPolicyId: arg("--payment") ?? "",

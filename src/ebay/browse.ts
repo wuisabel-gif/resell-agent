@@ -71,8 +71,46 @@ export async function getActiveComps(
     }));
 }
 
-// Sold comps require Marketplace Insights API access (application + approval).
-// Wire it here once approved; same shape, source "ebay-sold".
-export async function getSoldComps(_a: ItemAttributes): Promise<Comp[]> {
-  return [];
+// Sold comps via the Marketplace Insights API. This code is complete but DORMANT:
+// the buy.marketplace.insights scope is gated, so the token call fails until eBay
+// approves your app. Set EBAY_INSIGHTS=1 only after approval; until then this
+// returns [] and pricing falls back to discounted active asks.
+// ponytail: env flag is the on-switch; no code change needed once approved.
+const INSIGHTS_SCOPE = "https://api.ebay.com/oauth/api_scope/buy.marketplace.insights";
+
+export async function getSoldComps(a: ItemAttributes, limit = 25): Promise<Comp[]> {
+  if (!process.env.EBAY_INSIGHTS) return [];
+
+  const token = await getAppToken(INSIGHTS_SCOPE);
+  const params = new URLSearchParams({
+    q: buildQuery(a),
+    limit: String(limit),
+    filter: `conditionIds:{${conditionFilter(a.condition)}}`,
+  });
+
+  const res = await fetch(
+    `${cfg.apiBase}/buy/marketplace_insights/v1_beta/item_sales/search?${params.toString()}`,
+    { headers: { Authorization: `Bearer ${token}`, "X-EBAY-C-MARKETPLACE-ID": "EBAY_US" } }
+  );
+  if (!res.ok) throw new Error(`insights search failed: ${res.status} ${await res.text()}`);
+
+  const j = (await res.json()) as {
+    itemSales?: Array<{
+      title: string;
+      lastSoldPrice?: { value: string; currency: string };
+      condition?: string;
+      itemWebUrl: string;
+    }>;
+  };
+
+  return (j.itemSales ?? [])
+    .filter((it) => it.lastSoldPrice)
+    .map((it) => ({
+      title: it.title,
+      price: Number(it.lastSoldPrice!.value),
+      currency: it.lastSoldPrice!.currency,
+      condition: it.condition ?? null,
+      url: it.itemWebUrl,
+      source: "ebay-sold" as const,
+    }));
 }

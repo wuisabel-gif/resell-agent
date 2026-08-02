@@ -60,6 +60,7 @@ export async function publishListing(
         title: draft.title,
         description: draft.description,
         imageUrls: opts.imageUrls,
+        ...(draft.itemSpecifics ? { aspects: draft.itemSpecifics } : {}),
       },
     }),
   });

@@ -36,6 +36,9 @@ export interface ListingDraft {
   description: string;
   price: number;
   condition: ItemAttributes["condition"];
+  // eBay-only, filled at draft time by the taxonomy step. Poshmark ignores these.
+  categoryId?: string;
+  itemSpecifics?: Record<string, string[]>;
 }
 
 export interface DraftBundle {

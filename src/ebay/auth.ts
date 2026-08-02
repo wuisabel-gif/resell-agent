@@ -6,16 +6,16 @@ function basicAuth(): string {
   return Buffer.from(`${cfg.clientId}:${cfg.clientSecret}`).toString("base64");
 }
 
-let appTokenCache: { token: string; exp: number } | null = null;
+const BASE_SCOPE = "https://api.ebay.com/oauth/api_scope";
+const appTokenCache = new Map<string, { token: string; exp: number }>();
 
-// App token (client credentials). Used for Browse API / pricing. No user login.
-export async function getAppToken(): Promise<string> {
-  if (appTokenCache && Date.now() < appTokenCache.exp) return appTokenCache.token;
+// App token (client credentials). Used for Browse / Taxonomy / Insights. No user login.
+// Cached per scope — Marketplace Insights needs a different (gated) scope than Browse.
+export async function getAppToken(scope: string = BASE_SCOPE): Promise<string> {
+  const hit = appTokenCache.get(scope);
+  if (hit && Date.now() < hit.exp) return hit.token;
 
-  const body = new URLSearchParams({
-    grant_type: "client_credentials",
-    scope: "https://api.ebay.com/oauth/api_scope",
-  });
+  const body = new URLSearchParams({ grant_type: "client_credentials", scope });
 
   const res = await fetch(`${cfg.apiBase}${OAUTH_TOKEN_PATH}`, {
     method: "POST",
@@ -30,8 +30,9 @@ export async function getAppToken(): Promise<string> {
     throw new Error(`app token failed: ${res.status} ${await res.text()}`);
   }
   const j = (await res.json()) as { access_token: string; expires_in: number };
-  appTokenCache = { token: j.access_token, exp: Date.now() + (j.expires_in - 60) * 1000 };
-  return appTokenCache.token;
+  const entry = { token: j.access_token, exp: Date.now() + (j.expires_in - 60) * 1000 };
+  appTokenCache.set(scope, entry);
+  return entry.token;
 }
 
 // Step 1 of user consent: build the URL the human opens in a browser.
