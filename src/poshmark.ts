@@ -1,39 +1,13 @@
 import type { Comp, ItemAttributes } from "./types.js";
+import { buildQuery, gatedJson } from "./sources.js";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Poshmark has NO public API. This hits the same undocumented internal endpoint
-// their web app uses. That means:
-//   • It is AGAINST Poshmark's Terms of Service. Ban risk is on your account.
-//   • It is FRAGILE — the endpoint/shape can change without notice and break.
-//   • It returns ASKING prices only (Poshmark exposes no sold data publicly).
-// It is OFF unless you set ENABLE_POSHMARK=1. Enable at your own risk.
-// ─────────────────────────────────────────────────────────────────────────────
-
-const UA =
-  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 " +
-  "(KHTML, like Gecko) Chrome/125.0 Safari/537.36";
-
-function query(a: ItemAttributes): string {
-  return [a.brand, ...a.titleKeywords, a.size].filter(Boolean).join(" ").trim();
-}
-
+// Poshmark — unofficial internal endpoint, ToS-risky, ASKING prices only.
+// Off unless ENABLE_POSHMARK=1. See src/sources.ts for the shared caveats.
 export async function getPoshmarkComps(a: ItemAttributes, limit = 40): Promise<Comp[]> {
-  if (!process.env.ENABLE_POSHMARK) return [];
-
-  const request = JSON.stringify({ filters: { inventory_status: ["available"] }, query: query(a) });
+  const request = JSON.stringify({ filters: { inventory_status: ["available"] }, query: buildQuery(a) });
   const url = `https://poshmark.com/vm-rest/posts?request=${encodeURIComponent(request)}&summarize=true&count=${limit}`;
-
-  try {
-    const res = await fetch(url, {
-      headers: { "User-Agent": UA, Accept: "application/json", "X-Requested-With": "XMLHttpRequest" },
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return parsePoshmark(await res.json());
-  } catch (e) {
-    // Fragile + unofficial: never let it break the draft, just warn and skip.
-    console.warn(`poshmark comps unavailable (${String(e)}); skipping. Source is unofficial/ToS-risky.`);
-    return [];
-  }
+  const j = await gatedJson("ENABLE_POSHMARK", "poshmark", url, { "X-Requested-With": "XMLHttpRequest" });
+  return j ? parsePoshmark(j) : [];
 }
 
 // Pure parse, split out so the shape handling is testable without the network.

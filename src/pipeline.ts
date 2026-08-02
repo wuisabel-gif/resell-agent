@@ -4,6 +4,9 @@ import { generateListing } from "./brain/listing.js";
 import { fillAspects } from "./brain/aspects.js";
 import { getActiveComps, getSoldComps } from "./ebay/browse.js";
 import { getPoshmarkComps } from "./poshmark.js";
+import { getThredupComps } from "./thredup.js";
+import { getRealRealComps } from "./therealreal.js";
+import { getMercariComps } from "./mercari.js";
 import { suggestCategory, getRequiredAspects } from "./ebay/taxonomy.js";
 import type { DraftBundle, Platform } from "./types.js";
 
@@ -16,12 +19,17 @@ export async function buildDraft(
 ): Promise<DraftBundle> {
   const attributes = await extractAttributes(photoPaths, notes);
 
-  const [active, sold, poshmark] = await Promise.all([
+  // Each scrape source is gated by its own ENABLE_* flag and yields [] when off
+  // or blocked, so the draft never depends on them. Only eBay is sanctioned.
+  const [active, sold, poshmark, thredup, realreal, mercari] = await Promise.all([
     getActiveComps(attributes),
     getSoldComps(attributes),
     getPoshmarkComps(attributes),
+    getThredupComps(attributes),
+    getRealRealComps(attributes),
+    getMercariComps(attributes),
   ]);
-  const comps = [...sold, ...active, ...poshmark];
+  const comps = [...sold, ...active, ...poshmark, ...thredup, ...realreal, ...mercari];
 
   const price = priceFromComps(comps);
   const comparison = compareByPlatform(comps);

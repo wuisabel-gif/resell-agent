@@ -84,11 +84,14 @@ Image URLs must be publicly reachable (eBay pulls them). Host them somewhere fir
   to active-listing asks discounted 15 percent.
 - Cross-platform price comparison: the draft shows a trimmed median + range per
   source (eBay sold, eBay active, Poshmark). Only eBay has a sanctioned API. The
-  Poshmark source (`src/poshmark.ts`) hits an unofficial internal endpoint — it is
-  against Poshmark's ToS, fragile, and off unless you set `ENABLE_POSHMARK=1`; the
-  account-ban risk is yours. The suggested price stays eBay-anchored (post lists to
-  eBay); other platforms only inform the comparison. Add more sources behind the same
-  `Comp[]` shape with a new `source` value.
+  Poshmark, ThredUp, The RealReal, and Mercari sources (`src/poshmark.ts`,
+  `thredup.ts`, `therealreal.ts`, `mercari.ts`, sharing `src/sources.ts`) hit
+  unofficial internal endpoints — each is against that platform's ToS, fragile, and
+  off unless you set its `ENABLE_*` flag; account/IP-ban risk is yours. Each yields
+  `[]` when off or blocked, so the draft never depends on them. The suggested price
+  stays eBay-anchored (post lists to eBay); other platforms only inform the
+  comparison. Add another source behind the same `Comp[]` shape with a new `source`
+  value and an `ENABLE_*` gate.
 - Category and item specifics are resolved at draft time via the Taxonomy API
   (`src/ebay/taxonomy.ts` + `src/brain/aspects.ts`). Best-effort: if eBay can't suggest
   a category, the draft still builds and you pass `--category` on `post`.

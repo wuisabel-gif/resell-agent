@@ -18,7 +18,13 @@ export interface Comp {
   currency: string;
   condition: string | null;
   url: string;
-  source: "ebay-active" | "ebay-sold" | "poshmark-active";
+  source:
+    | "ebay-active"
+    | "ebay-sold"
+    | "poshmark-active"
+    | "thredup-active"
+    | "therealreal-active"
+    | "mercari-active";
 }
 
 // One row of the cross-platform price comparison (trimmed stats per source).
