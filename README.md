@@ -19,6 +19,21 @@ but does not auto-post there (automating that UI carries account-ban risk, so it
 left out). The optional Poshmark *price* source above only reads asking prices for
 comparison, and carries the same risk — hence off by default.
 
+## Why
+
+Every year around graduation the same thing happens: leases end, dorms empty, and
+a whole class has a couple of weeks to turn a room full of stuff — the winter coat,
+the textbooks, the desk lamp, the barely-used coffee maker — into cash before the
+move-out truck comes. The bottleneck was never willingness to sell. It's the tedium.
+Every item needs a title, a price that isn't just a guess, the right category, and a
+description rewritten for each platform. Do that thirty times in finals week and you
+end up leaving half of it on the curb.
+
+resell-agent is the shortcut for exactly that pile: photograph an item, and it does
+the cataloging, the comps, and the copy, so listing takes seconds instead of ten
+minutes. It started as a course project — but the deadline it's really built for is
+graduation.
+
 ## How it works
 
 ```mermaid
