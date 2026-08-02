@@ -16,11 +16,24 @@ async function cmdDraft() {
   const out = arg("--out") ?? "draft.json";
 
   if (photos.length === 0) {
-    console.error("Usage: draft --photos a.jpg,b.jpg [--notes '...'] [--platforms ebay,poshmark] [--out draft.json]");
+    console.error("Usage: draft --photos a.jpg,b.jpg [--notes '...'] [--platforms ebay,poshmark] [--clean] [--out draft.json]");
     process.exit(1);
   }
 
-  const bundle = await buildDraft(photos, notes, platforms);
+  // --clean: remove backgrounds first. Cleaner input -> better attribute extraction,
+  // and the .clean.png files are listing-ready (host them for `post --images`).
+  let usePhotos = photos;
+  if (process.argv.includes("--clean")) {
+    const { cleanPhoto } = await import("./brain/bgremove.js");
+    usePhotos = [];
+    for (const p of photos) {
+      const out = await cleanPhoto(p);
+      console.log(`cleaned ${p} -> ${out}`);
+      usePhotos.push(out);
+    }
+  }
+
+  const bundle = await buildDraft(usePhotos, notes, platforms);
   writeFileSync(out, JSON.stringify(bundle, null, 2));
 
   console.log(`\nAttributes: ${bundle.attributes.brand ?? "?"} ${bundle.attributes.category} (${bundle.attributes.condition})`);

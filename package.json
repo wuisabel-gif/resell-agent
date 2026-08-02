@@ -13,6 +13,9 @@
   "engines": {
     "node": ">=22.0.0"
   },
+  "dependencies": {
+    "@imgly/background-removal-node": "^1.4.5"
+  },
   "devDependencies": {
     "typescript": "^5.6.0",
     "@types/node": "^22.0.0"
