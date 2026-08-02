@@ -52,12 +52,14 @@ npm run draft -- --photos front.jpg,back.jpg,tag.jpg --notes "small stain on lef
 
 Writes `draft.json` and prints the price and both listings. Review it.
 
-Add `--clean` to remove photo backgrounds first (via `@imgly/background-removal-node`).
-It writes a transparent `*.clean.png` next to each photo — cleaner input for attribute
-extraction, and listing-ready (eBay composites transparent PNGs onto white). Host those
-`.clean.png` files and pass them to `post --images`. Note: the background remover pulls
-native deps (`sharp`, `onnxruntime-node`) whose install scripts you must approve on
-`npm install`, and it downloads its model on first run.
+Add `--clean` to remove photo backgrounds first (via `@imgly/background-removal-node`),
+then auto-crop tight to the item (`sharp` trims the transparent margin, leaving a small
+pad). It writes a transparent `*.clean.png` next to each photo — cleaner, centered input
+for attribute extraction, and listing-ready (eBay composites transparent PNGs onto white).
+Host those `.clean.png` files and pass them to `post --images`. Note: the remover and crop
+pull native deps (`sharp`, `onnxruntime-node`) whose install scripts you must approve on
+`npm install`, and the remover downloads its model on first run. Auto-crop is best-effort:
+if `sharp` is unavailable it falls back to the uncropped cutout.
 
 The draft step also resolves the eBay leaf category and fills item specifics
 automatically (Taxonomy API), so `post` no longer needs `--category`.
