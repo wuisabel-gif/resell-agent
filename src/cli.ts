@@ -1,5 +1,6 @@
 import { writeFileSync, readFileSync } from "node:fs";
 import { buildDraft } from "./pipeline.js";
+import { renderSheet } from "./sheet.js";
 import { buildConsentUrl, exchangeCode } from "./ebay/auth.js";
 import { publishListing, type PostOptions } from "./ebay/sell.js";
 import type { DraftBundle, Platform } from "./types.js";
@@ -36,9 +37,18 @@ async function cmdDraft() {
   const bundle = await buildDraft(usePhotos, notes, platforms);
   writeFileSync(out, JSON.stringify(bundle, null, 2));
 
+  // Paste sheet: the artifact you send a friend (eBay + Poshmark blocks).
+  const sheetPath = out.replace(/\.json$/i, "") + ".md";
+  writeFileSync(sheetPath, renderSheet(bundle, usePhotos));
+
+  const p = bundle.price;
   console.log(`\nAttributes: ${bundle.attributes.brand ?? "?"} ${bundle.attributes.category} (${bundle.attributes.condition})`);
-  console.log(`Price: ${bundle.price.suggested} ${bundle.price.currency}  [${bundle.price.low}-${bundle.price.high}]`);
-  console.log(`Basis: ${bundle.price.basis}`);
+  if (p.suggested > 0) {
+    console.log(`Price: ${p.low}–${p.high} ${p.currency}  (start around ${p.suggested}, adjust)`);
+  } else {
+    console.log(`Price: no comps found — set it manually`);
+  }
+  console.log(`Basis: ${p.basis}`);
   if (bundle.comparison.length) {
     console.log(`\nCross-platform comps:`);
     for (const s of bundle.comparison) {
@@ -54,7 +64,7 @@ async function cmdDraft() {
       if (n) console.log(`item specifics (${n}): ${Object.entries(specs).map(([k, v]) => `${k}=${v.join("/")}`).join(", ")}`);
     }
   }
-  console.log(`\nSaved ${out}. Review it, then use \`post\` to publish to eBay.`);
+  console.log(`\nSaved ${out} (data) and ${sheetPath} (paste sheet to send). Review before sharing.`);
 }
 
 async function cmdPost() {

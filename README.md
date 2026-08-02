@@ -112,7 +112,11 @@ Draft (no posting):
 npm run draft -- --photos front.jpg,back.jpg,tag.jpg --notes "small stain on left cuff"
 ```
 
-Writes `draft.json` and prints the price and both listings. Review it.
+Writes `draft.json` (data) and `draft.md` — a paste sheet with an eBay block and a
+Poshmark block (title, price range, description, item specifics) plus the photo
+references. The price is shown as a **range with a suggested starting point**, not a
+single number, since it's comp-derived. Send the `.md` to whoever's listing the item;
+they copy the block into their own account. Review before sharing.
 
 Add `--clean` to remove photo backgrounds first (via `@imgly/background-removal-node`),
 then auto-crop tight to the item (`sharp` trims the transparent margin, leaving a small
