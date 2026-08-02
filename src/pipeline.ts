@@ -1,8 +1,9 @@
 import { extractAttributes } from "./brain/extract.js";
-import { priceFromComps } from "./brain/price.js";
+import { priceFromComps, compareByPlatform } from "./brain/price.js";
 import { generateListing } from "./brain/listing.js";
 import { fillAspects } from "./brain/aspects.js";
 import { getActiveComps, getSoldComps } from "./ebay/browse.js";
+import { getPoshmarkComps } from "./poshmark.js";
 import { suggestCategory, getRequiredAspects } from "./ebay/taxonomy.js";
 import type { DraftBundle, Platform } from "./types.js";
 
@@ -15,13 +16,15 @@ export async function buildDraft(
 ): Promise<DraftBundle> {
   const attributes = await extractAttributes(photoPaths, notes);
 
-  const [active, sold] = await Promise.all([
+  const [active, sold, poshmark] = await Promise.all([
     getActiveComps(attributes),
     getSoldComps(attributes),
+    getPoshmarkComps(attributes),
   ]);
-  const comps = [...sold, ...active];
+  const comps = [...sold, ...active, ...poshmark];
 
   const price = priceFromComps(comps);
+  const comparison = compareByPlatform(comps);
 
   const listings = await Promise.all(
     platforms.map((p) => generateListing(attributes, price, p))
@@ -38,5 +41,5 @@ export async function buildDraft(
     }
   }
 
-  return { attributes, price, comps, listings };
+  return { attributes, price, comps, comparison, listings };
 }

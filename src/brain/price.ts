@@ -1,4 +1,6 @@
-import type { Comp, PriceSuggestion } from "../types.js";
+import type { Comp, PlatformStat, PriceSuggestion } from "../types.js";
+
+const round = (x: number) => Math.round(x * 100) / 100;
 
 function median(xs: number[]): number {
   const s = [...xs].sort((a, b) => a - b);
@@ -10,6 +12,34 @@ function percentile(xs: number[], p: number): number {
   const s = [...xs].sort((a, b) => a - b);
   const i = Math.min(s.length - 1, Math.max(0, Math.round(p * (s.length - 1))));
   return s[i];
+}
+
+// Cross-platform view: trimmed median + IQR per source, so the seller can see
+// where the item runs cheap or dear. Does not change the suggested price (that
+// stays eBay-anchored, since `post` lists to eBay).
+export function compareByPlatform(comps: Comp[]): PlatformStat[] {
+  const groups = new Map<Comp["source"], number[]>();
+  for (const c of comps) {
+    const g = groups.get(c.source) ?? [];
+    g.push(c.price);
+    groups.set(c.source, g);
+  }
+  const out: PlatformStat[] = [];
+  for (const [source, prices] of groups) {
+    if (!prices.length) continue;
+    const lo = percentile(prices, 0.1);
+    const hi = percentile(prices, 0.9);
+    const trimmed = prices.filter((p) => p >= lo && p <= hi);
+    const pool = trimmed.length ? trimmed : prices;
+    out.push({
+      source,
+      median: round(median(pool)),
+      low: round(percentile(pool, 0.25)),
+      high: round(percentile(pool, 0.75)),
+      n: prices.length,
+    });
+  }
+  return out.sort((a, b) => a.source.localeCompare(b.source));
 }
 
 // Trim outliers, then anchor to the sold-comp median if we have sold data,

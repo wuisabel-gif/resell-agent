@@ -82,6 +82,13 @@ Image URLs must be publicly reachable (eBay pulls them). Host them somewhere fir
   dormant: once eBay approves the `buy.marketplace.insights` scope for your app, set
   `EBAY_INSIGHTS=1` and it turns on with no code change. Until then the tool falls back
   to active-listing asks discounted 15 percent.
+- Cross-platform price comparison: the draft shows a trimmed median + range per
+  source (eBay sold, eBay active, Poshmark). Only eBay has a sanctioned API. The
+  Poshmark source (`src/poshmark.ts`) hits an unofficial internal endpoint — it is
+  against Poshmark's ToS, fragile, and off unless you set `ENABLE_POSHMARK=1`; the
+  account-ban risk is yours. The suggested price stays eBay-anchored (post lists to
+  eBay); other platforms only inform the comparison. Add more sources behind the same
+  `Comp[]` shape with a new `source` value.
 - Category and item specifics are resolved at draft time via the Taxonomy API
   (`src/ebay/taxonomy.ts` + `src/brain/aspects.ts`). Best-effort: if eBay can't suggest
   a category, the draft still builds and you pass `--category` on `post`.

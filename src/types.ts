@@ -18,7 +18,16 @@ export interface Comp {
   currency: string;
   condition: string | null;
   url: string;
-  source: "ebay-active" | "ebay-sold";
+  source: "ebay-active" | "ebay-sold" | "poshmark-active";
+}
+
+// One row of the cross-platform price comparison (trimmed stats per source).
+export interface PlatformStat {
+  source: Comp["source"];
+  median: number;
+  low: number;
+  high: number;
+  n: number;
 }
 
 export interface PriceSuggestion {
@@ -45,5 +54,6 @@ export interface DraftBundle {
   attributes: ItemAttributes;
   price: PriceSuggestion;
   comps: Comp[];
+  comparison: PlatformStat[];
   listings: ListingDraft[];
 }

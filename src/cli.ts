@@ -39,6 +39,12 @@ async function cmdDraft() {
   console.log(`\nAttributes: ${bundle.attributes.brand ?? "?"} ${bundle.attributes.category} (${bundle.attributes.condition})`);
   console.log(`Price: ${bundle.price.suggested} ${bundle.price.currency}  [${bundle.price.low}-${bundle.price.high}]`);
   console.log(`Basis: ${bundle.price.basis}`);
+  if (bundle.comparison.length) {
+    console.log(`\nCross-platform comps:`);
+    for (const s of bundle.comparison) {
+      console.log(`  ${s.source.padEnd(16)} ${String(s.median).padStart(7)}  [${s.low}-${s.high}]  n=${s.n}`);
+    }
+  }
   for (const l of bundle.listings) {
     console.log(`\n--- ${l.platform} ---\n${l.title}\n${l.description}`);
     if (l.platform === "ebay") {
