@@ -1,0 +1,20 @@
+{
+  "name": "resell-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "draft": "node --env-file=.env dist/cli.js draft",
+    "post": "node --env-file=.env dist/cli.js post",
+    "auth-url": "node --env-file=.env dist/cli.js auth-url",
+    "auth-exchange": "node --env-file=.env dist/cli.js auth-exchange"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "@types/node": "^22.0.0"
+  }
+}
