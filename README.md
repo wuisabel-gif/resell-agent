@@ -1,17 +1,23 @@
 # resell-agent
 
 A second-hand sales agent. Point it at photos of an item, it figures out what the
-item is, prices it from eBay comps, writes optimized listings for eBay and Poshmark,
+item is, prices it from comps, writes optimized listings for eBay and Poshmark,
 and can publish the eBay listing for you.
 
 Two halves:
 
-- **Brain** (read-only, safe): photos to attributes to comps to price to listing copy.
+- **Brain** (read-only, safe): photos → attributes → comps → price → listing copy.
+  Comps are gathered in parallel across sources (eBay by default; Poshmark, ThredUp,
+  The RealReal, Mercari optional), and the draft shows a per-platform price
+  comparison. Only eBay is a sanctioned API — the rest are opt-in, ToS-risky
+  scrapers, off unless you set their `ENABLE_*` flag. The suggested price stays
+  eBay-anchored, since that's where `post` lists.
 - **Hands** (eBay only for now): publishes a real listing via the eBay Sell API.
 
-Poshmark has no public API, so the tool writes you a ready-to-paste Poshmark listing
-but does not auto-post there. Automating the Poshmark UI is a possible later add-on
-and carries account-ban risk, so it is intentionally left out of the MVP.
+Poshmark has no public API. The tool writes you a ready-to-paste Poshmark listing
+but does not auto-post there (automating that UI carries account-ban risk, so it's
+left out). The optional Poshmark *price* source above only reads asking prices for
+comparison, and carries the same risk — hence off by default.
 
 A visual operating guide lives in [`docs/index.html`](docs/index.html) — serve it
 (`python3 -m http.server -d docs`) or publish the `docs/` folder to GitHub Pages.
