@@ -13,6 +13,11 @@ Poshmark has no public API, so the tool writes you a ready-to-paste Poshmark lis
 but does not auto-post there. Automating the Poshmark UI is a possible later add-on
 and carries account-ban risk, so it is intentionally left out of the MVP.
 
+A visual operating guide lives in [`docs/index.html`](docs/index.html) — serve it
+(`python3 -m http.server -d docs`) or publish the `docs/` folder to GitHub Pages.
+The walkthrough section has placeholder slots to drop your own photos and listing
+screenshots into.
+
 ## Setup
 
 1. Install and build: `npm install && npm run build` (rebuild after any code change)
