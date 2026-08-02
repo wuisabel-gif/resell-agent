@@ -19,6 +19,47 @@ but does not auto-post there (automating that UI carries account-ban risk, so it
 left out). The optional Poshmark *price* source above only reads asking prices for
 comparison, and carries the same risk — hence off by default.
 
+## How it works
+
+```mermaid
+flowchart TD
+    P["Photos + notes"] -->|"--clean (optional)"| CUT
+    subgraph CUT["Cut the item out"]
+      direction LR
+      BG["Remove background<br/>U²-Net segmentation"] --> TRIM["Auto-crop<br/>trim transparent border to bbox + pad"]
+    end
+    CUT --> X["Extract attributes<br/>Claude vision"]
+    P -.->|"without --clean"| X
+    X --> COMPS
+    subgraph COMPS["Comps, gathered in parallel"]
+      direction LR
+      EB["eBay active + sold"]
+      OT["Poshmark · ThredUp · The RealReal · Mercari<br/>(gated, opt-in)"]
+    end
+    X --> TAX["Category + item specifics<br/>eBay Taxonomy API"]
+    COMPS --> PRICE["Price<br/>trimmed median + per-platform comparison"]
+    PRICE --> LIST["Listings<br/>eBay + Poshmark copy"]
+    TAX --> DRAFT["draft.json"]
+    LIST --> DRAFT
+    DRAFT -->|"post, on command"| PUB["Publish to eBay"]
+```
+
+### Cutting the item out (`--clean`)
+
+Two steps, both in [`src/brain/bgremove.ts`](src/brain/bgremove.ts):
+
+1. **Remove the background.** `@imgly/background-removal-node` runs a U²-Net
+   segmentation model that classifies each pixel as subject or background, and
+   erases the background — leaving a transparent PNG with just the item.
+2. **Auto-crop to the item.** Because everything outside the item is now
+   transparent, its bounding box *is* the non-transparent pixels. `sharp.trim()`
+   removes the transparent border (cropping tight to the item), then a small
+   transparent pad is added back so it isn't flush to the edge.
+
+The result is a centered, tight, transparent cutout — cleaner input for the vision
+step and listing-ready (eBay composites transparent PNGs onto white). The crop is
+best-effort: if `sharp` is unavailable it falls back to the uncropped cutout.
+
 A visual operating guide lives in [`docs/index.html`](docs/index.html) — serve it
 (`python3 -m http.server -d docs`) or publish the `docs/` folder to GitHub Pages.
 The walkthrough section has placeholder slots to drop your own photos and listing
