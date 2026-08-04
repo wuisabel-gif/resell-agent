@@ -57,8 +57,8 @@ export async function extractAttributes(
   imageSearchHint?: string
 ): Promise<ItemAttributes> {
   const hint = imageSearchHint
-    ? `\n\nA reverse-image search suggests this may be: "${imageSearchHint}". ` +
-      `Treat it as a lead to confirm or reject the brand, not proof; keep brandInferred true if you rely on it.`
+    ? `\n\nAutomated brand leads (${imageSearchHint}). ` +
+      `Treat these as leads to confirm or reject against the photo, not proof; keep brandInferred true if you rely on one.`
     : "";
   const content: Msg["content"] = [
     ...photoPaths.map(imageBlock),

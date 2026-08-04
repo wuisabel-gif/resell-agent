@@ -160,10 +160,16 @@ Image URLs must be publicly reachable (eBay pulls them). Host them somewhere fir
   value and an `ENABLE_*` gate.
 - Brand is identified from the photo: read off a visible label, or inferred from
   design signatures when there's none (the draft flags an inferred brand to verify).
-  Optionally, `--image-url https://<public-photo>` with `ENABLE_IMAGE_SEARCH=1` runs an
-  unofficial Google reverse-image lookup (`src/imagesearch.ts`) and feeds its best-guess
-  in as a brand lead. Same caveats as the scrapers: against Google's ToS, fragile, often
-  blocked, needs a public URL. Off by default.
+  Two optional brand-lead sources feed the vision step (both off by default, both a
+  lead to confirm, never proof):
+  - `ENABLE_BRAND_MATCH=1` runs a **local CLIP visual match** (`src/brandvision.ts`,
+    transformers.js) over the photo bytes against a curated house list. Ours, no
+    scraping/key/ToS risk; first run downloads a ~150MB model (`npm i @xenova/transformers`).
+    Zero-shot, so it only names brands on the list; swap the list for nearest-neighbour
+    over your own image-embedding index for true photo-to-listing matching.
+  - `ENABLE_IMAGE_SEARCH=1` with `--image-url https://<public-photo>` runs an unofficial
+    Google reverse-image lookup (`src/imagesearch.ts`). Same caveats as the scrapers:
+    against Google's ToS, fragile, often blocked, needs a public URL.
 - Category and item specifics are resolved at draft time via the Taxonomy API
   (`src/ebay/taxonomy.ts` + `src/brain/aspects.ts`). Best-effort: if eBay can't suggest
   a category, the draft still builds and you pass `--category` on `post`.

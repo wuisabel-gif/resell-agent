@@ -9,6 +9,7 @@ import { getRealRealComps } from "./therealreal.js";
 import { getMercariComps } from "./mercari.js";
 import { suggestCategory, getRequiredAspects } from "./ebay/taxonomy.js";
 import { getImageGuess } from "./imagesearch.js";
+import { matchBrand } from "./brandvision.js";
 import type { DraftBundle, Platform } from "./types.js";
 
 // photos + notes  ->  attributes  ->  comps  ->  price  ->  listings.
@@ -19,10 +20,17 @@ export async function buildDraft(
   platforms: Platform[] = ["ebay", "poshmark"],
   imageUrl?: string
 ): Promise<DraftBundle> {
-  // Optional reverse-image lookup (gated by ENABLE_IMAGE_SEARCH) feeds a brand
-  // lead into the vision step. Needs a public image URL; yields null otherwise.
-  const hint = imageUrl ? await getImageGuess(imageUrl) : null;
-  const attributes = await extractAttributes(photoPaths, notes, hint ?? undefined);
+  // Optional brand leads fed into the vision step (both gated, both null when off):
+  // a local CLIP visual match, and an unofficial reverse-image search (needs a URL).
+  const [urlGuess, clip] = await Promise.all([
+    imageUrl ? getImageGuess(imageUrl) : Promise.resolve(null),
+    matchBrand(photoPaths[0]),
+  ]);
+  const leads = [
+    urlGuess ? `reverse-image search: "${urlGuess}"` : null,
+    clip ? `visual brand match: ${clip.brand} (${Math.round(clip.score * 100)}%)` : null,
+  ].filter(Boolean);
+  const attributes = await extractAttributes(photoPaths, notes, leads.join("; ") || undefined);
 
   // Each scrape source is gated by its own ENABLE_* flag and yields [] when off
   // or blocked, so the draft never depends on them. Only eBay is sanctioned.
