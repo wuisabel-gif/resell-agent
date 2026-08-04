@@ -19,11 +19,11 @@
   <a class="brand" href="./index.html"><b>resell·agent</b><span>Resale, considered</span></a>
   <button class="nav-toggle" aria-expanded="false" aria-controls="menu" aria-label="Menu"><span></span><span></span><span></span></button>
   <ul class="nav-links" id="menu">
-    <li><a href="#how">How it runs</a></li>
-    <li><a href="#case">The case</a></li>
-    <li><a href="#procedure">Procedure</a></li>
-    <li><a href="#commands">Commands</a></li>
-    <li><a href="#craft">Craft</a></li>
+    <li><a href="./index.html" aria-current="page">How it runs</a></li>
+    <li><a href="./case.html">The case</a></li>
+    <li><a href="./procedure.html">Procedure</a></li>
+    <li><a href="./commands.html">Commands</a></li>
+    <li><a href="./craft.html">Craft</a></li>
     <li><a href="./example.html">Sample draft</a></li>
   </ul>
 </div></header>
@@ -36,7 +36,7 @@
       <p class="lede" data-load="3">resell·agent reads a garment or accessory from its photographs, prices it against the market, and composes finished listings for eBay and Poshmark — so the value in a wardrobe is realised, not stored.</p>
       <div class="hero-cta" data-load="4">
         <a class="btn btn--gold" href="./example.html">See a sample draft</a>
-        <a class="btn btn--on-dark" href="#procedure">How it runs</a>
+        <a class="btn btn--on-dark" href="./procedure.html">How it runs</a>
       </div>
     </div>
     <div class="hero-media">
@@ -61,6 +61,7 @@
           <div class="step"><span class="num">2</span><div><h3>It completes the draft</h3><p>Attributes, a sold-comp price, item specifics, category, and finished copy for eBay and Poshmark.</p></div></div>
           <div class="step"><span class="num">3</span><div><h3>Place it, on your word</h3><p>Send the eBay listing when you're ready — or keep the draft to review and paste yourself.</p></div></div>
         </div>
+        <a class="btn btn--ghost" href="./procedure.html" style="margin-top:2rem;">Read the full procedure</a>
       </div>
       <div>
         <div class="listcard">
@@ -94,90 +95,6 @@
       </div>
     </div>
   </div></section>
-
-  <section id="case" class="section"><div class="wrap">
-    <div class="sec-head"><span class="eyebrow">The case</span><h2>A wardrobe accumulates value it rarely realises.</h2>
-      <p>The bag out of rotation, the barely-worn coat, the watch kept in a drawer — each is worth real money to the right buyer. Selling it well is its own discipline.</p></div>
-    <div class="values">
-      <div class="value"><h3>The price</h3><p>The honest market figure, drawn from real comparables — not a lowball, not a guess.</p></div>
-      <div class="value"><h3>The words</h3><p>A listing that reads considered rather than eager, in the voice each platform rewards.</p></div>
-      <div class="value"><h3>The placement</h3><p>On eBay and Poshmark, where the buyers for these pieces are already looking.</p></div>
-    </div>
-  </div></section>
-
-  <section id="procedure" class="section" style="background:var(--surface);"><div class="wrap">
-    <div class="sec-head"><span class="eyebrow">Procedure</span><h2>Running a piece, beginning to end</h2>
-      <p>Steps one through three are prepared once. Four through six repeat for each piece.</p></div>
-
-    <div class="op"><div class="rn">1</div><div>
-      <h3>Install &amp; build</h3>
-      <p>Node 22 or later. The build compiles to <code class="k">dist/</code>; rebuild after any change.</p>
-      <div class="cmd">npm install &amp;&amp; npm run build</div></div></div>
-
-    <div class="op"><div class="rn">2</div><div>
-      <h3>Configure keys</h3>
-      <p>Copy the example environment and provide your eBay and Anthropic keys. Keep <code class="k">EBAY_ENV=sandbox</code> until you are ready to list in earnest.</p>
-      <div class="cmd">cp .env.example .env   <span class="cmt"># then fill in the keys</span></div></div></div>
-
-    <div class="op"><div class="rn">3</div><div>
-      <h3>Authorise placement <span class="once">to list only</span></h3>
-      <p>Pricing requires nothing further. To place a listing, authorise a user token once and create your business policies — the full sequence is in the README.</p></div></div>
-
-    <div class="op"><div class="rn">4</div><div>
-      <h3>Draft the listing</h3>
-      <p>A clean frontal image and the label read best. Add <code class="k">--clean</code> to lift the piece from its background — a cleaner reading, and a squared image ready to list.</p>
-      <div class="cmd">npm run draft -- --photos front.jpg,label.jpg <span class="flag">--clean</span></div></div></div>
-
-    <div class="op"><div class="rn">5</div><div>
-      <h3>Review the draft</h3>
-      <p>The considered step. Read <code class="k">draft.md</code> before it goes anywhere and confirm the price, the condition notes, the category, and the titles.</p></div></div>
-
-    <div class="op"><div class="rn">6</div><div>
-      <h3>Place it</h3>
-      <p>Host the images at public URLs (eBay retrieves them), and the category carries from the draft. Poshmark stays by hand — the tool writes a listing to place, and never posts there for you.</p></div></div>
-  </div></section>
-
-  <section id="commands" class="section"><div class="wrap">
-    <div class="sec-head"><span class="eyebrow">Commands</span><h2>Four verbs</h2></div>
-    <div class="tbl"><table>
-      <thead><tr><th>Verb</th><th>What it does</th><th>Principal flags</th></tr></thead>
-      <tbody>
-        <tr><td>draft</td><td>Photographs to attributes, comparables, price, and listings. Writes draft.json and a paste sheet. Read-only.</td><td><span class="fl">--photos --notes --platforms --clean --out</span></td></tr>
-        <tr><td>post</td><td>Places the eBay listing from a draft.</td><td><span class="fl">--draft --images --location --fulfillment --payment --return</span></td></tr>
-        <tr><td>auth-url</td><td>Prints the eBay consent URL for one-time authorisation.</td><td><span class="fl">—</span></td></tr>
-        <tr><td>auth-exchange</td><td>Exchanges the returned code for a refresh token.</td><td><span class="fl">&lt;code&gt;</span></td></tr>
-      </tbody>
-    </table></div>
-  </div></section>
-
-  <section id="craft" class="band section"><div class="wrap">
-    <div class="sec-head"><span class="eyebrow">The craft</span><h2>How the parts that matter work</h2></div>
-    <div class="services">
-      <div class="service">
-        <svg class="ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2v20M6 7h9a3 3 0 0 1 0 6H8a3 3 0 0 0 0 6h10"/></svg>
-        <h3>The price</h3><p>The extreme tenth on each side is trimmed, then the median taken. Absent sold data it draws on active asks, discounted — always a range, never false precision.</p></div>
-      <div class="service">
-        <svg class="ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-        <h3>Attribution</h3><p>House, material, colour, closure, and condition are read from the photographs. It won't invent what it can't see — measurements are left for you to add.</p></div>
-      <div class="service">
-        <svg class="ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3h18v18H3z"/><path d="M3 15l5-5 4 4 4-4 5 5"/></svg>
-        <h3>The cutout</h3><p>The background is lifted and the piece squared and centred — a cleaner reading, and an image ready to list on a white ground.</p></div>
-      <div class="service">
-        <svg class="ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 6 9 17l-5-5"/></svg>
-        <h3>Placement</h3><p>Category and item specifics are resolved for you; the listing is composed and, only on your word, published. Poshmark is written but placed by hand.</p></div>
-    </div>
-  </div></section>
-
-  <section id="limits" class="section" style="background:var(--surface);"><div class="wrap">
-    <div class="sec-head"><span class="eyebrow">In candour</span><h2>What it won't do</h2></div>
-    <div class="values">
-      <div class="value"><h3>It won't authenticate</h3><p>It reads what's visible; it does not verify a house's mark. For high-value pieces, authenticate before you list.</p></div>
-      <div class="value"><h3>It won't invent measurements</h3><p>A photograph can't be measured — those fields are left for you to complete.</p></div>
-      <div class="value"><h3>It won't host images</h3><p>The cutout is produced; eBay needs a public URL, so you host it.</p></div>
-      <div class="value"><h3>It won't post to Poshmark</h3><p>The copy is written; placing it there is yours.</p></div>
-      <div class="value"><h3>Placement is irreversible</h3><p>The draft is the gate, and it runs only when you run it.</p></div>
-    </div>
-  </div></section>
 </main>
 
 <footer class="site-footer"><div class="wrap">
@@ -185,7 +102,7 @@
     <div class="footer-brand"><b>resell·agent</b><span>Resale, considered</span>
       <p>Photographs to a priced, considered listing — reads only, places on your word.</p></div>
     <div class="footer-col"><h4>The site</h4><ul>
-      <li><a href="#case">The case</a></li><li><a href="#procedure">Procedure</a></li><li><a href="#commands">Commands</a></li></ul></div>
+      <li><a href="./case.html">The case</a></li><li><a href="./procedure.html">Procedure</a></li><li><a href="./commands.html">Commands</a></li><li><a href="./craft.html">Craft</a></li></ul></div>
     <div class="footer-col"><h4>Elsewhere</h4><ul>
       <li><a href="./example.html">Sample draft</a></li><li><a href="https://github.com/wuisabel-gif/resell-agent">Source</a></li></ul></div>
   </div>

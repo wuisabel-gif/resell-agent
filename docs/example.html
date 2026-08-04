@@ -16,12 +16,14 @@
 
 <header class="site-header"><div class="wrap nav">
   <a class="brand" href="./index.html"><b>resell·agent</b><span>Resale, considered</span></a>
+  <button class="nav-toggle" aria-expanded="false" aria-controls="menu" aria-label="Menu"><span></span><span></span><span></span></button>
   <ul class="nav-links" id="menu">
-    <li><a href="#bag">Bag</a></li>
-    <li><a href="#dress">Dress</a></li>
-    <li><a href="#shoes">Footwear</a></li>
-    <li><a href="#home">Home</a></li>
-    <li><a href="./index.html">The guide</a></li>
+    <li><a href="./index.html">How it runs</a></li>
+    <li><a href="./case.html">The case</a></li>
+    <li><a href="./procedure.html">Procedure</a></li>
+    <li><a href="./commands.html">Commands</a></li>
+    <li><a href="./craft.html">Craft</a></li>
+    <li><a href="./example.html" aria-current="page">Sample draft</a></li>
   </ul>
 </div></header>
 
@@ -33,8 +35,14 @@
     <p style="margin-top:1.4rem;font-size:var(--step--1);color:oklch(0.74 0.02 312);">Illustrative — the comparables shown are sample figures; a live run prices from real eBay data.</p>
   </div></section>
 
+  <div class="wrap"><div class="runbar" data-run>
+    <button class="btn btn--gold runbtn" type="button">▶&nbsp; Run — draft the four pieces</button>
+    <span class="runstatus"></span>
+  </div></div>
+
+  <div id="drafts">
   <!-- ── 1 · Coach bag ─────────────────────────────────────────── -->
-  <section id="bag"><div class="draftgrid">
+  <section id="bag" class="draft-item"><div class="draftgrid">
     <div class="in">
       <span class="eyebrow">Vintage Coach messenger</span>
       <div class="shot" style="margin-top:1.4rem;">
@@ -68,7 +76,7 @@
   </div></section>
 
   <!-- ── 2 · Lace dress ────────────────────────────────────────── -->
-  <section id="dress" style="background:var(--surface);border-top:1px solid var(--line);"><div class="draftgrid">
+  <section id="dress" class="draft-item" style="background:var(--surface);border-top:1px solid var(--line);"><div class="draftgrid">
     <div class="in">
       <span class="eyebrow">Ivory lace cocktail dress</span>
       <div class="shot" style="margin-top:1.4rem;">
@@ -101,7 +109,7 @@
   </div></section>
 
   <!-- ── 3 · Hermès sneakers ───────────────────────────────────── -->
-  <section id="shoes" style="border-top:1px solid var(--line);"><div class="draftgrid">
+  <section id="shoes" class="draft-item" style="border-top:1px solid var(--line);"><div class="draftgrid">
     <div class="in">
       <span class="eyebrow">Hermès Quick sneakers</span>
       <div class="shot" style="margin-top:1.4rem;">
@@ -135,7 +143,7 @@
   </div></section>
 
   <!-- ── 4 · Jenni Kayne candles ───────────────────────────────── -->
-  <section id="home" style="background:var(--surface);border-top:1px solid var(--line);"><div class="draftgrid">
+  <section id="home" class="draft-item" style="background:var(--surface);border-top:1px solid var(--line);"><div class="draftgrid">
     <div class="in">
       <span class="eyebrow">Jenni Kayne candle set</span>
       <div class="shot" style="margin-top:1.4rem;">
@@ -167,6 +175,7 @@
         <div class="fld"><span class="l">Description</span><div class="txt">A set of four Jenni Kayne natural wax candles — Ash, Musk, Cedar, and Aspen — 2.5 oz each, in frosted and black glass. New, unburned. <span class="todo">[ a lot — confirm all four are included before listing ]</span></div></div></div>
     </div>
   </div></section>
+  </div><!-- /#drafts -->
 </main>
 
 <footer class="site-footer"><div class="wrap">
@@ -174,5 +183,39 @@
 </div></footer>
 
 <script src="./main.js"></script>
+<script>
+(function(){
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var drafts = document.getElementById('drafts');
+  var bar = document.querySelector('[data-run]');
+  if (!drafts || !bar || reduce) return; // no-JS / reduced-motion: drafts stay visible
+  var items = [].slice.call(drafts.querySelectorAll('.draft-item'));
+  var btn = bar.querySelector('.runbtn');
+  var status = bar.querySelector('.runstatus');
+  function hide(it){ it.style.opacity='0'; it.style.transform='translateY(26px)'; it.style.transition='opacity .7s cubic-bezier(0.16,1,0.3,1), transform .7s cubic-bezier(0.16,1,0.3,1)'; }
+  function show(it){ it.style.opacity='1'; it.style.transform='none'; }
+  items.forEach(hide); // stage until Run (inline — always wins the cascade)
+  var stages = ['reading the piece…','gathering comparables…','pricing against the market…','composing eBay & Poshmark copy…'];
+  var running = false, timers = [];
+  function run(){
+    if (running) return; running = true;
+    timers.forEach(clearTimeout); timers = [];
+    bar.classList.add('running'); btn.disabled = true; btn.textContent = 'Running…';
+    items.forEach(hide);
+    status.textContent = '$ resell draft --photos … --clean';
+    var i = 0;
+    var tick = setInterval(function(){ if (i < stages.length){ status.textContent = stages[i++]; } else { clearInterval(tick); } }, 680);
+    timers.push(tick);
+    items.forEach(function(it, idx){ timers.push(setTimeout(function(){ show(it); }, 1000 + idx*560)); });
+    timers.push(setTimeout(function(){
+      clearInterval(tick);
+      status.textContent = items.length + ' drafts ready — review before placing.';
+      bar.classList.remove('running'); btn.disabled = false; btn.textContent = '↻ Run again';
+      running = false;
+    }, 1000 + items.length*560 + 500));
+  }
+  btn.addEventListener('click', run);
+})();
+</script>
 </body>
 </html>

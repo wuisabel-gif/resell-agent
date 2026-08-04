@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>resell·agent — commands</title>
+<meta name="description" content="The four verbs of resell·agent: draft, post, auth-url, auth-exchange." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23241423'/%3E%3Ccircle cx='16' cy='16' r='4.5' fill='%23c79a4a'/%3E%3C/svg%3E" />
+<link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header"><div class="wrap nav">
+  <a class="brand" href="./index.html"><b>resell·agent</b><span>Resale, considered</span></a>
+  <button class="nav-toggle" aria-expanded="false" aria-controls="menu" aria-label="Menu"><span></span><span></span><span></span></button>
+  <ul class="nav-links" id="menu">
+    <li><a href="./index.html">How it runs</a></li>
+    <li><a href="./case.html">The case</a></li>
+    <li><a href="./procedure.html">Procedure</a></li>
+    <li><a href="./commands.html" aria-current="page">Commands</a></li>
+    <li><a href="./craft.html">Craft</a></li>
+    <li><a href="./example.html">Sample draft</a></li>
+  </ul>
+</div></header>
+
+<main id="main">
+  <section class="page-hero"><div class="wrap">
+    <span class="eyebrow" style="color:var(--gold);">Commands</span>
+    <h1>Four verbs.</h1>
+    <p>Everything up to <em>post</em> only reads. The draft is a file you review before anything is placed.</p>
+  </div></section>
+
+  <section class="section"><div class="wrap">
+    <div class="tbl"><table>
+      <thead><tr><th>Verb</th><th>What it does</th><th>Principal flags</th></tr></thead>
+      <tbody>
+        <tr><td>draft</td><td>Photographs to attributes, comparables, price, and listings. Writes draft.json and a paste sheet. Read-only.</td><td><span class="fl">--photos --notes --platforms --clean --out</span></td></tr>
+        <tr><td>post</td><td>Places the eBay listing from a draft.</td><td><span class="fl">--draft --images --location --fulfillment --payment --return</span></td></tr>
+        <tr><td>auth-url</td><td>Prints the eBay consent URL for one-time authorisation.</td><td><span class="fl">—</span></td></tr>
+        <tr><td>auth-exchange</td><td>Exchanges the returned code for a refresh token.</td><td><span class="fl">&lt;code&gt;</span></td></tr>
+      </tbody>
+    </table></div>
+    <div style="margin-top:3rem;"><a class="btn btn--ghost" href="./procedure.html">See the full procedure</a></div>
+  </div></section>
+</main>
+
+<footer class="site-footer"><div class="wrap">
+  <div class="footer-grid" style="grid-template-columns:1.6fr 1fr 1fr;">
+    <div class="footer-brand"><b>resell·agent</b><span>Resale, considered</span>
+      <p>Photographs to a priced, considered listing — reads only, places on your word.</p></div>
+    <div class="footer-col"><h4>The site</h4><ul>
+      <li><a href="./case.html">The case</a></li><li><a href="./procedure.html">Procedure</a></li><li><a href="./commands.html">Commands</a></li><li><a href="./craft.html">Craft</a></li></ul></div>
+    <div class="footer-col"><h4>Elsewhere</h4><ul>
+      <li><a href="./example.html">Sample draft</a></li><li><a href="https://github.com/wuisabel-gif/resell-agent">Source</a></li></ul></div>
+  </div>
+  <div class="footer-bottom"><span>resell·agent — reads only · places on your word</span><span>© <span data-year></span></span></div>
+</div></footer>
+
+<script src="./main.js"></script>
+</body>
+</html>
