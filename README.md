@@ -1,8 +1,9 @@
 # resell-agent
 
-A second-hand sales agent. Point it at photos of an item, it figures out what the
-item is, prices it from comps, writes optimized listings for eBay and Poshmark,
-and can publish the eBay listing for you.
+A resale agent for the pieces worth selling well. Point it at photographs of a
+garment or accessory — it identifies the piece, prices it against the market,
+writes considered listings for eBay and Poshmark, and can place the eBay listing
+for you.
 
 Two halves:
 
@@ -21,18 +22,15 @@ comparison, and carries the same risk — hence off by default.
 
 ## Why
 
-Every year around graduation the same thing happens: leases end, dorms empty, and
-a whole class has a couple of weeks to turn a room full of stuff — the winter coat,
-the textbooks, the desk lamp, the barely-used coffee maker — into cash before the
-move-out truck comes. The bottleneck was never willingness to sell. It's the tedium.
-Every item needs a title, a price that isn't just a guess, the right category, and a
-description rewritten for each platform. Do that thirty times in finals week and you
-end up leaving half of it on the curb.
+A wardrobe accumulates value it rarely realises. The bag that's fallen out of
+rotation, the barely-worn designer coat, the watch kept in a drawer — each is worth
+real money to the right buyer. But selling it well is its own discipline: knowing the
+honest market price rather than a lowball, writing a listing that reads as considered
+rather than eager, and placing it where those buyers actually look.
 
-resell-agent is the shortcut for exactly that pile: photograph an item, and it does
-the cataloging, the comps, and the copy, so listing takes seconds instead of ten
-minutes. It started as a course project — but the deadline it's really built for is
-graduation.
+resell·agent does that work. Photograph a piece and it returns a priced, polished
+draft — attributes, comparables, and listing copy for eBay and Poshmark — so the value
+in a closet is realised, not stored.
 
 ## How it works
 
