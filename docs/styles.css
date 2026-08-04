@@ -415,9 +415,11 @@ code.k{font-family:var(--sans);background:var(--surface-2);color:var(--gold-ink)
 @media (max-width:900px){ .draftgrid .in{border-right:0;border-bottom:1px solid var(--line);} }
 .draftgrid .out{padding:clamp(2rem,4vw,3rem) var(--gutter);min-width:0;}
 .shot{aspect-ratio:3/4;border-radius:3px;position:relative;display:flex;align-items:flex-end;overflow:hidden;
-  background:linear-gradient(160deg,var(--surface-2),oklch(0.9 0.02 312));box-shadow:0 30px 60px -40px oklch(0.2 0.03 312 / 0.5);}
-.shot .pin{position:absolute;top:0;left:0;font-size:0.62rem;letter-spacing:0.08em;color:var(--gold-ink);background:var(--surface);padding:0.5rem 0.8rem;}
-.shot .cap{font-style:italic;font-size:0.9rem;color:var(--ink-soft);padding:1.1rem 1.2rem;background:linear-gradient(to top,oklch(1 0 0 / 0.55),transparent);}
+  background:var(--surface-2);box-shadow:0 30px 60px -40px oklch(0.2 0.03 312 / 0.5);}
+.shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;}
+.shot .pin{position:absolute;top:0;left:0;z-index:2;font-size:0.62rem;letter-spacing:0.08em;color:var(--gold-ink);background:var(--surface);padding:0.5rem 0.8rem;border-bottom-right-radius:3px;}
+.shot .cap{position:relative;z-index:2;font-style:italic;font-size:0.9rem;color:oklch(0.95 0.01 312);padding:1.4rem 1.2rem 1.2rem;
+  background:linear-gradient(to top,oklch(0.08 0.02 312 / 0.9),oklch(0.08 0.02 312 / 0.4) 60%,transparent);}
 .bigprice{font-family:var(--serif);font-size:clamp(2.2rem,1.8rem+2vw,3rem);color:var(--ink);line-height:1;}
 .bigprice em{font-style:normal;color:var(--gold-ink);margin:0 0.12em;}
 .priceblock{padding-bottom:1.8rem;margin-bottom:2rem;border-bottom:1px solid var(--line);}
