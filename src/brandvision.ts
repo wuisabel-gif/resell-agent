@@ -50,12 +50,24 @@ export function pickBrand(
 export async function matchBrand(imagePath: string): Promise<BrandMatch | null> {
   if (!process.env.ENABLE_BRAND_MATCH) return null;
   try {
-    // Dynamic + untyped so tsc doesn't need the (heavy) optional package to build.
+    const { existsSync } = await import("node:fs");
+    const indexPath = process.env.BRAND_INDEX ?? "brand-index.json";
+
+    // Preferred: nearest-neighbour against your own indexed reference photos.
+    if (existsSync(indexPath)) {
+      const { loadIndex, search } = await import("./nnindex.js");
+      const { embedImage } = await import("./embed.js");
+      const hits = search(loadIndex(indexPath), await embedImage(imagePath), 3);
+      const min = Number(process.env.BRAND_MATCH_MIN ?? 0.75);
+      if (!hits.length || hits[0].score < min) return null;
+      return { brand: hits[0].label, score: hits[0].score };
+    }
+
+    // Fallback: zero-shot against the curated label list (no index built yet).
     // @ts-ignore optional dependency, resolved at runtime when ENABLE_BRAND_MATCH is set
     const mod: any = await import("@xenova/transformers");
     const classify = await mod.pipeline("zero-shot-image-classification", "Xenova/clip-vit-base-patch32");
-    const out = await classify(imagePath, BRANDS.map(label));
-    return pickBrand(out);
+    return pickBrand(await classify(imagePath, BRANDS.map(label)));
   } catch (e) {
     console.warn(`brand match unavailable (${String(e)}); skipping. Set ENABLE_BRAND_MATCH and install @xenova/transformers.`);
     return null;

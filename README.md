@@ -163,10 +163,15 @@ Image URLs must be publicly reachable (eBay pulls them). Host them somewhere fir
   Two optional brand-lead sources feed the vision step (both off by default, both a
   lead to confirm, never proof):
   - `ENABLE_BRAND_MATCH=1` runs a **local CLIP visual match** (`src/brandvision.ts`,
-    transformers.js) over the photo bytes against a curated house list. Ours, no
-    scraping/key/ToS risk; first run downloads a ~150MB model (`npm i @xenova/transformers`).
-    Zero-shot, so it only names brands on the list; swap the list for nearest-neighbour
-    over your own image-embedding index for true photo-to-listing matching.
+    transformers.js) over the photo bytes. Ours, no scraping/key/ToS risk; first run
+    downloads a ~150MB model (`npm i @xenova/transformers`). Two modes:
+    - **Nearest-neighbour over your own catalog** (the durable core). Drop reference
+      photos into `refs/<Brand>/*.jpg` (or `refs/Brand__desc.jpg`), then
+      `npm run index -- --dir refs` builds `brand-index.json` (`src/nnindex.ts`, brute-force
+      cosine). Each draft embeds the photo and matches it against the index, so it knows
+      *your* brands and can be extended to full photo-to-listing matching.
+    - **Zero-shot fallback** when no index exists: classifies against a curated house
+      list, so it only names brands on that list.
   - `ENABLE_IMAGE_SEARCH=1` with `--image-url https://<public-photo>` runs an unofficial
     Google reverse-image lookup (`src/imagesearch.ts`). Same caveats as the scrapers:
     against Google's ToS, fragile, often blocked, needs a public URL.

@@ -110,17 +110,31 @@ async function cmdAuthExchange() {
   console.log(`EBAY_USER_REFRESH_TOKEN=${t.refresh_token}`);
 }
 
+// Build the reference brand index from a folder of your own product photos.
+// Layout: refs/<Brand>/anything.jpg  (or  refs/Brand__desc.jpg). See README.
+async function cmdIndex() {
+  const dir = arg("--dir") ?? "refs";
+  const out = arg("--out") ?? "brand-index.json";
+  const { buildIndex, saveIndex } = await import("./nnindex.js");
+  console.log(`Embedding reference photos in ${dir}/ (first run downloads the model)...`);
+  const idx = await buildIndex(dir);
+  saveIndex(out, idx);
+  const brands = new Set(idx.entries.map((e) => e.label));
+  console.log(`Indexed ${idx.entries.length} photos across ${brands.size} labels -> ${out}. Set ENABLE_BRAND_MATCH=1 to use it.`);
+}
+
 const cmd = process.argv[2];
 const table: Record<string, () => unknown | Promise<unknown>> = {
   draft: cmdDraft,
   post: cmdPost,
+  index: cmdIndex,
   "auth-url": cmdAuthUrl,
   "auth-exchange": cmdAuthExchange,
 };
 
 const fn = table[cmd];
 if (!fn) {
-  console.error("Commands: draft | post | auth-url | auth-exchange");
+  console.error("Commands: draft | post | index | auth-url | auth-exchange");
   process.exit(1);
 }
 Promise.resolve(fn()).catch((e) => {
