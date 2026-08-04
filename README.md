@@ -158,6 +158,12 @@ Image URLs must be publicly reachable (eBay pulls them). Host them somewhere fir
   stays eBay-anchored (post lists to eBay); other platforms only inform the
   comparison. Add another source behind the same `Comp[]` shape with a new `source`
   value and an `ENABLE_*` gate.
+- Brand is identified from the photo: read off a visible label, or inferred from
+  design signatures when there's none (the draft flags an inferred brand to verify).
+  Optionally, `--image-url https://<public-photo>` with `ENABLE_IMAGE_SEARCH=1` runs an
+  unofficial Google reverse-image lookup (`src/imagesearch.ts`) and feeds its best-guess
+  in as a brand lead. Same caveats as the scrapers: against Google's ToS, fragile, often
+  blocked, needs a public URL. Off by default.
 - Category and item specifics are resolved at draft time via the Taxonomy API
   (`src/ebay/taxonomy.ts` + `src/brain/aspects.ts`). Best-effort: if eBay can't suggest
   a category, the draft still builds and you pass `--category` on `post`.

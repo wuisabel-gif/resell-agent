@@ -8,6 +8,7 @@ import { getThredupComps } from "./thredup.js";
 import { getRealRealComps } from "./therealreal.js";
 import { getMercariComps } from "./mercari.js";
 import { suggestCategory, getRequiredAspects } from "./ebay/taxonomy.js";
+import { getImageGuess } from "./imagesearch.js";
 import type { DraftBundle, Platform } from "./types.js";
 
 // photos + notes  ->  attributes  ->  comps  ->  price  ->  listings.
@@ -15,9 +16,13 @@ import type { DraftBundle, Platform } from "./types.js";
 export async function buildDraft(
   photoPaths: string[],
   notes: string,
-  platforms: Platform[] = ["ebay", "poshmark"]
+  platforms: Platform[] = ["ebay", "poshmark"],
+  imageUrl?: string
 ): Promise<DraftBundle> {
-  const attributes = await extractAttributes(photoPaths, notes);
+  // Optional reverse-image lookup (gated by ENABLE_IMAGE_SEARCH) feeds a brand
+  // lead into the vision step. Needs a public image URL; yields null otherwise.
+  const hint = imageUrl ? await getImageGuess(imageUrl) : null;
+  const attributes = await extractAttributes(photoPaths, notes, hint ?? undefined);
 
   // Each scrape source is gated by its own ENABLE_* flag and yields [] when off
   // or blocked, so the draft never depends on them. Only eBay is sanctioned.

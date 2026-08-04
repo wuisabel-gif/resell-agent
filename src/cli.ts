@@ -15,9 +15,10 @@ async function cmdDraft() {
   const notes = arg("--notes") ?? "";
   const platforms = ((arg("--platforms") ?? "ebay,poshmark").split(",")) as Platform[];
   const out = arg("--out") ?? "draft.json";
+  const imageUrl = arg("--image-url"); // public URL for reverse-image brand lookup
 
   if (photos.length === 0) {
-    console.error("Usage: draft --photos a.jpg,b.jpg [--notes '...'] [--platforms ebay,poshmark] [--clean] [--out draft.json]");
+    console.error("Usage: draft --photos a.jpg,b.jpg [--notes '...'] [--platforms ebay,poshmark] [--clean] [--image-url https://...] [--out draft.json]");
     process.exit(1);
   }
 
@@ -34,7 +35,7 @@ async function cmdDraft() {
     }
   }
 
-  const bundle = await buildDraft(usePhotos, notes, platforms);
+  const bundle = await buildDraft(usePhotos, notes, platforms, imageUrl);
   writeFileSync(out, JSON.stringify(bundle, null, 2));
 
   // Paste sheet: the artifact you send a friend (eBay + Poshmark blocks).

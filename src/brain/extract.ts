@@ -53,13 +53,18 @@ Reply with ONLY a JSON object, no prose, matching this shape:
 
 export async function extractAttributes(
   photoPaths: string[],
-  notes = ""
+  notes = "",
+  imageSearchHint?: string
 ): Promise<ItemAttributes> {
+  const hint = imageSearchHint
+    ? `\n\nA reverse-image search suggests this may be: "${imageSearchHint}". ` +
+      `Treat it as a lead to confirm or reject the brand, not proof; keep brandInferred true if you rely on it.`
+    : "";
   const content: Msg["content"] = [
     ...photoPaths.map(imageBlock),
     {
       type: "text",
-      text: `Seller notes: ${notes || "(none)"}\n\nCatalog this item as JSON.`,
+      text: `Seller notes: ${notes || "(none)"}${hint}\n\nCatalog this item as JSON.`,
     },
   ];
   const raw = await complete(SYSTEM, [{ role: "user", content }], 1000);
