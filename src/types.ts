@@ -2,6 +2,7 @@ export type Platform = "ebay" | "poshmark";
 
 export interface ItemAttributes {
   brand: string | null;
+  brandInferred: boolean; // true = inferred from design signatures, not read off a label
   category: string;
   titleKeywords: string[];
   size: string | null;

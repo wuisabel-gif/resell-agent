@@ -17,6 +17,10 @@ export function renderSheet(bundle: DraftBundle, photos: string[] = []): string 
   }
   out.push(`_${p.basis}_`, "");
 
+  if (a.brand && a.brandInferred) {
+    out.push(`Brand: ${a.brand} — inferred from the photo, not a visible label. Verify before listing.`, "");
+  }
+
   if (comparison.length) {
     out.push("Comps by source:");
     for (const s of comparison) out.push(`- ${s.source}: median $${s.median}  [$${s.low}–$${s.high}]  n=${s.n}`);

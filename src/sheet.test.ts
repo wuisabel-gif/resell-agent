@@ -5,7 +5,7 @@ import type { DraftBundle } from "./types.js";
 
 const bundle: DraftBundle = {
   attributes: {
-    brand: "Patagonia", category: "Fleece Jacket", titleKeywords: ["synchilla"],
+    brand: "Patagonia", brandInferred: false, category: "Fleece Jacket", titleKeywords: ["synchilla"],
     size: "M", color: "green", material: "fleece", condition: "good",
     flaws: ["small stain on cuff"], dimensions: "≈ 27 x 24 in (estimate)", originalRetail: 139,
   },
