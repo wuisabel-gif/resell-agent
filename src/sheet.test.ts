@@ -7,7 +7,7 @@ const bundle: DraftBundle = {
   attributes: {
     brand: "Patagonia", category: "Fleece Jacket", titleKeywords: ["synchilla"],
     size: "M", color: "green", material: "fleece", condition: "good",
-    flaws: ["small stain on cuff"], originalRetail: 139,
+    flaws: ["small stain on cuff"], dimensions: "≈ 27 x 24 in (estimate)", originalRetail: 139,
   },
   price: { suggested: 68, low: 55, high: 82, currency: "USD", basis: "median of 21 active asks", sampleSize: 21 },
   comparison: [{ source: "ebay-active", median: 80, low: 72, high: 95, n: 21 }],
@@ -28,6 +28,7 @@ assert.ok(md.includes("**Category:** 57988"));
 assert.ok(md.includes("Brand: Patagonia"));
 assert.ok(md.includes("front.clean.png"));
 assert.ok(md.includes("small stain on cuff"));
+assert.ok(md.includes("≈ 27 x 24 in (estimate)"), "shows the estimated dimensions");
 
 // No comps -> manual price, no crash.
 const empty = renderSheet({ ...bundle, price: { ...bundle.price, suggested: 0, low: 0, high: 0 }, comparison: [] });

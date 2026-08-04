@@ -20,6 +20,14 @@ const SYSTEM = `You are a resale cataloging assistant. Given photos of a used it
 seller notes, identify its attributes for listing on eBay and Poshmark.
 Be conservative: if you cannot see the brand or size, use null rather than guessing.
 Grade condition honestly from visible wear. List real visible flaws.
+
+For "dimensions", ESTIMATE the item's approximate size and return a short string
+like "≈ 15 x 11 x 4 in (estimate)". Base the estimate on the item's type and its
+typical size, refined by its proportions against anything of known size in frame
+(a hand, a coin or card, standard furniture, a hanger). Always mark it "(estimate)".
+Use null only when size truly can't be inferred — e.g. clothing/shoe SIZING, which
+needs the garment's own label, not a visual guess. Never present an estimate as exact.
+
 Reply with ONLY a JSON object, no prose, matching this shape:
 {
   "brand": string|null,
@@ -30,6 +38,7 @@ Reply with ONLY a JSON object, no prose, matching this shape:
   "material": string|null,
   "condition": "NWT"|"like-new"|"good"|"fair",
   "flaws": string[],
+  "dimensions": string|null,
   "originalRetail": number|null
 }`;
 

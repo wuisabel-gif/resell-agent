@@ -9,6 +9,7 @@ export interface ItemAttributes {
   material: string | null;
   condition: "NWT" | "like-new" | "good" | "fair";
   flaws: string[];
+  dimensions: string | null; // estimated size, e.g. "≈ 15 x 11 x 4 in (estimate)"
   originalRetail: number | null;
 }
 

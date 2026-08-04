@@ -22,6 +22,7 @@ export function renderSheet(bundle: DraftBundle, photos: string[] = []): string 
     for (const s of comparison) out.push(`- ${s.source}: median $${s.median}  [$${s.low}–$${s.high}]  n=${s.n}`);
     out.push("");
   }
+  if (a.dimensions) out.push(`Dimensions: ${a.dimensions} — confirm before listing`, "");
   if (a.flaws.length) out.push(`Flaws: ${a.flaws.join("; ")}`, "");
   if (photos.length) out.push(`Photos: ${photos.join(", ")}`, "");
 
