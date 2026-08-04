@@ -5,176 +5,202 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>resell·agent — resale, considered</title>
 <meta name="description" content="resell·agent reads a garment or accessory from its photographs, prices it against the market, and composes finished eBay and Poshmark listings." />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500&family=Hedvig+Letters+Serif&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <style>
-  :root {
-    --bg:#f6f4ef; --panel:#efece4; --ink:#14120f; --muted:#6f6a5f; --gold:#9a7b3f; --line:#dcd6ca;
-    --display:"Hedvig Letters Serif",Georgia,serif;
-    --body:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
-    --mono:"Spline Sans Mono",ui-monospace,Menlo,monospace;
-    --edge:clamp(1.3rem,6vw,5rem); color-scheme:light;
-  }
-  @media (prefers-color-scheme:dark){ :root{ --bg:#14120f; --panel:#1c1813; --ink:#efeae0; --muted:#a49d8f; --gold:#c6a869; --line:#2f2a22; color-scheme:dark; } }
-  :root[data-theme="light"]{ --bg:#f6f4ef; --panel:#efece4; --ink:#14120f; --muted:#6f6a5f; --gold:#9a7b3f; --line:#dcd6ca; color-scheme:light; }
-  :root[data-theme="dark"]{ --bg:#14120f; --panel:#1c1813; --ink:#efeae0; --muted:#a49d8f; --gold:#c6a869; --line:#2f2a22; color-scheme:dark; }
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Hanken+Grotesk:wght@400;500;600;700&display=swap');
+:root{
+  --bg:oklch(0.972 0.006 312); --surface:oklch(0.995 0.003 312); --surface-2:oklch(0.955 0.008 312);
+  --ink:oklch(0.235 0.028 312); --ink-soft:oklch(0.34 0.026 310); --muted:oklch(0.47 0.022 308);
+  --plum:oklch(0.43 0.13 305); --aubergine:oklch(0.205 0.034 313); --aubergine-2:oklch(0.26 0.04 312);
+  --gold:oklch(0.80 0.085 80); --gold-soft:oklch(0.86 0.06 82); --gold-ink:oklch(0.56 0.085 72);
+  --line:oklch(0.88 0.01 310); --line-dark:oklch(0.34 0.03 312);
+  --maxw:1160px; --gutter:clamp(1.25rem,5vw,4rem);
+  --serif:'Bodoni Moda',Georgia,serif; --sans:'Hanken Grotesk',system-ui,sans-serif;
+  --step--1:clamp(0.78rem,0.74rem+0.2vw,0.86rem); --step-0:clamp(0.98rem,0.94rem+0.2vw,1.06rem);
+  --step-1:clamp(1.2rem,1.1rem+0.5vw,1.45rem); --step-2:clamp(1.5rem,1.3rem+1vw,2.1rem);
+  --step-3:clamp(2rem,1.6rem+2vw,3.1rem); --step-4:clamp(2.6rem,1.9rem+3.4vw,4.6rem);
+  --step-5:clamp(3.2rem,2.2rem+5vw,5.4rem);
+  --ease:cubic-bezier(0.16,1,0.3,1); --radius:2px;
+}
+*,*::before,*::after{box-sizing:border-box;} *{margin:0;}
+html{scroll-behavior:smooth;} @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto;}}
+body{font-family:var(--sans);font-size:var(--step-0);line-height:1.6;color:var(--ink-soft);background:var(--bg);
+  -webkit-font-smoothing:antialiased;font-synthesis:none;}
+img{display:block;max-width:100%;} a{color:inherit;text-decoration:none;}
+button{font:inherit;color:inherit;}
+h1,h2,h3,h4{font-family:var(--serif);color:var(--ink);font-weight:600;line-height:1.08;letter-spacing:-0.015em;text-wrap:balance;}
+p{text-wrap:pretty;max-width:66ch;}
+:focus-visible{outline:2px solid var(--plum);outline-offset:3px;}
+.wrap{width:100%;max-width:var(--maxw);margin-inline:auto;padding-inline:var(--gutter);}
+.section{padding-block:clamp(3.5rem,7vw,6.5rem);}
+.eyebrow{font-family:var(--sans);font-size:var(--step--1);font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold-ink);}
+.lede{font-size:var(--step-1);color:var(--ink-soft);line-height:1.5;}
 
-  *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto;} }
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-weight:400;
-    font-size:1.0625rem;line-height:1.72;-webkit-font-smoothing:antialiased;font-synthesis:none;}
-  .frame{max-width:1180px;margin:0 auto;}
-  .pad{padding-inline:var(--edge);}
-  a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--gold);}
-  a:hover{color:var(--gold);}
-  .mono{font-family:var(--mono);}
-  .eyebrow{font-family:var(--body);font-weight:500;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--gold);}
-  .lab{font-family:var(--body);font-weight:500;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.16em;color:var(--muted);}
-  h2{font-family:var(--display);font-weight:400;font-size:clamp(1.7rem,1.3rem+1.5vw,2.5rem);line-height:1.1;letter-spacing:-0.01em;margin:0.9rem 0 0;text-wrap:balance;}
-  p{max-width:64ch;}
+.btn{display:inline-flex;align-items:center;gap:0.55rem;padding:0.85rem 1.6rem;border-radius:var(--radius);
+  font-family:var(--sans);font-weight:600;font-size:var(--step--1);letter-spacing:0.06em;text-transform:uppercase;
+  cursor:pointer;border:1px solid transparent;transition:all 0.4s var(--ease);}
+.btn--gold{background:var(--gold-ink);color:oklch(0.99 0.01 90);} .btn--gold:hover{background:var(--ink);}
+.btn--ghost{background:transparent;color:var(--ink);border-color:var(--ink);} .btn--ghost:hover{background:var(--ink);color:var(--bg);}
+.btn--on-dark{background:transparent;color:var(--gold);border-color:var(--gold);} .btn--on-dark:hover{background:var(--gold);color:var(--aubergine);}
+.link-gold{color:var(--gold-ink);font-weight:600;display:inline-flex;align-items:center;gap:0.4rem;}
+.link-gold::after{content:'→';transition:transform 0.4s var(--ease);} .link-gold:hover::after{transform:translateX(4px);}
 
-  header.top{border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);}
-  header.top .frame{display:flex;justify-content:space-between;align-items:center;padding:1.3rem var(--edge);}
-  .wordmark{font-family:var(--display);font-size:1.2rem;letter-spacing:0.02em;}
-  .wordmark .amp{color:var(--gold);}
-  nav.links{display:flex;gap:1.8rem;align-items:center;}
-  nav.links a{font-family:var(--body);font-weight:400;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--muted);border:0;}
-  nav.links a:hover{color:var(--gold);}
-  @media (max-width:820px){ nav.links a:not(.sample){display:none;} }
-  #theme{background:none;border:0;cursor:pointer;color:var(--muted);font-size:1rem;}
-  #theme:hover{color:var(--gold);}
+.site-header{position:sticky;top:0;z-index:100;background:color-mix(in oklch,var(--bg) 88%,transparent);
+  backdrop-filter:saturate(140%) blur(12px);border-bottom:1px solid var(--line);}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;min-height:76px;}
+.brand{display:flex;flex-direction:column;line-height:1;}
+.brand b{font-family:var(--serif);font-weight:600;font-size:1.3rem;color:var(--ink);letter-spacing:0.01em;}
+.brand span{font-size:0.58rem;letter-spacing:0.32em;text-transform:uppercase;color:var(--gold-ink);margin-top:5px;}
+.nav-links{display:flex;align-items:center;gap:clamp(1rem,2.2vw,2rem);list-style:none;}
+.nav-links a{font-size:var(--step--1);letter-spacing:0.04em;font-weight:500;color:var(--ink);position:relative;padding-block:0.4rem;}
+.nav-links a::after{content:'';position:absolute;left:0;bottom:0;height:1.5px;width:0;background:var(--gold-ink);transition:width 0.4s var(--ease);}
+.nav-links a:hover::after{width:100%;}
+@media (max-width:820px){ .nav-links a:not(.keep){display:none;} }
 
-  .hero{padding:clamp(3.5rem,9vw,7rem) 0 clamp(2.5rem,6vw,4.5rem);border-bottom:1px solid var(--line);}
-  .hero .eyebrow{display:block;}
-  h1{font-family:var(--display);font-weight:400;font-size:clamp(2.6rem,1.7rem+3.6vw,5rem);line-height:1.02;letter-spacing:-0.015em;margin:1.3rem 0 0;max-width:16ch;text-wrap:balance;}
-  .hero .lede{max-width:52ch;margin:1.6rem 0 0;color:var(--muted);font-weight:300;font-size:1.2rem;}
-  .hero .cta{margin-top:2.2rem;display:flex;gap:2rem;align-items:center;flex-wrap:wrap;}
-  .hero .cta a{font-family:var(--body);font-weight:500;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.14em;}
-  .cmd{font-family:var(--mono);font-size:0.82rem;background:var(--panel);border:1px solid var(--line);padding:0.75rem 1rem;margin-top:2rem;max-width:640px;overflow-x:auto;color:var(--ink);}
-  .cmd .cmt{color:var(--muted);} .cmd .flag{color:var(--gold);}
+.hero{background:var(--aubergine);color:oklch(0.92 0.01 312);position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(120% 80% at 80% 15%,oklch(0.4 0.08 312 / 0.5),transparent 60%);}
+.hero-grid{display:grid;grid-template-columns:1.05fr 0.95fr;gap:clamp(2rem,5vw,4.5rem);align-items:center;
+  padding-block:clamp(3.5rem,8vw,7rem);position:relative;}
+@media (max-width:860px){ .hero-grid{grid-template-columns:1fr;} }
+.hero .eyebrow{color:var(--gold);}
+.hero h1{color:oklch(0.97 0.01 312);font-size:var(--step-5);font-weight:600;line-height:1.02;margin-top:1.2rem;max-width:15ch;}
+.hero h1 em{font-style:italic;color:var(--gold);}
+.hero .lede{color:oklch(0.82 0.015 312);margin-top:1.5rem;max-width:46ch;}
+.hero-cta{display:flex;gap:1rem;margin-top:2.2rem;flex-wrap:wrap;}
+.hero-since{margin-top:2.6rem;display:flex;align-items:center;gap:1rem;color:oklch(0.78 0.02 312);font-size:var(--step--1);letter-spacing:0.06em;text-transform:uppercase;}
+.hero-since::before{content:'';width:42px;height:1px;background:var(--gold);}
+.hero-card{position:relative;background:var(--surface);color:var(--ink);border-radius:3px;padding:1.6rem 1.7rem;
+  box-shadow:0 40px 80px -40px oklch(0 0 0 / 0.6);}
+.hero-card .amt{font-family:var(--serif);font-size:2.4rem;line-height:1;color:var(--ink);}
+.hero-card .amt em{font-style:normal;color:var(--gold-ink);}
+.hero-card .row{margin-top:0.5rem;color:var(--muted);font-size:var(--step--1);}
+.hero-card hr{border:0;border-top:1px solid var(--line);margin:1.2rem 0;}
+.hero-card .ln{font-family:var(--serif);font-size:1.05rem;color:var(--ink);}
+.hero-card .sm{font-size:var(--step--1);color:var(--muted);margin-top:0.3rem;}
+.hero-tag{position:absolute;right:-12px;top:-16px;background:var(--aubergine);color:oklch(0.92 0.01 312);
+  padding:0.7rem 1.1rem;border-radius:2px;box-shadow:0 18px 40px -20px oklch(0 0 0 / 0.6);}
+.hero-tag b{font-family:var(--serif);font-size:1rem;display:block;color:oklch(0.97 0.01 312);}
+.hero-tag span{font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);}
 
-  section{border-top:1px solid var(--line);padding:clamp(3rem,6vw,5rem) 0;}
-  section:first-of-type{border-top:0;}
-  .head{margin-bottom:2.4rem;}
-  .head p{margin:1rem 0 0;color:var(--muted);font-weight:300;}
+.sec-head{margin-bottom:clamp(2rem,4vw,3rem);}
+.sec-head h2{font-size:var(--step-3);margin-top:0.7rem;} .sec-head p{color:var(--muted);margin-top:0.6rem;}
 
-  /* process — quiet numbered row */
-  .process{display:grid;grid-template-columns:repeat(6,1fr);border-top:1px solid var(--line);}
-  @media (max-width:820px){ .process{grid-template-columns:repeat(2,1fr);} }
-  .process .st{padding:1.4rem var(--edge) 1.6rem;border-right:1px solid var(--line);}
-  .process .st:last-child{border-right:0;}
-  @media (max-width:820px){ .process .st:nth-child(2n){border-right:0;} .process .st{border-bottom:1px solid var(--line);} }
-  .process .n{font-family:var(--display);font-size:1.1rem;color:var(--gold);}
-  .process .t{font-family:var(--display);font-size:1.15rem;margin-top:0.5rem;}
-  .process .d{font-weight:300;color:var(--muted);font-size:0.9rem;margin-top:0.4rem;}
-  .process .st.last .t{color:var(--gold);}
+.process{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:3px;overflow:hidden;}
+@media (max-width:720px){ .process{grid-template-columns:repeat(2,1fr);} }
+.process .st{background:var(--surface);padding:1.6rem 1.5rem;}
+.process .n{font-family:var(--serif);font-size:1.2rem;color:var(--gold-ink);}
+.process .t{font-family:var(--serif);font-size:1.25rem;color:var(--ink);margin-top:0.4rem;}
+.process .d{color:var(--muted);font-size:var(--step--1);margin-top:0.4rem;}
+.process .st.last .t{color:var(--gold-ink);}
 
-  /* procedure ledger */
-  .op{display:grid;grid-template-columns:3.5rem 1fr;gap:clamp(1rem,3vw,2.2rem);padding:2rem 0;border-top:1px solid var(--line);}
-  .op:first-child{border-top:0;padding-top:0;}
-  .op .rn{font-family:var(--display);font-size:1.6rem;color:var(--gold);line-height:1;}
-  .op h3{font-family:var(--display);font-weight:400;font-size:1.6rem;margin:0 0 0.5rem;}
-  .op h3 .once{font-family:var(--body);font-weight:500;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--gold);border:1px solid var(--gold);padding:2px 7px;margin-left:0.8ch;vertical-align:middle;}
-  .op p{margin:0;font-weight:300;color:color-mix(in srgb,var(--ink) 85%,transparent);}
-  .op ul{margin:0.6rem 0 0;padding-left:1.1rem;font-weight:300;}
-  .op li{margin:0.4rem 0;} .op li b{font-weight:500;}
-  code.k{font-family:var(--mono);font-size:0.85em;color:var(--gold);}
+.op{display:grid;grid-template-columns:3.5rem 1fr;gap:clamp(1rem,3vw,2rem);padding:2rem 0;border-top:1px solid var(--line);}
+.op:first-child{border-top:0;padding-top:0.5rem;}
+.op .rn{font-family:var(--serif);font-size:1.8rem;color:var(--gold-ink);line-height:1;}
+.op h3{font-size:1.55rem;margin-bottom:0.5rem;}
+.op h3 .once{font-family:var(--sans);font-weight:600;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--gold-ink);border:1px solid var(--gold-soft);padding:2px 7px;border-radius:2px;margin-left:0.7ch;vertical-align:middle;}
+.op p{color:var(--ink-soft);} .op ul{margin:0.6rem 0 0;padding-left:1.1rem;} .op li{margin:0.4rem 0;}
+.op li b{color:var(--ink);font-weight:600;font-family:var(--serif);}
+code.k{font-family:var(--sans);font-size:0.9em;background:var(--surface-2);color:var(--gold-ink);padding:1px 6px;border-radius:2px;}
+.cmd{font-family:ui-monospace,Menlo,monospace;font-size:0.82rem;background:var(--surface);border:1px solid var(--line);border-radius:2px;padding:0.7rem 0.95rem;margin-top:0.9rem;overflow-x:auto;color:var(--ink);}
+.cmd .cmt{color:var(--muted);} .cmd .flag{color:var(--gold-ink);}
 
-  .cmd2{font-family:var(--mono);font-size:0.8rem;background:var(--panel);border:1px solid var(--line);padding:0.7rem 0.95rem;margin-top:0.9rem;overflow-x:auto;}
-  .cmd2 .cmt{color:var(--muted);} .cmd2 .flag{color:var(--gold);}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:3px;}
+table{border-collapse:collapse;width:100%;font-size:var(--step--1);min-width:560px;}
+th,td{text-align:left;padding:0.8rem 1rem;border-bottom:1px solid var(--line);vertical-align:top;}
+thead th{font-family:var(--sans);font-weight:600;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted);background:var(--surface-2);}
+td:first-child{font-family:var(--serif);color:var(--ink);white-space:nowrap;}
+td .fl{font-family:ui-monospace,Menlo,monospace;color:var(--gold-ink);font-size:0.9em;} tbody tr:last-child td{border-bottom:0;}
 
-  table{border-collapse:collapse;width:100%;font-family:var(--mono);font-size:0.8rem;}
-  th,td{text-align:left;padding:0.75rem 0.5rem;border-bottom:1px solid var(--line);vertical-align:top;}
-  thead th{font-family:var(--body);font-weight:500;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--muted);border-bottom-color:var(--ink);}
-  td:first-child{color:var(--ink);font-weight:500;white-space:nowrap;}
-  td .fl{color:var(--gold);}
-  tbody tr:last-child td{border-bottom:0;}
-  .tw{overflow-x:auto;}
+dl.int{margin:0;} dl.int .r{display:grid;grid-template-columns:13rem 1fr;gap:1rem clamp(1.5rem,4vw,3rem);padding:1.6rem 0;border-top:1px solid var(--line);}
+dl.int .r:first-child{border-top:0;} @media (max-width:720px){ dl.int .r{grid-template-columns:1fr;gap:0.4rem;} }
+dl.int dt{font-family:var(--serif);font-size:1.3rem;color:var(--ink);}
+dl.int dt small{display:block;font-family:var(--sans);font-weight:600;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--gold-ink);margin-top:0.4rem;}
+dl.int dd{color:var(--muted);max-width:60ch;}
 
-  /* internals — spec list */
-  dl.int{margin:0;border-top:1px solid var(--line);}
-  dl.int .r{display:grid;grid-template-columns:14rem 1fr;gap:1rem clamp(1.5rem,4vw,3rem);padding:1.4rem 0;border-bottom:1px solid var(--line);}
-  @media (max-width:720px){ dl.int .r{grid-template-columns:1fr;gap:0.4rem;} }
-  dl.int dt{font-family:var(--display);font-size:1.25rem;font-weight:400;}
-  dl.int dt small{display:block;font-family:var(--body);font-weight:500;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--gold);margin-top:0.4rem;}
-  dl.int dd{margin:0;font-weight:300;color:var(--muted);max-width:60ch;}
+.band{background:var(--aubergine);color:oklch(0.9 0.012 312);}
+.band .eyebrow{color:var(--gold);} .band h2{color:oklch(0.97 0.01 312);}
+ul.limits{list-style:none;padding:0;margin:2rem 0 0;}
+ul.limits li{display:grid;grid-template-columns:1.6rem 1fr;padding:1.1rem 0;border-top:1px solid var(--line-dark);color:oklch(0.82 0.015 312);max-width:74ch;}
+ul.limits li::before{content:'—';color:var(--gold);}
+ul.limits li b{font-family:var(--serif);color:oklch(0.97 0.01 312);font-weight:600;}
 
-  ul.limits{list-style:none;margin:0;padding:0;border-top:1px solid var(--line);}
-  ul.limits li{padding:1.1rem 0;border-bottom:1px solid var(--line);font-weight:300;max-width:70ch;display:grid;grid-template-columns:1.5rem 1fr;}
-  ul.limits li::before{content:"—";color:var(--gold);}
-  ul.limits li b{font-weight:500;}
-
-  footer{border-top:1px solid var(--line);padding:2rem var(--edge) 3rem;font-family:var(--mono);font-size:0.72rem;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
-  :focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
+.site-footer{background:var(--ink);color:oklch(0.8 0.012 312);padding-block:clamp(3rem,5vw,4rem) 2rem;}
+.footer-grid{display:flex;justify-content:space-between;flex-wrap:wrap;gap:1.5rem;padding-bottom:2rem;border-bottom:1px solid var(--line-dark);}
+.footer-brand b{font-family:var(--serif);font-size:1.4rem;color:oklch(0.97 0.01 312);display:block;}
+.footer-brand span{font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);}
+.footer-note{font-size:var(--step--1);color:oklch(0.74 0.014 312);max-width:40ch;margin-top:0.8rem;}
+.footer-bottom{padding-top:1.4rem;font-size:var(--step--1);color:oklch(0.64 0.014 312);}
 </style>
 </head>
 <body>
 
-<header class="top"><div class="frame" style="max-width:1180px;margin:0 auto;padding:1.3rem var(--edge);display:flex;justify-content:space-between;align-items:center;">
-  <span class="wordmark">resell<span class="amp">·</span>agent</span>
-  <nav class="links">
-    <a href="#process">Process</a>
-    <a href="#procedure">Procedure</a>
-    <a href="#commands">Commands</a>
-    <a href="#craft">Craft</a>
-    <a class="sample" href="./example.html">Sample&nbsp;draft</a>
-    <button id="theme" aria-label="Toggle theme">◐</button>
-  </nav>
+<header class="site-header"><div class="wrap nav">
+  <a class="brand" href="./index.html"><b>resell·agent</b><span>Resale, considered</span></a>
+  <ul class="nav-links">
+    <li><a href="#process">Process</a></li>
+    <li><a href="#procedure">Procedure</a></li>
+    <li><a href="#commands">Commands</a></li>
+    <li><a href="#craft">Craft</a></li>
+    <li><a class="keep link-gold" href="./example.html">Sample draft</a></li>
+  </ul>
 </div></header>
 
-<main class="frame">
-  <section class="hero pad" style="border-top:0;">
-    <span class="eyebrow">Resale, considered</span>
-    <h1>Photograph the piece. Receive the listing.</h1>
-    <p class="lede">resell·agent reads a garment or accessory from its photographs, prices it against the market, and composes finished listings for eBay and Poshmark — so the value in a wardrobe is realised, not stored.</p>
-    <div class="cta">
-      <a href="./example.html">See a sample draft →</a>
-      <a href="#procedure">How it runs</a>
+<main>
+  <section class="hero"><div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">Resale, considered</span>
+      <h1>Photograph the piece. Receive the <em>listing</em>.</h1>
+      <p class="lede">resell·agent reads a garment or accessory from its photographs, prices it against the market, and composes finished listings for eBay and Poshmark — so the value in a wardrobe is realised, not stored.</p>
+      <div class="hero-cta">
+        <a class="btn btn--gold" href="./example.html">See a sample draft</a>
+        <a class="btn btn--on-dark" href="#procedure">How it runs</a>
+      </div>
+      <div class="hero-since">Reads only · places on your word</div>
     </div>
-    <div class="cmd"><span class="cmt"># one piece, start to finish</span><br>npm run draft -- --photos coat.jpg,label.jpg <span class="flag">--clean</span></div>
-  </section>
+    <div class="hero-card">
+      <div class="amt">$110 <em>–</em> $185</div>
+      <div class="row">Suggested entry $145 · median of sold comparables</div>
+      <hr>
+      <div class="ln">Vintage Coach Black Leather Messenger</div>
+      <div class="sm">eBay &amp; Poshmark copy · category &amp; specifics resolved</div>
+      <div class="hero-tag"><b>Read-only</b><span>nothing is posted</span></div>
+    </div>
+  </div></section>
 
-  <section id="process" class="pad">
-    <div class="head"><span class="eyebrow">The process</span><h2>A single reading, then a placement</h2>
+  <section id="process" class="section"><div class="wrap">
+    <div class="sec-head"><span class="eyebrow">The process</span><h2>A single reading, then a placement</h2>
       <p>Everything up to placement only reads — nothing is posted, nothing on an account changes. The draft is yours to review before a piece is ever listed.</p></div>
     <div class="process">
       <div class="st"><div class="n">i</div><div class="t">Photographs</div><div class="d">the piece, plus any notes</div></div>
       <div class="st"><div class="n">ii</div><div class="t">Attributes</div><div class="d">house, material, condition</div></div>
       <div class="st"><div class="n">iii</div><div class="t">Comparables</div><div class="d">the market, gathered</div></div>
       <div class="st"><div class="n">iv</div><div class="t">Price</div><div class="d">a considered range</div></div>
-      <div class="st"><div class="n">v</div><div class="t">Listings</div><div class="d">eBay & Poshmark copy</div></div>
+      <div class="st"><div class="n">v</div><div class="t">Listings</div><div class="d">eBay &amp; Poshmark copy</div></div>
       <div class="st last"><div class="n">vi</div><div class="t">Placement</div><div class="d">eBay, on your word</div></div>
     </div>
-  </section>
+  </div></section>
 
-  <section id="procedure" class="pad">
-    <div class="head"><span class="eyebrow">Procedure</span><h2>Running a piece, beginning to end</h2>
+  <section id="procedure" class="section" style="background:var(--surface);"><div class="wrap">
+    <div class="sec-head"><span class="eyebrow">Procedure</span><h2>Running a piece, beginning to end</h2>
       <p>Steps one through three are prepared once. Four through six repeat for each piece.</p></div>
 
     <div class="op"><div class="rn">1</div><div>
       <h3>Install &amp; build</h3>
       <p>Node 22 or later. The build compiles to <code class="k">dist/</code>; rebuild after any change.</p>
-      <div class="cmd2">npm install &amp;&amp; npm run build</div>
-    </div></div>
+      <div class="cmd">npm install &amp;&amp; npm run build</div></div></div>
 
     <div class="op"><div class="rn">2</div><div>
       <h3>Configure keys</h3>
       <p>Copy the example environment and provide your eBay and Anthropic keys. Keep <code class="k">EBAY_ENV=sandbox</code> until you are ready to list in earnest.</p>
-      <div class="cmd2">cp .env.example .env   <span class="cmt"># then fill in the keys</span></div>
-    </div></div>
+      <div class="cmd">cp .env.example .env   <span class="cmt"># then fill in the keys</span></div></div></div>
 
     <div class="op"><div class="rn">3</div><div>
       <h3>Authorise placement <span class="once">to list only</span></h3>
-      <p>Pricing requires nothing further. To place a listing, authorise a user token once and create your business policies — the full sequence is in the README.</p>
-    </div></div>
+      <p>Pricing requires nothing further. To place a listing, authorise a user token once and create your business policies — the full sequence is in the README.</p></div></div>
 
     <div class="op"><div class="rn">4</div><div>
       <h3>Draft the listing</h3>
       <p>A clean frontal image and the label read best. Add <code class="k">--clean</code> to lift the piece from its background — a cleaner reading, and a squared image ready to list.</p>
-      <div class="cmd2">npm run draft -- --photos front.jpg,label.jpg <span class="flag">--clean</span></div>
-    </div></div>
+      <div class="cmd">npm run draft -- --photos front.jpg,label.jpg <span class="flag">--clean</span></div></div></div>
 
     <div class="op"><div class="rn">5</div><div>
       <h3>Review the draft</h3>
@@ -184,68 +210,56 @@
         <li><b>Condition &amp; notes</b> — the reading is candid by design; confirm it caught the real wear.</li>
         <li><b>Category &amp; specifics</b> — resolved for you; correct anything that reads wrong.</li>
         <li><b>Titles</b> — eBay dense with the terms buyers search, Poshmark warmer.</li>
-      </ul>
-    </div></div>
+      </ul></div></div>
 
     <div class="op"><div class="rn">6</div><div>
       <h3>Place it</h3>
-      <p>Host the images at public URLs (eBay retrieves them), and the category carries from the draft. Poshmark stays by hand — the tool writes a listing to place, and never posts there for you.</p>
-      <div class="cmd2">npm run post -- --draft draft.json --images https://host/1.jpg <span class="cmt"># + policy ids</span></div>
-    </div></div>
-  </section>
+      <p>Host the images at public URLs (eBay retrieves them), and the category carries from the draft. Poshmark stays by hand — the tool writes a listing to place, and never posts there for you.</p></div></div>
+  </div></section>
 
-  <section id="commands" class="pad">
-    <div class="head"><span class="eyebrow">Commands</span><h2>Four verbs</h2></div>
+  <section id="commands" class="section"><div class="wrap">
+    <div class="sec-head"><span class="eyebrow">Commands</span><h2>Four verbs</h2></div>
     <div class="tw"><table>
       <thead><tr><th>Verb</th><th>What it does</th><th>Principal flags</th></tr></thead>
       <tbody>
-        <tr><td>draft</td><td>Photographs to attributes, comparables, price, and listings. Writes draft.json and a paste sheet. Read-only.</td><td class="fl">--photos --notes --platforms --clean --out</td></tr>
-        <tr><td>post</td><td>Places the eBay listing from a draft.</td><td class="fl">--draft --images --location --fulfillment --payment --return</td></tr>
-        <tr><td>auth-url</td><td>Prints the eBay consent URL for one-time authorisation.</td><td class="fl">—</td></tr>
-        <tr><td>auth-exchange</td><td>Exchanges the returned code for a refresh token.</td><td class="fl">&lt;code&gt;</td></tr>
+        <tr><td>draft</td><td>Photographs to attributes, comparables, price, and listings. Writes draft.json and a paste sheet. Read-only.</td><td><span class="fl">--photos --notes --platforms --clean --out</span></td></tr>
+        <tr><td>post</td><td>Places the eBay listing from a draft.</td><td><span class="fl">--draft --images --location --fulfillment --payment --return</span></td></tr>
+        <tr><td>auth-url</td><td>Prints the eBay consent URL for one-time authorisation.</td><td><span class="fl">—</span></td></tr>
+        <tr><td>auth-exchange</td><td>Exchanges the returned code for a refresh token.</td><td><span class="fl">&lt;code&gt;</span></td></tr>
       </tbody>
     </table></div>
-  </section>
+  </div></section>
 
-  <section id="craft" class="pad">
-    <div class="head"><span class="eyebrow">The craft</span><h2>How the parts that matter work</h2></div>
+  <section id="craft" class="section" style="background:var(--surface);"><div class="wrap">
+    <div class="sec-head"><span class="eyebrow">The craft</span><h2>How the parts that matter work</h2></div>
     <dl class="int">
       <div class="r"><dt>Price<small>Trimmed comparables</small></dt><dd>The extreme tenth on each side is trimmed, then the median taken. Absent sold data it draws on active asking prices, discounted — always given as a range, never false precision.</dd></div>
       <div class="r"><dt>Attribution<small>Read from the piece</small></dt><dd>House, material, colour, closure, and condition are read from the photographs. It won't invent what it can't see — measurements, for one, are left for you to add.</dd></div>
       <div class="r"><dt>The cutout<small>--clean</small></dt><dd>The background is lifted and the piece squared and centred — a cleaner reading, and an image ready to list on a white ground.</dd></div>
       <div class="r"><dt>Placement<small>eBay Sell API</small></dt><dd>Category and item specifics are resolved for you; the listing is composed and, only on your word, published. Poshmark is written but placed by hand.</dd></div>
     </dl>
-  </section>
+  </div></section>
 
-  <section id="limits" class="pad">
-    <div class="head"><span class="eyebrow">In candour</span><h2>What it won't do</h2></div>
+  <section class="band section"><div class="wrap">
+    <div class="sec-head"><span class="eyebrow">In candour</span><h2>What it won't do</h2></div>
     <ul class="limits">
       <li><b>It won't authenticate.</b> It reads what's visible; it does not verify a house's mark. For high-value pieces, authenticate before you list.</li>
       <li><b>It won't invent measurements.</b> A photograph can't be measured — those fields are left for you to complete.</li>
       <li><b>It won't host your images.</b> The cutout is produced; eBay needs a public URL, so you host it.</li>
-      <li><b>It won't post to Poshmark.</b> The copy is written; placing it there is yours (no public interface).</li>
+      <li><b>It won't post to Poshmark.</b> The copy is written; placing it there is yours.</li>
       <li><b>Placement is the one irreversible step.</b> The draft is the gate, and it runs only when you run it.</li>
     </ul>
-  </section>
+  </div></section>
 </main>
 
-<footer>
-  <span>resell·agent — resale, considered</span>
-  <span>reads only · places on your word</span>
-</footer>
+<footer class="site-footer"><div class="wrap">
+  <div class="footer-grid">
+    <div class="footer-brand"><b>resell·agent</b><span>Resale, considered</span>
+      <p class="footer-note">Photographs to a priced, considered listing — reads only, places on your word.</p></div>
+    <a class="link-gold" href="./example.html" style="color:var(--gold);align-self:flex-end;">See a sample draft</a>
+  </div>
+  <div class="footer-bottom">resell·agent — reads only · places on your word</div>
+</div></footer>
 
-<script>
-  (function(){
-    var root=document.documentElement,btn=document.getElementById("theme"),saved=null;
-    try{saved=localStorage.getItem("theme");}catch(e){}
-    if(saved)root.setAttribute("data-theme",saved);
-    btn.addEventListener("click",function(){
-      var dark=matchMedia("(prefers-color-scheme:dark)").matches;
-      var cur=root.getAttribute("data-theme")||(dark?"dark":"light");
-      root.setAttribute("data-theme",cur==="dark"?"light":"dark");
-      try{localStorage.setItem("theme",root.getAttribute("data-theme"));}catch(e){}
-    });
-  })();
-</script>
 </body>
 </html>
