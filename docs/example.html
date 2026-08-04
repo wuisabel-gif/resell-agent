@@ -9,183 +9,86 @@
 <meta property="og:type" content="website" />
 <meta property="og:title" content="resell·agent — a sample draft" />
 <meta property="og:description" content="One photograph, a considered listing: attributes, comparables, and eBay & Poshmark copy." />
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&family=Hanken+Grotesk:wght@400;500;600;700&display=swap');
-:root{
-  --bg:oklch(0.972 0.006 312); --surface:oklch(0.995 0.003 312); --surface-2:oklch(0.955 0.008 312);
-  --ink:oklch(0.235 0.028 312); --ink-soft:oklch(0.34 0.026 310); --muted:oklch(0.47 0.022 308);
-  --plum:oklch(0.43 0.13 305); --aubergine:oklch(0.205 0.034 313); --aubergine-2:oklch(0.26 0.04 312);
-  --gold:oklch(0.80 0.085 80); --gold-soft:oklch(0.86 0.06 82); --gold-ink:oklch(0.56 0.085 72);
-  --line:oklch(0.88 0.01 310); --line-dark:oklch(0.34 0.03 312);
-  --maxw:1160px; --gutter:clamp(1.25rem,5vw,4rem);
-  --serif:'Bodoni Moda',Georgia,serif; --sans:'Hanken Grotesk',system-ui,sans-serif;
-  --step--1:clamp(0.78rem,0.74rem+0.2vw,0.86rem); --step-0:clamp(0.98rem,0.94rem+0.2vw,1.06rem);
-  --step-1:clamp(1.2rem,1.1rem+0.5vw,1.45rem); --step-2:clamp(1.5rem,1.3rem+1vw,2.1rem);
-  --step-3:clamp(2rem,1.6rem+2vw,3.1rem); --step-4:clamp(2.6rem,1.9rem+3.4vw,4.4rem);
-  --ease:cubic-bezier(0.16,1,0.3,1); --radius:2px;
-}
-*,*::before,*::after{box-sizing:border-box;} *{margin:0;}
-body{font-family:var(--sans);font-size:var(--step-0);line-height:1.6;color:var(--ink-soft);background:var(--bg);-webkit-font-smoothing:antialiased;font-synthesis:none;}
-img{display:block;max-width:100%;} a{color:inherit;text-decoration:none;} button{font:inherit;}
-h1,h2,h3,h4{font-family:var(--serif);color:var(--ink);font-weight:600;line-height:1.08;letter-spacing:-0.015em;text-wrap:balance;}
-p{text-wrap:pretty;max-width:64ch;}
-:focus-visible{outline:2px solid var(--plum);outline-offset:3px;}
-.wrap{width:100%;max-width:var(--maxw);margin-inline:auto;padding-inline:var(--gutter);}
-.eyebrow{font-family:var(--sans);font-size:var(--step--1);font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold-ink);}
-.lede{font-size:var(--step-1);color:var(--ink-soft);line-height:1.5;}
-.lab{font-family:var(--sans);font-weight:600;font-size:0.64rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--gold-ink);}
-
-.site-header{position:sticky;top:0;z-index:100;background:color-mix(in oklch,var(--bg) 88%,transparent);backdrop-filter:saturate(140%) blur(12px);border-bottom:1px solid var(--line);}
-.nav{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;min-height:76px;}
-.brand{display:flex;flex-direction:column;line-height:1;}
-.brand b{font-family:var(--serif);font-weight:600;font-size:1.3rem;color:var(--ink);}
-.brand span{font-size:0.58rem;letter-spacing:0.32em;text-transform:uppercase;color:var(--gold-ink);margin-top:5px;}
-.back{font-size:var(--step--1);letter-spacing:0.04em;font-weight:500;color:var(--ink);}
-.back:hover{color:var(--gold-ink);}
-
-.page-hero{background:var(--aubergine);color:oklch(0.92 0.01 312);position:relative;overflow:hidden;}
-.page-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(100% 90% at 85% 10%,oklch(0.4 0.08 312 / 0.45),transparent 60%);}
-.page-hero .wrap{position:relative;padding-block:clamp(3rem,7vw,5.5rem);}
-.page-hero .eyebrow{color:var(--gold);}
-.page-hero h1{color:oklch(0.97 0.01 312);font-size:var(--step-4);margin-top:1rem;max-width:18ch;}
-.page-hero p{color:oklch(0.82 0.015 312);margin-top:1.3rem;max-width:56ch;}
-.page-hero .note{margin-top:1.6rem;font-size:var(--step--1);color:oklch(0.74 0.02 312);display:flex;align-items:center;gap:0.7rem;}
-.page-hero .note::before{content:'';width:32px;height:1px;background:var(--gold);}
-
-.cols{display:grid;grid-template-columns:0.85fr 1.15fr;}
-@media (max-width:900px){ .cols{grid-template-columns:1fr;} }
-.in{border-right:1px solid var(--line);padding:clamp(2rem,4vw,3.5rem) var(--gutter);}
-@media (max-width:900px){ .in{border-right:0;border-bottom:1px solid var(--line);} }
-.out{padding:clamp(2rem,4vw,3.5rem) var(--gutter);min-width:0;}
-.in .lab,.out .lab.top{display:block;margin-bottom:1.6rem;}
-
-.shot{aspect-ratio:3/4;border-radius:3px;position:relative;display:flex;align-items:flex-end;overflow:hidden;
-  background:linear-gradient(160deg,var(--surface-2),oklch(0.9 0.02 312));box-shadow:0 30px 60px -40px oklch(0.2 0.03 312 / 0.5);}
-.shot .pin{position:absolute;top:0;left:0;font-size:0.62rem;letter-spacing:0.08em;color:var(--gold-ink);
-  background:var(--surface);padding:0.5rem 0.8rem;border-bottom-right-radius:3px;}
-.shot .cap{font-style:italic;font-size:0.9rem;color:var(--ink-soft);padding:1.1rem 1.2rem;background:linear-gradient(to top,oklch(1 0 0 / 0.6),transparent);}
-
-dl.spec{margin:1.8rem 0 0;}
-dl.spec .r{display:grid;grid-template-columns:7.5rem 1fr;gap:1rem;padding:0.7rem 0;border-top:1px solid var(--line);}
-dl.spec .r:last-child{border-bottom:1px solid var(--line);}
-dl.spec dt{font-family:var(--sans);font-weight:600;font-size:0.64rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted);padding-top:0.25rem;}
-dl.spec dd{color:var(--ink);} dl.spec dd.flaw{color:var(--gold-ink);}
-
-.price{padding-bottom:1.8rem;margin-bottom:2rem;border-bottom:1px solid var(--line);}
-.price .amt{font-family:var(--serif);font-size:clamp(2.4rem,1.8rem+2.4vw,3.2rem);line-height:1;color:var(--ink);}
-.price .amt em{font-style:normal;color:var(--gold-ink);margin:0 0.12em;}
-.price .entry{font-size:1.05rem;color:var(--ink-soft);margin-top:0.7rem;}
-.price .basis{font-size:var(--step--1);color:var(--muted);margin-top:0.35rem;font-style:italic;}
-
-table{border-collapse:collapse;width:100%;font-size:var(--step--1);margin-bottom:2.4rem;}
-th,td{text-align:left;padding:0.65rem 0.4rem;border-bottom:1px solid var(--line);}
-thead th{font-family:var(--sans);font-weight:600;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted);border-bottom-color:var(--ink);}
-td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;}
-td:first-child{font-family:var(--serif);color:var(--ink);}
-tbody tr:last-child td{border-bottom:0;}
-
-.block{margin-bottom:2.2rem;}
-.block .bh{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:0.7rem;border-bottom:1px solid var(--ink);margin-bottom:1.2rem;}
-.block .bh h3{font-size:1.5rem;} .block .bh .cp{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--muted);}
-.fld{margin-bottom:1rem;} .fld .lab{display:block;margin-bottom:0.35rem;color:var(--muted);}
-.fld .title{font-family:var(--serif);font-size:1.15rem;color:var(--ink);line-height:1.3;}
-.fld .txt{color:var(--ink-soft);}
-.chips{display:flex;flex-wrap:wrap;gap:0.4rem 1.2rem;}
-.chip{font-size:0.74rem;color:var(--muted);} .chip b{color:var(--ink);font-weight:600;}
-.mono{font-family:ui-monospace,Menlo,monospace;font-size:0.82rem;}
-.todo{color:var(--gold-ink);font-style:italic;}
-
-.steps{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);background:var(--surface);}
-@media (max-width:680px){ .steps{grid-template-columns:1fr;} }
-.steps .s{padding:clamp(1.6rem,3vw,2.4rem) var(--gutter);border-right:1px solid var(--line);}
-.steps .s:last-child{border-right:0;}
-.steps .rn{font-family:var(--serif);font-size:1.4rem;color:var(--gold-ink);}
-.steps .st{font-family:var(--serif);font-size:1.3rem;color:var(--ink);margin-top:0.4rem;}
-.steps .sd{color:var(--muted);margin-top:0.5rem;font-size:0.92rem;}
-
-.site-footer{background:var(--ink);color:oklch(0.72 0.014 312);padding:1.8rem 0;font-size:var(--step--1);}
-.site-footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.8rem;}
-</style>
+<link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 
 <header class="site-header"><div class="wrap nav">
   <a class="brand" href="./index.html"><b>resell·agent</b><span>Resale, considered</span></a>
-  <a class="back" href="./index.html">The guide →</a>
+  <ul class="nav-links" id="menu">
+    <li><a href="./index.html#case">The case</a></li>
+    <li><a href="./index.html#procedure">Procedure</a></li>
+    <li><a href="./index.html">The guide</a></li>
+  </ul>
 </div></header>
 
-<section class="page-hero"><div class="wrap">
-  <span class="eyebrow">A sample draft</span>
-  <h1>One photograph, a considered listing.</h1>
-  <p>What a single run makes from one image of a vintage Coach messenger: the attributes read from the piece, a price built from comparables, and finished listing copy for eBay and Poshmark — ready to place.</p>
-  <div class="note">Illustrative — the comparables shown are sample figures; a live run prices from real eBay data.</div>
-</div></section>
+<main id="main">
+  <section class="page-hero"><div class="wrap">
+    <span class="eyebrow" style="color:var(--gold);">A sample draft</span>
+    <h1>One photograph, a considered listing.</h1>
+    <p>What a single run makes from one image of a vintage Coach messenger: the attributes read from the piece, a price built from comparables, and finished listing copy for eBay and Poshmark — ready to place.</p>
+    <p style="margin-top:1.4rem;font-size:var(--step--1);color:oklch(0.74 0.02 312);">Illustrative — the comparables shown are sample figures; a live run prices from real eBay data.</p>
+  </div></section>
 
-<div class="wrap" style="padding:0;max-width:var(--maxw);">
-  <div class="cols">
+  <div class="draftgrid">
     <div class="in">
-      <span class="lab top">The piece</span>
-      <div class="shot">
+      <span class="eyebrow">The piece</span>
+      <div class="shot" style="margin-top:1.4rem;">
         <span class="pin">front.clean.png</span>
         <span class="cap">Coach messenger · black leather · brass turnlock · top handle &amp; crossbody · original hangtag</span>
       </div>
-      <dl class="spec">
-        <div class="r"><dt>House</dt><dd>Coach</dd></div>
-        <div class="r"><dt>Type</dt><dd>Messenger / laptop bag</dd></div>
-        <div class="r"><dt>Colour</dt><dd>Black</dd></div>
-        <div class="r"><dt>Material</dt><dd>Glovetanned leather</dd></div>
-        <div class="r"><dt>Closure</dt><dd>Brass turnlock</dd></div>
-        <div class="r"><dt>Carry</dt><dd>Top handle &amp; adjustable crossbody</dd></div>
-        <div class="r"><dt>Condition</dt><dd>Like-new</dd></div>
-        <div class="r"><dt>Notes</dt><dd class="flaw">light surface wear · soft brass patina</dd></div>
+      <dl class="specs" style="margin-top:1.8rem;">
+        <div><dt>House</dt><dd>Coach</dd></div>
+        <div><dt>Type</dt><dd>Messenger / laptop bag</dd></div>
+        <div><dt>Colour</dt><dd>Black</dd></div>
+        <div><dt>Material</dt><dd>Glovetanned leather</dd></div>
+        <div><dt>Closure</dt><dd>Brass turnlock</dd></div>
+        <div><dt>Carry</dt><dd>Top handle &amp; crossbody</dd></div>
+        <div><dt>Condition</dt><dd>Like-new</dd></div>
+        <div><dt>Notes</dt><dd style="color:var(--gold-ink);">light wear · soft patina</dd></div>
       </dl>
     </div>
 
     <div class="out">
-      <span class="lab top">The draft</span>
-      <div class="price">
-        <div class="amt">$110<em>–</em>$185</div>
+      <span class="eyebrow">The draft</span>
+      <div class="priceblock" style="margin-top:1.4rem;">
+        <div class="bigprice">$110<em>–</em>$185</div>
         <div class="entry">Suggested entry $145, to be set to taste.</div>
         <div class="basis">median of sold comparables, 10% trimmed (sample data)</div>
       </div>
 
-      <table>
+      <div class="tbl" style="margin-bottom:2.4rem;"><table>
         <thead><tr><th>Comparable source</th><th class="num">Median</th><th class="num">Range</th><th class="num">n</th></tr></thead>
         <tbody>
           <tr><td>eBay · sold</td><td class="num">$140</td><td class="num">110–180</td><td class="num">9</td></tr>
           <tr><td>eBay · active</td><td class="num">$165</td><td class="num">130–210</td><td class="num">22</td></tr>
           <tr><td>Poshmark · active</td><td class="num">$155</td><td class="num">125–200</td><td class="num">14</td></tr>
         </tbody>
-      </table>
+      </table></div>
 
-      <div class="block">
-        <div class="bh"><h3>eBay</h3><span class="cp">copy</span></div>
-        <div class="fld"><span class="lab">Title · 76 / 80</span><div class="title">Vintage Coach Black Leather Messenger Bag Crossbody Briefcase Brass Turnlock</div></div>
-        <div class="fld"><span class="lab">Category</span><div class="mono">169291 · Bags &amp; Handbags</div></div>
-        <div class="fld"><span class="lab">Item specifics</span>
-          <div class="chips"><span class="chip">House <b>Coach</b></span><span class="chip">Colour <b>Black</b></span><span class="chip">Material <b>Leather</b></span><span class="chip">Style <b>Messenger</b></span><span class="chip">Closure <b>Turnlock</b></span><span class="chip">Hardware <b>Brass</b></span><span class="chip">Vintage <b>Yes</b></span></div></div>
-        <div class="fld"><span class="lab">Description</span><div class="txt">Vintage Coach messenger in black glovetanned leather. Signature brass turnlock closure, structured flap, top carry handle, and an adjustable leather crossbody strap. Original Coach hangtag attached; interior slip pockets. Condition: like-new — supple leather with light surface wear, brass carrying a soft patina. No rips, tears, or odours. <span class="todo">[ add W × H × D measurements before listing ]</span></div></div>
+      <div class="copyblock">
+        <div class="ch"><h3>eBay</h3><span>copy</span></div>
+        <div class="fld"><span class="l">Title · 76 / 80</span><div class="title">Vintage Coach Black Leather Messenger Bag Crossbody Briefcase Brass Turnlock</div></div>
+        <div class="fld"><span class="l">Category</span><div class="mono">169291 · Bags &amp; Handbags</div></div>
+        <div class="fld"><span class="l">Item specifics</span><div class="chips">
+          <span class="chip-i">House <b>Coach</b></span><span class="chip-i">Colour <b>Black</b></span><span class="chip-i">Material <b>Leather</b></span><span class="chip-i">Style <b>Messenger</b></span><span class="chip-i">Closure <b>Turnlock</b></span><span class="chip-i">Hardware <b>Brass</b></span><span class="chip-i">Vintage <b>Yes</b></span></div></div>
+        <div class="fld"><span class="l">Description</span><div class="txt">Vintage Coach messenger in black glovetanned leather. Signature brass turnlock closure, structured flap, top carry handle, and an adjustable leather crossbody strap. Original Coach hangtag attached; interior slip pockets. Condition: like-new — supple leather with light surface wear, brass carrying a soft patina. No rips, tears, or odours. <span class="todo">[ add W × H × D measurements before listing ]</span></div></div>
       </div>
 
-      <div class="block">
-        <div class="bh"><h3>Poshmark</h3><span class="cp">copy</span></div>
-        <div class="fld"><span class="lab">Title</span><div class="title">Vintage Coach Black Leather Messenger Bag 🖤</div></div>
-        <div class="fld"><span class="lab">Description</span><div class="txt">A timeless vintage Coach in black leather. Brass turnlock, top handle and adjustable crossbody — the piece that carries from desk to dinner. Original hangtag attached. Gently kept, like-new: light surface wear, a soft brass patina, nothing more. Smoke-free home. <span class="todo">Measurements added below.</span></div></div>
+      <div class="copyblock">
+        <div class="ch"><h3>Poshmark</h3><span>copy</span></div>
+        <div class="fld"><span class="l">Title</span><div class="title">Vintage Coach Black Leather Messenger Bag 🖤</div></div>
+        <div class="fld"><span class="l">Description</span><div class="txt">A timeless vintage Coach in black leather. Brass turnlock, top handle and adjustable crossbody — the piece that carries from desk to dinner. Original hangtag attached. Gently kept, like-new: light surface wear, a soft brass patina, nothing more. Smoke-free home. <span class="todo">Measurements added below.</span></div></div>
       </div>
     </div>
   </div>
-
-  <div class="steps">
-    <div class="s"><div class="rn">i</div><div class="st">Photograph</div><div class="sd">A single image of the piece; the cutout is squared and centred.</div></div>
-    <div class="s"><div class="rn">ii</div><div class="st">Draft</div><div class="sd">The piece is read, comparables priced, copy composed — moments, not hours.</div></div>
-    <div class="s"><div class="rn">iii</div><div class="st">Place</div><div class="sd">The sheet is handed over; the block is placed on eBay or Poshmark, unedited.</div></div>
-  </div>
-</div>
+</main>
 
 <footer class="site-footer"><div class="wrap">
-  <span>resell·agent — a sample draft</span>
-  <span>illustrative comparables · live runs price from real eBay data</span>
+  <div class="footer-bottom" style="border:0;"><span>resell·agent — a sample draft · illustrative comparables</span><a href="./index.html" style="color:var(--gold);">The guide →</a></div>
 </div></footer>
 
+<script src="./main.js"></script>
 </body>
 </html>
