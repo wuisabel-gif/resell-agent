@@ -97,6 +97,31 @@
 
   $$('[data-year]').forEach((n) => (n.textContent = new Date().getFullYear()));
 
+  // market stat counters — count up when scrolled into view, reduced-motion safe
+  const statsWrap = $('[data-stats]');
+  if (statsWrap) {
+    const nums = $$('[data-count]', statsWrap);
+    const reduceS = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const finish = () => nums.forEach((n) => (n.textContent = n.dataset.count));
+    if (reduceS || !('IntersectionObserver' in window)) {
+      finish();
+    } else {
+      const io = new IntersectionObserver((entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        io.disconnect();
+        const t0 = performance.now(), dur = 1400;
+        const tick = (t) => {
+          const p = Math.min(1, (t - t0) / dur);
+          const ease = 1 - Math.pow(1 - p, 3);
+          nums.forEach((n) => (n.textContent = Math.round(Number(n.dataset.count) * ease)));
+          if (p < 1) requestAnimationFrame(tick); else finish();
+        };
+        requestAnimationFrame(tick);
+      }, { threshold: 0.35 });
+      io.observe(statsWrap);
+    }
+  }
+
   // hero carousel — auto-advance, dots, swipe, hover-pause, reduced-motion safe
   const carousel = $('[data-carousel]');
   if (carousel) {

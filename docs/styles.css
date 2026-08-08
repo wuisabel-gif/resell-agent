@@ -518,3 +518,13 @@ code.k{font-family:var(--sans);background:var(--surface-2);color:var(--gold-ink)
 .photoband h2{color:oklch(0.97 0.01 312);}
 .photoband p{color:oklch(0.85 0.015 312);}
 .logos{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:clamp(1.4rem,5vw,3.4rem);font-family:var(--serif);font-size:clamp(1.2rem,1rem+0.8vw,1.6rem);color:var(--ink-soft);}
+
+/* ── market stats (count-up demo) ────────────────────────────────────────── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:clamp(1.4rem,3vw,2.4rem);margin-top:2.6rem;}
+.stat-card{border-top:2px solid var(--gold-ink);padding-top:1.2rem;}
+.stat-card .big{font-family:var(--serif);font-size:clamp(2.2rem,1.7rem+2vw,3.2rem);line-height:1;color:var(--ink);font-variant-numeric:tabular-nums;}
+.stat-card .big .unit{font-size:0.55em;color:var(--gold-ink);}
+.stat-card p{font-size:var(--step--1);color:var(--muted);margin-top:0.6rem;}
+.band .stat-card .big{color:oklch(0.97 0.01 312);}
+.band .stat-card p{color:oklch(0.8 0.015 312);}
+.band .stat-card{border-top-color:var(--gold);}

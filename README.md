@@ -32,6 +32,31 @@ resell·agent does that work. Photograph a piece and it returns a priced, polish
 draft, attributes, comparables, and listing copy for eBay and Poshmark, so the value
 in a closet is realised, not stored.
 
+## The market
+
+Those closet pieces sit inside a fast-growing market. Second-hand luxury is now worth
+roughly **$40B to $63B** globally and growing about **8 to 10% a year**, on track
+toward **$70B to $160B+ by the early 2030s**, expanding around three times faster than
+the primary luxury market. North America is the largest region (about 38 to 40%),
+then Europe (about 30%).
+
+- **Handbags and leather goods** are roughly 34% of sales, driven by repeated
+  first-hand price hikes; **watches and jewellery** are nearly 28%, on strong value
+  retention; apparel keeps growing steadily.
+- **72 to 80%** of buyers cite lower prices and value retention as the reason to buy
+  pre-owned; **40 to 52%** cite sustainability and circular fashion.
+- Counterfeit anxiety touches about **46%** of shoppers, and **64%+** of resale
+  platforms have adopted AI and digital authentication in response.
+
+resell·agent is a personal tool for that shift: it reads a piece, prices it from
+comparables, drafts the listing, and identifies the house from the photo as a lead to
+verify (identification, not authentication, see "what it won't do").
+
+Sources: [Towards Consumer Goods](https://www.towardsconsumergoods.com/insights/second-hand-luxury-goods-market),
+[Research and Markets](https://www.researchandmarkets.com/reports/6111024/secondhand-luxury-global-strategic-business),
+[BCG](https://www.bcg.com/publications/2025/how-fashion-luxury-brands-can-win-secondhand-market),
+[P&C Global](https://www.pandcglobal.com/research-insights/expansion-of-second-hand-luxury-market/).
+
 ## Seeing it detect
 
 Point it at a whole outfit and it separates the pieces, the dress, the bag, the
