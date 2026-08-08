@@ -35,7 +35,9 @@ in a closet is realised, not stored.
 ## Seeing it detect
 
 Point it at a whole outfit and it separates the pieces — the dress, the bag, the
-sunglasses, the heels — reading, identifying, and pricing each one on its own.
+sunglasses, the heels — reading, pricing, and matching each to a brand where its
+design gives it away (a lead to verify, never a claim). Generic pieces honestly
+come back "no confident match".
 
 ![resell-agent detecting each piece of an outfit](docs/detect.svg)
 
