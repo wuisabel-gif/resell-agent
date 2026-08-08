@@ -42,9 +42,9 @@
     </figure>
 
     <div class="ex-intro">
-      <img src="./image_02.focus.png" alt="Ivory floral lace cocktail dress on a hanger" />
+      <img src="./demo_02.png" alt="Yellow daisy applique midi dress, photographed on a city street" />
       <div><span class="eyebrow">The worked example</span>
-        <p>Steps four through six follow one real piece from the sample drafts: the ivory lace cocktail dress, no visible label, worn once.</p></div>
+        <p>Steps four through six follow one piece, a yellow daisy appliqué midi dress photographed on the street, no visible label, worn once, with what each step actually shows on screen.</p></div>
     </div>
 
     <div class="op"><div class="rn">1</div><div>
@@ -65,21 +65,14 @@
       <h3>Draft the listing</h3>
       <p>A clean frontal image and the label read best. Add <code class="k">--clean</code> to lift the piece from its background, a cleaner reading, and a squared image ready to list.</p>
       <div class="cmd">npm run draft -- --photos dress.jpg <span class="flag">--clean</span> --notes "worn once"</div>
-      <div class="ex"><span class="exl">Worked example · what it reads</span>
-        <pre>cleaned dress.jpg -> dress.clean.png
-Attributes: <b>ivory lace cocktail dress</b> · lace over mesh · cap sleeve · like-new
-House: <span class="warn">not visible, check the interior tag</span>   Length: <span class="warn">~ 44 in (estimate)</span></pre></div>
+      <img class="shot-img" src="./proc-terminal.png" alt="Terminal output of the draft run: attributes read, house not visible, price 90 to 210 dollars from 17 active asks, draft saved" />
+      <img class="shot-img" src="./proc-clean.png" alt="Before and after of the clean step: the street photograph beside the cut and squared dress on a white ground" />
     </div></div>
 
     <div class="op"><div class="rn">5</div><div>
       <h3>Review the draft</h3>
-      <p>The considered step. Read <code class="k">draft.md</code> before it goes anywhere and confirm the price, the condition notes, the category, and the titles.</p>
-      <div class="ex"><span class="exl">Worked example · draft.md, the lines that matter</span>
-        <pre><b>Price: $75-180</b> · start around $120 and adjust
-<i>no sold data, median of active asks</i>
-Comps: eBay active $135 (n=12) · Poshmark active $120 (n=9)
-Title: <b>Ivory Floral Lace Cap Sleeve Fitted Midi Cocktail Evening Dress</b>
-To do: <span class="warn">add the house and size from the interior tag before listing</span></pre></div>
+      <p>The considered step. Read <code class="k">draft.md</code> before it goes anywhere and confirm the price, the condition notes, the category, and the titles. For the yellow dress, the sheet flags what it could not read: the house, waiting on the interior tag.</p>
+      <img class="shot-img" src="./proc-draft.png" alt="The draft.md paste sheet: price 90 to 210 dollars, eBay and Poshmark blocks, a note to add the brand from the interior tag" />
     </div></div>
 
     <div class="op"><div class="rn">6</div><div>
@@ -87,8 +80,8 @@ To do: <span class="warn">add the house and size from the interior tag before li
       <p>Host the images at public URLs (eBay retrieves them), and the category carries from the draft. Poshmark stays by hand, the tool writes a listing to place, and never posts there for you.</p>
       <div class="ex"><span class="exl">Worked example · the placement</span>
         <pre>npm run post -- --draft draft.json --images https://host/dress.clean.png ...
-Category 63861 · Dresses carried from the draft · live on eBay at <b>$120</b>,
-the Poshmark copy pasted by hand, priced a touch warmer at <b>$135</b>.</pre></div>
+Category 63861 · Dresses carried from the draft · live on eBay at <b>$145</b>,
+the Poshmark copy pasted by hand, priced a touch warmer at <b>$160</b>.</pre></div>
     </div></div>
 
     <div style="margin-top:3rem;display:flex;gap:1rem;flex-wrap:wrap;">

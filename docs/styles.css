@@ -538,3 +538,6 @@ code.k{font-family:var(--sans);background:var(--surface-2);color:var(--gold-ink)
 .ex-intro{display:flex;gap:1.2rem;align-items:center;margin:0 0 3rem;max-width:640px;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:1rem 1.2rem;}
 .ex-intro img{width:86px;aspect-ratio:3/4;object-fit:cover;border-radius:3px;flex:none;}
 .ex-intro p{font-size:var(--step--1);color:var(--ink-soft);margin:0.3rem 0 0;}
+
+/* ── procedure screenshots ───────────────────────────────────────────────── */
+.shot-img{width:100%;max-width:660px;display:block;margin-top:1rem;border-radius:10px;box-shadow:0 24px 50px -32px oklch(0.2 0.03 312 / 0.55);}
