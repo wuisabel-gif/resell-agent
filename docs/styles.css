@@ -509,3 +509,12 @@ code.k{font-family:var(--sans);background:var(--surface-2);color:var(--gold-ink)
 .demo .dtotal{display:flex;justify-content:space-between;margin-top:0.9rem;font-family:var(--serif);font-size:1.2rem;color:var(--gold-ink);}
 .demo .dtotal b{color:var(--gold-ink);}
 .demo .dnote{font-size:0.74rem;color:var(--muted);margin-top:0.5rem;font-style:italic;}
+
+/* ── mid-page photo band (image behind an aubergine overlay) ──────────────── */
+.photoband{position:relative;background-size:cover;background-position:center;color:oklch(0.92 0.01 312);}
+.photoband::before{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,oklch(0.205 0.034 313 / 0.80),oklch(0.16 0.03 312 / 0.93));}
+.photoband > .wrap{position:relative;}
+.photoband .eyebrow{color:var(--gold);}
+.photoband h2{color:oklch(0.97 0.01 312);}
+.photoband p{color:oklch(0.85 0.015 312);}
+.logos{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:clamp(1.4rem,5vw,3.4rem);font-family:var(--serif);font-size:clamp(1.2rem,1rem+0.8vw,1.6rem);color:var(--ink-soft);}
