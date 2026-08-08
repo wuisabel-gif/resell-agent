@@ -1,0 +1,114 @@
+<svg viewBox="0 0 640 860" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="resell-agent detecting each piece of an outfit: sunglasses, dress, tote bag, heeled sandals">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0" stop-color="#3a4a34"/>
+      <stop offset="0.55" stop-color="#5b5238"/>
+      <stop offset="1" stop-color="#2b2130"/>
+    </linearGradient>
+    <linearGradient id="scanFade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c79a4a" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#c79a4a" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#c79a4a" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="vig" cx="0.5" cy="0.42" r="0.75">
+      <stop offset="0.6" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.45"/>
+    </radialGradient>
+    <style>
+      .name{font-family:Georgia,'Times New Roman',serif;font-size:16px;fill:#f4f1e8}
+      .conf{font-family:Arial,Helvetica,sans-serif;font-size:12px;fill:#c79a4a;letter-spacing:1.2px}
+      .eyebrow{font-family:Arial,Helvetica,sans-serif;font-size:13px;letter-spacing:5px;fill:#c79a4a}
+      .foot{font-family:Arial,Helvetica,sans-serif;font-size:12.5px;letter-spacing:3px;fill:#e7e0d4}
+      .box{fill:#c79a4a;fill-opacity:0.06;stroke:#c79a4a;stroke-width:2}
+      .tick{stroke:#f4f1e8;stroke-width:2.5}
+      .tag{fill:#241423}
+      .sil{fill:#cfc7b8;fill-opacity:0.30}
+      .det{opacity:1;transform-box:fill-box;transform-origin:center}
+      @media (prefers-reduced-motion: no-preference){
+        .det{animation:reveal 8s ease-in-out infinite}
+        .d1{animation-delay:0s}.d2{animation-delay:.8s}.d3{animation-delay:1.6s}.d4{animation-delay:2.4s}
+        .scan{animation:sweep 2.9s linear infinite}
+        .blip{animation:blink 1.1s steps(1) infinite}
+      }
+      @keyframes reveal{
+        0%{opacity:0;transform:scale(.93)}
+        6%{opacity:1;transform:scale(1)}
+        78%{opacity:1;transform:scale(1)}
+        90%,100%{opacity:0;transform:scale(1)}
+      }
+      @keyframes sweep{0%{transform:translateY(-40px)}100%{transform:translateY(860px)}}
+      @keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0.15}}
+    </style>
+  </defs>
+
+  <!-- scene -->
+  <rect width="640" height="860" fill="url(#bg)"/>
+  <circle cx="90" cy="150" r="70" fill="#9fb08a" fill-opacity="0.20"/>
+  <circle cx="560" cy="250" r="90" fill="#c9a3c4" fill-opacity="0.18"/>
+  <circle cx="540" cy="120" r="46" fill="#e7d9a0" fill-opacity="0.16"/>
+
+  <!-- stylised figure (schematic, so the boxes frame something) -->
+  <g class="sil">
+    <circle cx="320" cy="150" r="34"/>
+    <rect x="309" y="182" width="22" height="22"/>
+    <path d="M270 200 L370 200 L412 556 L228 556 Z"/>
+    <path d="M285 205 L268 470 L292 470 L312 210 Z"/>
+    <path d="M355 205 L378 470 L400 470 L335 210 Z"/>
+    <rect x="292" y="556" width="24" height="256" rx="10"/>
+    <rect x="324" y="556" width="24" height="256" rx="10"/>
+  </g>
+  <!-- woven tote in hand -->
+  <path class="sil" d="M312 486 L430 486 L410 584 L332 584 Z"/>
+
+  <rect width="640" height="860" fill="url(#vig)"/>
+
+  <!-- scanning line -->
+  <rect class="scan" x="0" y="0" width="640" height="40" fill="url(#scanFade)"/>
+
+  <!-- header -->
+  <text class="eyebrow" x="40" y="52">DETECTING PIECES</text>
+
+  <!-- 1 · Sunglasses -->
+  <g class="det d1">
+    <rect class="box" x="286" y="132" width="70" height="27" rx="2"/>
+    <path class="tick" d="M286 140 v-8 h8 M356 140 v-8 h-8"/>
+    <g transform="translate(112,104)">
+      <rect class="tag" x="0" y="-16" width="174" height="24" rx="2"/>
+      <text class="name" x="9" y="2">Sunglasses</text><text class="conf" x="122" y="1">0.94</text>
+    </g>
+  </g>
+
+  <!-- 2 · Dress -->
+  <g class="det d2">
+    <rect class="box" x="224" y="188" width="192" height="372" rx="2"/>
+    <path class="tick" d="M224 200 v-12 h12 M416 200 v-12 h-12 M224 548 v12 h12 M416 548 v12 h-12"/>
+    <g transform="translate(424,326)">
+      <rect class="tag" x="0" y="-16" width="192" height="24" rx="2"/>
+      <text class="name" x="9" y="2">Floral midi dress</text><text class="conf" x="142" y="1">0.97</text>
+    </g>
+  </g>
+
+  <!-- 3 · Tote bag -->
+  <g class="det d3">
+    <rect class="box" x="304" y="476" width="132" height="116" rx="2"/>
+    <path class="tick" d="M304 488 v-12 h12 M436 488 v-12 h-12"/>
+    <g transform="translate(440,540)">
+      <rect class="tag" x="0" y="-16" width="176" height="24" rx="2"/>
+      <text class="name" x="9" y="2">Woven tote</text><text class="conf" x="118" y="1">0.88</text>
+    </g>
+  </g>
+
+  <!-- 4 · Heeled sandals -->
+  <g class="det d4">
+    <rect class="box" x="280" y="790" width="98" height="52" rx="2"/>
+    <path class="tick" d="M280 802 v-12 h12 M378 802 v-12 h-12"/>
+    <g transform="translate(388,824)">
+      <rect class="tag" x="0" y="-16" width="200" height="24" rx="2"/>
+      <text class="name" x="9" y="2">Heeled sandals</text><text class="conf" x="150" y="1">0.91</text>
+    </g>
+  </g>
+
+  <!-- footer -->
+  <circle class="blip" cx="46" cy="828" r="5" fill="#c79a4a"/>
+  <text class="foot" x="60" y="833">resell·agent · four pieces, priced separately</text>
+</svg>
