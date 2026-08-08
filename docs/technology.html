@@ -56,7 +56,7 @@
     <div class="sec-head"><span class="eyebrow">Under the hood</span><h2>The machine learning</h2>
       <p>Three models do the reading, one cloud and two on your own machine. The price, deliberately, is not one of them.</p></div>
     <div class="values">
-      <div class="value"><h3>Vision-language model</h3><p>Reads the piece from its photographs: the house, condition, flaws, an estimated size, and the finished listing copy. Runs in the cloud.</p></div>
+      <div class="value"><h3>Vision-language model</h3><p>Reads the piece from its photographs: the house, condition, flaws, an estimated size, and the finished listing copy. It also locates each sellable piece in a full-outfit photo, so a whole look is drafted piece by piece. Runs in the cloud.</p></div>
       <div class="value"><h3>Segmentation, U²-Net</h3><p>A convolutional network that lifts the piece from its background for the cutout. Runs locally.</p></div>
       <div class="value"><h3>CLIP and nearest neighbour</h3><p>Encodes the photo into a vector and matches it against your own reference library to suggest a house. Runs locally, no keys.</p></div>
       <div class="value"><h3>Pricing is statistics</h3><p>The price is a trimmed median of real comparables, not a model. Honest and debuggable where a predictor on thin resale data would not be.</p></div>

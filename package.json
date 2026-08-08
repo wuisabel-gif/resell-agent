@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc",
     "draft": "node --env-file=.env dist/cli.js draft",
+    "outfit": "node --env-file=.env dist/cli.js outfit",
     "index": "node --env-file=.env dist/cli.js index",
     "post": "node --env-file=.env dist/cli.js post",
     "auth-url": "node --env-file=.env dist/cli.js auth-url",

@@ -39,9 +39,17 @@ sunglasses, the heels, reading, pricing, and matching each to a brand where its
 design gives it away (a lead to verify, never a claim). Generic pieces honestly
 come back "no confident match".
 
+This is a real command: `npm run outfit -- --photos look.jpg` runs Claude vision as
+the detector (a bounding box per sellable piece), crops each region, runs the normal
+single-item pipeline on it, and writes `outfit.svg` (a detection overlay built from
+the actual boxes) plus a paste sheet per piece. The three graphics below are
+illustrative examples of that output.
+
 ![resell-agent detecting each piece of an outfit](docs/detect.svg)
 
 ![resell-agent detecting a Gucci look and matching the brand](docs/detect-03.svg)
+
+![resell-agent detecting a street look and matching the brand](docs/detect-04.svg)
 
 ## How it works
 
@@ -138,6 +146,18 @@ if `sharp` is unavailable it falls back to the uncropped cutout.
 
 The draft step also resolves the eBay leaf category and fills item specifics
 automatically (Taxonomy API), so `post` no longer needs `--category`.
+
+### A whole outfit at once
+
+```
+npm run outfit -- --photos look.jpg
+```
+
+Detects every sellable piece in one photo (Claude vision returns a box per item),
+crops each region, and drafts them separately, so a full look becomes one paste sheet
+per piece plus `outfit.svg`, a detection overlay drawn from the real boxes with each
+piece's brand and price. Each crop runs the same pipeline as `draft` (attributes,
+brand match, comps, price, copy).
 
 Post the eBay listing:
 

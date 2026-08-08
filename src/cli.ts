@@ -123,9 +123,39 @@ async function cmdIndex() {
   console.log(`Indexed ${idx.entries.length} photos across ${brands.size} labels -> ${out}. Set ENABLE_BRAND_MATCH=1 to use it.`);
 }
 
+// Multi-item: detect every piece in one photo, then draft each separately.
+async function cmdOutfit() {
+  const photo = (arg("--photos") ?? arg("--photo") ?? "").split(",")[0]?.trim();
+  const outBase = arg("--out") ?? "outfit";
+  const platforms = ((arg("--platforms") ?? "ebay,poshmark").split(",")) as Platform[];
+  if (!photo) {
+    console.error("Usage: outfit --photos look.jpg [--notes '...'] [--out outfit]");
+    process.exit(1);
+  }
+  const { buildOutfit, renderDetectionSvg } = await import("./outfit.js");
+  console.log(`Detecting pieces in ${photo} ...`);
+  const items = await buildOutfit(photo, arg("--notes") ?? "", platforms);
+  if (!items.length) {
+    console.log("No sellable pieces detected.");
+    return;
+  }
+  console.log(`\nDetected ${items.length} piece(s):`);
+  items.forEach((it, i) => {
+    const p = it.draft.price;
+    const price = p.suggested > 0 ? `${p.low}-${p.high} ${p.currency}` : "set manually";
+    const a = it.draft.attributes;
+    const brand = a.brand ? ` · ${a.brand}${a.brandInferred ? " (verify)" : ""}` : "";
+    writeFileSync(`${outBase}-${i + 1}.md`, renderSheet(it.draft, [it.crop]));
+    console.log(`  ${i + 1}. ${it.label} — ${price}${brand}`);
+  });
+  writeFileSync(`${outBase}.svg`, await renderDetectionSvg(photo, items));
+  console.log(`\nWrote ${outBase}.svg and ${items.length} sheet(s) (${outBase}-1.md ...). Review before sharing.`);
+}
+
 const cmd = process.argv[2];
 const table: Record<string, () => unknown | Promise<unknown>> = {
   draft: cmdDraft,
+  outfit: cmdOutfit,
   post: cmdPost,
   index: cmdIndex,
   "auth-url": cmdAuthUrl,
@@ -134,7 +164,7 @@ const table: Record<string, () => unknown | Promise<unknown>> = {
 
 const fn = table[cmd];
 if (!fn) {
-  console.error("Commands: draft | post | index | auth-url | auth-exchange");
+  console.error("Commands: draft | outfit | post | index | auth-url | auth-exchange");
   process.exit(1);
 }
 Promise.resolve(fn()).catch((e) => {
