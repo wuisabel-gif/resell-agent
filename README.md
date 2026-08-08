@@ -55,28 +55,7 @@ illustrative examples of that output.
 
 ## How it works
 
-```mermaid
-flowchart TD
-    P["Photos + notes"] -->|"--clean (optional)"| CUT
-    subgraph CUT["Cut the item out"]
-      direction LR
-      BG["Remove background<br/>U²-Net segmentation"] --> TRIM["Auto-crop<br/>trim transparent border to bbox + pad"]
-    end
-    CUT --> X["Extract attributes<br/>Claude vision"]
-    P -.->|"without --clean"| X
-    X --> COMPS
-    subgraph COMPS["Comps, gathered in parallel"]
-      direction LR
-      EB["eBay active + sold"]
-      OT["Poshmark · ThredUp · The RealReal · Mercari<br/>(gated, opt-in)"]
-    end
-    X --> TAX["Category + item specifics<br/>eBay Taxonomy API"]
-    COMPS --> PRICE["Price<br/>trimmed median + per-platform comparison"]
-    PRICE --> LIST["Listings<br/>eBay + Poshmark copy"]
-    TAX --> DRAFT["draft.json"]
-    LIST --> DRAFT
-    DRAFT -->|"post, on command"| PUB["Publish to eBay"]
-```
+![resell·agent flow: photographs to a published eBay listing](docs/flow.svg)
 
 ### Cutting the item out (`--clean`)
 

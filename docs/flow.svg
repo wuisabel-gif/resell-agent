@@ -1,0 +1,63 @@
+<svg viewBox="0 0 760 914" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="resell-agent flow: photographs to a published eBay listing">
+  <defs>
+    <marker id="arw" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#9a7b3f"/>
+    </marker>
+  </defs>
+  <rect width="760" height="914" fill="#faf8f2"/>
+  
+    <g>
+      <rect x="70" y="24" width="620" height="66" rx="6" fill="#f4f1ea" stroke="#dcd6ca" stroke-width="1.5"/>
+      <text x="380" y="52" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="20" fill="#241423">Photographs + notes</text>
+      <text x="380" y="74" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="13" fill="#6f6a5f">one image or a batch</text>
+      <path d="M380 90 L380 124" stroke="#9a7b3f" stroke-width="2" marker-end="url(#arw)"/>
+    </g>
+    <g>
+      <rect x="70" y="124" width="620" height="66" rx="6" fill="#f4f1ea" stroke="#dcd6ca" stroke-width="1.5"/>
+      <text x="380" y="152" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="20" fill="#241423">Cut out the item</text>
+      <text x="380" y="174" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="13" fill="#6f6a5f">remove background · auto-crop   (optional: --clean)</text>
+      <path d="M380 190 L380 224" stroke="#9a7b3f" stroke-width="2" marker-end="url(#arw)"/>
+    </g>
+    <g>
+      <rect x="70" y="224" width="620" height="66" rx="6" fill="#f4f1ea" stroke="#dcd6ca" stroke-width="1.5"/>
+      <text x="380" y="252" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="20" fill="#241423">Read attributes</text>
+      <text x="380" y="274" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="13" fill="#6f6a5f">house, material, condition, size · Claude vision</text>
+      <path d="M380 290 L380 324" stroke="#9a7b3f" stroke-width="2" marker-end="url(#arw)"/>
+    </g>
+    <g>
+      <rect x="70" y="324" width="620" height="66" rx="6" fill="#f4f1ea" stroke="#dcd6ca" stroke-width="1.5"/>
+      <text x="380" y="352" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="20" fill="#241423">Gather comps</text>
+      <text x="380" y="374" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="13" fill="#6f6a5f">eBay · Poshmark · ThredUp · The RealReal · Mercari (gated)</text>
+      <path d="M380 390 L380 424" stroke="#9a7b3f" stroke-width="2" marker-end="url(#arw)"/>
+    </g>
+    <g>
+      <rect x="70" y="424" width="620" height="66" rx="6" fill="#f4f1ea" stroke="#dcd6ca" stroke-width="1.5"/>
+      <text x="380" y="452" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="20" fill="#241423">Resolve category + specifics</text>
+      <text x="380" y="474" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="13" fill="#6f6a5f">eBay Taxonomy API</text>
+      <path d="M380 490 L380 524" stroke="#9a7b3f" stroke-width="2" marker-end="url(#arw)"/>
+    </g>
+    <g>
+      <rect x="70" y="524" width="620" height="66" rx="6" fill="#f4f1ea" stroke="#dcd6ca" stroke-width="1.5"/>
+      <text x="380" y="552" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="20" fill="#241423">Price</text>
+      <text x="380" y="574" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="13" fill="#6f6a5f">trimmed median + per-platform comparison</text>
+      <path d="M380 590 L380 624" stroke="#9a7b3f" stroke-width="2" marker-end="url(#arw)"/>
+    </g>
+    <g>
+      <rect x="70" y="624" width="620" height="66" rx="6" fill="#f4f1ea" stroke="#dcd6ca" stroke-width="1.5"/>
+      <text x="380" y="652" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="20" fill="#241423">Compose listings</text>
+      <text x="380" y="674" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="13" fill="#6f6a5f">eBay + Poshmark copy</text>
+      <path d="M380 690 L380 724" stroke="#9a7b3f" stroke-width="2" marker-end="url(#arw)"/>
+    </g>
+    <g>
+      <rect x="70" y="724" width="620" height="66" rx="6" fill="#f4f1ea" stroke="#dcd6ca" stroke-width="1.5"/>
+      <text x="380" y="752" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="20" fill="#241423">draft.json + paste sheet</text>
+      <text x="380" y="774" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="13" fill="#6f6a5f">reviewed before anything is placed</text>
+      <path d="M380 790 L380 824" stroke="#9a7b3f" stroke-width="2" marker-end="url(#arw)"/>
+    </g>
+    <g>
+      <rect x="70" y="824" width="620" height="66" rx="6" fill="#241423" stroke="#241423" stroke-width="1.5"/>
+      <text x="380" y="852" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="20" fill="#f4f1e8">Publish to eBay</text>
+      <text x="380" y="874" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="13" fill="#d8c9a0">post, on your command</text>
+      
+    </g>
+</svg>
