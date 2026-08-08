@@ -1,7 +1,7 @@
 # resell-agent
 
 A resale agent for the pieces worth selling well. Point it at photographs of a
-garment or accessory — it identifies the piece, prices it against the market,
+garment or accessory, it identifies the piece, prices it against the market,
 writes considered listings for eBay and Poshmark, and can place the eBay listing
 for you.
 
@@ -10,7 +10,7 @@ Two halves:
 - **Brain** (read-only, safe): photos → attributes → comps → price → listing copy.
   Comps are gathered in parallel across sources (eBay by default; Poshmark, ThredUp,
   The RealReal, Mercari optional), and the draft shows a per-platform price
-  comparison. Only eBay is a sanctioned API — the rest are opt-in, ToS-risky
+  comparison. Only eBay is a sanctioned API, the rest are opt-in, ToS-risky
   scrapers, off unless you set their `ENABLE_*` flag. The suggested price stays
   eBay-anchored, since that's where `post` lists.
 - **Hands** (eBay only for now): publishes a real listing via the eBay Sell API.
@@ -18,24 +18,24 @@ Two halves:
 Poshmark has no public API. The tool writes you a ready-to-paste Poshmark listing
 but does not auto-post there (automating that UI carries account-ban risk, so it's
 left out). The optional Poshmark *price* source above only reads asking prices for
-comparison, and carries the same risk — hence off by default.
+comparison, and carries the same risk, hence off by default.
 
 ## Why
 
 A wardrobe accumulates value it rarely realises. The bag that's fallen out of
-rotation, the barely-worn designer coat, the watch kept in a drawer — each is worth
+rotation, the barely-worn designer coat, the watch kept in a drawer, each is worth
 real money to the right buyer. But selling it well is its own discipline: knowing the
 honest market price rather than a lowball, writing a listing that reads as considered
 rather than eager, and placing it where those buyers actually look.
 
 resell·agent does that work. Photograph a piece and it returns a priced, polished
-draft — attributes, comparables, and listing copy for eBay and Poshmark — so the value
+draft, attributes, comparables, and listing copy for eBay and Poshmark, so the value
 in a closet is realised, not stored.
 
 ## Seeing it detect
 
-Point it at a whole outfit and it separates the pieces — the dress, the bag, the
-sunglasses, the heels — reading, pricing, and matching each to a brand where its
+Point it at a whole outfit and it separates the pieces, the dress, the bag, the
+sunglasses, the heels, reading, pricing, and matching each to a brand where its
 design gives it away (a lead to verify, never a claim). Generic pieces honestly
 come back "no confident match".
 
@@ -72,17 +72,17 @@ Two steps, both in [`src/brain/bgremove.ts`](src/brain/bgremove.ts):
 
 1. **Remove the background.** `@imgly/background-removal-node` runs a U²-Net
    segmentation model that classifies each pixel as subject or background, and
-   erases the background — leaving a transparent PNG with just the item.
+   erases the background, leaving a transparent PNG with just the item.
 2. **Auto-crop to the item.** Because everything outside the item is now
    transparent, its bounding box *is* the non-transparent pixels. `sharp.trim()`
    removes the transparent border (cropping tight to the item), then a small
    transparent pad is added back so it isn't flush to the edge.
 
-The result is a centered, tight, transparent cutout — cleaner input for the vision
+The result is a centered, tight, transparent cutout, cleaner input for the vision
 step and listing-ready (eBay composites transparent PNGs onto white). The crop is
 best-effort: if `sharp` is unavailable it falls back to the uncropped cutout.
 
-A visual operating guide lives in [`docs/index.html`](docs/index.html) — serve it
+A visual operating guide lives in [`docs/index.html`](docs/index.html), serve it
 (`python3 -m http.server -d docs`) or publish the `docs/` folder to GitHub Pages.
 The walkthrough section has placeholder slots to drop your own photos and listing
 screenshots into.
@@ -119,7 +119,7 @@ Draft (no posting):
 npm run draft -- --photos front.jpg,back.jpg,tag.jpg --notes "small stain on left cuff"
 ```
 
-Writes `draft.json` (data) and `draft.md` — a paste sheet with an eBay block and a
+Writes `draft.json` (data) and `draft.md`, a paste sheet with an eBay block and a
 Poshmark block (title, price range, description, item specifics) plus the photo
 references. The price is shown as a **range with a suggested starting point**, not a
 single number, since it's comp-derived. Send the `.md` to whoever's listing the item;
@@ -127,7 +127,7 @@ they copy the block into their own account. Review before sharing.
 
 Add `--clean` to remove photo backgrounds first (via `@imgly/background-removal-node`),
 then auto-crop tight to the item (`sharp` trims the transparent margin, leaving a small
-pad). It writes a transparent `*.clean.png` next to each photo — cleaner, centered input
+pad). It writes a transparent `*.clean.png` next to each photo, cleaner, centered input
 for attribute extraction, and listing-ready (eBay composites transparent PNGs onto white).
 Host those `.clean.png` files and pass them to `post --images`. Note: the remover and crop
 pull native deps (`sharp`, `onnxruntime-node`) whose install scripts you must approve on
@@ -146,7 +146,7 @@ npm run post -- --draft draft.json \
   --fulfillment <id> --payment <id> --return <id>
 ```
 
-`--category <id>` is now optional — pass it only to override the auto-resolved one.
+`--category <id>` is now optional, pass it only to override the auto-resolved one.
 
 Image URLs must be publicly reachable (eBay pulls them). Host them somewhere first.
 
@@ -161,7 +161,7 @@ Image URLs must be publicly reachable (eBay pulls them). Host them somewhere fir
   source (eBay sold, eBay active, Poshmark). Only eBay has a sanctioned API. The
   Poshmark, ThredUp, The RealReal, and Mercari sources (`src/poshmark.ts`,
   `thredup.ts`, `therealreal.ts`, `mercari.ts`, sharing `src/sources.ts`) hit
-  unofficial internal endpoints — each is against that platform's ToS, fragile, and
+  unofficial internal endpoints, each is against that platform's ToS, fragile, and
   off unless you set its `ENABLE_*` flag; account/IP-ban risk is yours. Each yields
   `[]` when off or blocked, so the draft never depends on them. The suggested price
   stays eBay-anchored (post lists to eBay); other platforms only inform the
