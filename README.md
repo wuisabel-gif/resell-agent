@@ -41,6 +41,8 @@ come back "no confident match".
 
 ![resell-agent detecting each piece of an outfit](docs/detect.svg)
 
+![resell-agent detecting a Gucci look and matching the brand](docs/detect-03.svg)
+
 ## How it works
 
 ```mermaid
