@@ -485,3 +485,7 @@ code.k{font-family:var(--sans);background:var(--surface-2);color:var(--gold-ink)
 .hero-dots button[aria-current="true"]{background:var(--gold);}
 .hero-dots button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
 @media (prefers-reduced-motion:reduce){ .hero-slide{transition:none;} }
+
+/* ── page-hero with a photo behind the aubergine overlay ──────────────────── */
+.page-hero.photo{ background-size:cover; background-position:center; background-repeat:no-repeat; }
+.page-hero.photo::before{ background:linear-gradient(to bottom, oklch(0.205 0.034 313 / 0.72), oklch(0.16 0.03 312 / 0.94)); }
