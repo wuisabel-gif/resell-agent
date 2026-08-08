@@ -528,3 +528,13 @@ code.k{font-family:var(--sans);background:var(--surface-2);color:var(--gold-ink)
 .band .stat-card .big{color:oklch(0.97 0.01 312);}
 .band .stat-card p{color:oklch(0.8 0.015 312);}
 .band .stat-card{border-top-color:var(--gold);}
+
+/* ── worked-example callouts on the procedure page ───────────────────────── */
+.ex{background:var(--surface-2);border:1px solid var(--line);border-radius:3px;padding:1rem 1.2rem;margin-top:0.9rem;max-width:640px;}
+.ex .exl{font-size:0.62rem;font-weight:600;text-transform:uppercase;letter-spacing:0.14em;color:var(--gold-ink);display:block;margin-bottom:0.5rem;}
+.ex pre{margin:0;font-family:ui-monospace,Menlo,monospace;font-size:0.8rem;line-height:1.65;color:var(--ink-soft);white-space:pre-wrap;}
+.ex pre b{color:var(--ink);font-weight:600;}
+.ex pre .warn{color:var(--gold-ink);font-style:italic;}
+.ex-intro{display:flex;gap:1.2rem;align-items:center;margin:0 0 3rem;max-width:640px;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:1rem 1.2rem;}
+.ex-intro img{width:86px;aspect-ratio:3/4;object-fit:cover;border-radius:3px;flex:none;}
+.ex-intro p{font-size:var(--step--1);color:var(--ink-soft);margin:0.3rem 0 0;}
