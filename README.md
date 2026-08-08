@@ -51,6 +51,8 @@ illustrative examples of that output.
 
 ![resell-agent detecting a street look and matching the brand](docs/detect-04.svg)
 
+![resell-agent detecting a Fifth Avenue look and matching the brand](docs/detect-05.svg)
+
 ## How it works
 
 ```mermaid
