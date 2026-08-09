@@ -31,7 +31,7 @@
 <main id="main">
   <section class="page-hero photo" style="background-image:url('./hero-commands.jpg')"><div class="wrap">
     <span class="eyebrow" style="color:var(--gold);">Commands</span>
-    <h1>Four verbs.</h1>
+    <h1>Six verbs.</h1>
     <p>Everything up to <em>post</em> only reads. The draft is a file you review before anything is placed.</p>
   </div></section>
 
@@ -40,12 +40,31 @@
       <thead><tr><th>Verb</th><th>What it does</th><th>Principal flags</th></tr></thead>
       <tbody>
         <tr><td>draft</td><td>Photographs to attributes, comparables, price, and listings. Writes draft.json and a paste sheet. Read-only.</td><td><span class="fl">--photos --notes --platforms --clean --out</span></td></tr>
+        <tr><td>outfit</td><td>Detects every sellable piece in one photograph, crops each, and drafts them separately: one paste sheet per piece plus a detection overlay. Read-only.</td><td><span class="fl">--photos --notes --out</span></td></tr>
+        <tr><td>index</td><td>Embeds your reference photos (refs/) into brand-index.json for the visual brand match.</td><td><span class="fl">--dir --out</span></td></tr>
         <tr><td>post</td><td>Places the eBay listing from a draft.</td><td><span class="fl">--draft --images --location --fulfillment --payment --return</span></td></tr>
         <tr><td>auth-url</td><td>Prints the eBay consent URL for one-time authorisation.</td><td><span class="fl">None</span></td></tr>
         <tr><td>auth-exchange</td><td>Exchanges the returned code for a refresh token.</td><td><span class="fl">&lt;code&gt;</span></td></tr>
       </tbody>
     </table></div>
     <div style="margin-top:3rem;"><a class="btn btn--ghost" href="./procedure.html">See the full procedure</a></div>
+  </div></section>
+
+  <section class="section" style="background:var(--surface);"><div class="wrap">
+    <div class="how">
+      <div>
+        <span class="eyebrow">One verb, illustrated</span>
+        <h2 style="margin:0.9rem 0 1.2rem;">outfit, on one photograph</h2>
+        <div class="cmd">npm run outfit -- --photos toyshop.jpg</div>
+        <p style="margin-top:1.2rem;">One photograph in a toy shop, phone in hand. The command finds each sellable piece, crops it, and drafts it on its own: the slip dress read from its print and cut, the pendant named Van Cleef from the clover alone, the sunglasses honestly unmatched. Out come three paste sheets and this overlay.</p>
+        <p style="margin-top:1rem;color:var(--muted);font-size:var(--step--1);">Illustrative example of the outfit command's output.</p>
+      </div>
+      <div>
+        <figure class="demo" style="margin:0;">
+          <img src="./detect-08.svg" alt="resell-agent detecting pieces in a toy shop: Reformation floral slip dress, Van Cleef pendant, sunglasses" />
+        </figure>
+      </div>
+    </div>
   </div></section>
 </main>
 
