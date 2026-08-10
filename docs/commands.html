@@ -51,20 +51,53 @@
   </div></section>
 
   <section class="section" style="background:var(--surface);"><div class="wrap">
-    <div class="how">
-      <div>
-        <span class="eyebrow">One verb, illustrated</span>
-        <h2 style="margin:0.9rem 0 1.2rem;">outfit, on one photograph</h2>
-        <div class="cmd">npm run outfit -- --photos toyshop.jpg</div>
-        <p style="margin-top:1.2rem;">One photograph in a toy shop, phone in hand. The command finds each sellable piece, crops it, and drafts it on its own: the slip dress read from its print and cut, the pendant named Van Cleef from the clover alone, the sunglasses honestly unmatched. Out come three paste sheets and this overlay.</p>
-        <p style="margin-top:1rem;color:var(--muted);font-size:var(--step--1);">Illustrative example of the outfit command's output.</p>
-      </div>
-      <div>
-        <figure class="demo" style="margin:0;">
-          <img src="./detect-08.svg" alt="resell-agent detecting pieces in a toy shop: Reformation floral slip dress, Van Cleef pendant, sunglasses" />
-        </figure>
-      </div>
-    </div>
+    <div class="sec-head"><span class="eyebrow">Each verb, shown</span><h2>What every command looks like when it runs</h2>
+      <p>The same yellow dress and toy-shop photograph as everywhere else on the site; illustrative outputs, faithful to what the tool prints.</p></div>
+
+    <div class="op"><div class="rn" style="font-size:1.15rem;">draft</div><div>
+      <div class="cmd">npm run draft -- --photos dress.jpg <span class="flag">--clean</span> --notes "worn once"</div>
+      <img class="shot-img" src="./proc-terminal.png" alt="Terminal output of the draft run: attributes read, house not visible, price 90 to 210 dollars, draft saved" />
+    </div></div>
+
+    <div class="op"><div class="rn" style="font-size:1.15rem;">outfit</div><div>
+      <div class="cmd">npm run outfit -- --photos toyshop.jpg</div>
+      <div class="ex"><span class="exl">What it prints</span>
+        <pre>Detecting pieces in toyshop.jpg ...
+Detected 3 piece(s):
+  1. slip dress, 90-210 USD · <b>Reformation</b> (verify)
+  2. pendant necklace, 1,900-3,200 USD · <b>Van Cleef &amp; Arpels</b> (verify)
+  3. sunglasses, 40-90 USD
+Wrote outfit.svg and 3 sheet(s) (outfit-1.md ...). Review before sharing.</pre></div>
+      <img class="shot-img" src="./detect-08.svg" alt="The outfit.svg overlay: Reformation slip dress, Van Cleef pendant, sunglasses detected in a toy shop" style="max-width:480px;" />
+    </div></div>
+
+    <div class="op"><div class="rn" style="font-size:1.15rem;">index</div><div>
+      <div class="cmd">npm run index -- --dir refs</div>
+      <div class="ex"><span class="exl">What it prints</span>
+        <pre>Embedding reference photos in refs/ (first run downloads the model)...
+Indexed 3 photos across 3 labels -> <b>brand-index.json</b>. Set ENABLE_BRAND_MATCH=1 to use it.</pre></div>
+    </div></div>
+
+    <div class="op"><div class="rn" style="font-size:1.15rem;">post</div><div>
+      <div class="cmd">npm run post -- --draft draft.json --images https://host/dress.clean.png --location my-loc --fulfillment 1201... --payment 1202... --return 1203...</div>
+      <div class="ex"><span class="exl">What it prints</span>
+        <pre>Publishing "Yellow Daisy Applique Guipure Midi Dress A-Line Short Sleeve" at 145 ...
+<b>Live.</b> offerId=8724531012 listingId=1160245822</pre></div>
+    </div></div>
+
+    <div class="op"><div class="rn" style="font-size:1.15rem;">auth-url</div><div>
+      <div class="cmd">npm run auth-url</div>
+      <div class="ex"><span class="exl">What it prints</span>
+        <pre>Open this URL, sign in, approve, then copy the ?code= value from the redirect:
+https://auth.sandbox.ebay.com/oauth2/authorize?client_id=Isabel...&amp;redirect_uri=Isabel_Wu-...&amp;response_type=code&amp;scope=...</pre></div>
+    </div></div>
+
+    <div class="op"><div class="rn" style="font-size:1.15rem;">auth-exchange</div><div>
+      <div class="cmd">npm run auth-exchange -- v%5E1.23%40dAAE...</div>
+      <div class="ex"><span class="exl">What it prints</span>
+        <pre>Add this to your .env:
+EBAY_USER_REFRESH_TOKEN=v^1.1#i^1#p^3#r^1...<span class="warn"> (kept private, never committed)</span></pre></div>
+    </div></div>
   </div></section>
 </main>
 
