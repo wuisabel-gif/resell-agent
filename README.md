@@ -70,13 +70,12 @@ single-item pipeline on it, and writes `outfit.svg` (a detection overlay built f
 the actual boxes) plus a paste sheet per piece. The three graphics below are
 illustrative examples of that output.
 
-![resell-agent detecting each piece of an outfit](docs/detect.svg)
+<img src="docs/detect-06.svg" alt="Back view on a garden path: the crossbody reads Dior from its hardware and charm; the rest is honest about what a back view can't tell" width="49%" /> <img src="docs/detect-08.svg" alt="In a toy shop: the slip dress reads Reformation, the pendant reads Van Cleef from the clover alone, the sunglasses honestly unmatched" width="49%" />
 
-![resell-agent detecting a Gucci look and matching the brand](docs/detect-03.svg)
-
-![resell-agent detecting a street look and matching the brand](docs/detect-04.svg)
-
-![resell-agent detecting a Fifth Avenue look and matching the brand](docs/detect-05.svg)
+Left: photographed from behind, the bag still reads Dior from its hardware and charm.
+Right: in a toy shop, the pendant is named Van Cleef from the clover alone, and the
+sunglasses honestly come back "no confident match". More scenes on the
+[site](https://wuisabel-gif.github.io/resell-agent/case.html).
 
 ## How it works
 
@@ -97,6 +96,8 @@ Two steps, both in [`src/brain/bgremove.ts`](src/brain/bgremove.ts):
 The result is a centered, tight, transparent cutout, cleaner input for the vision
 step and listing-ready (eBay composites transparent PNGs onto white). The crop is
 best-effort: if `sharp` is unavailable it falls back to the uncropped cutout.
+
+![Before and after of the clean step: a street photograph beside the cut and squared dress on a white ground](docs/proc-clean.png)
 
 A visual operating guide lives in [`docs/index.html`](docs/index.html), serve it
 (`python3 -m http.server -d docs`) or publish the `docs/` folder to GitHub Pages.
@@ -135,6 +136,8 @@ Draft (no posting):
 npm run draft -- --photos front.jpg,back.jpg,tag.jpg --notes "small stain on left cuff"
 ```
 
+<img src="docs/proc-terminal.png" alt="Terminal output of a draft run: attributes read, house not visible, a price range from active asks, draft saved" width="72%" />
+
 Writes `draft.json` (data) and `draft.md`, a paste sheet with an eBay block and a
 Poshmark block (title, price range, description, item specifics) plus the photo
 references. The price is shown as a **range with a suggested starting point**, not a
@@ -164,6 +167,14 @@ crops each region, and drafts them separately, so a full look becomes one paste 
 per piece plus `outfit.svg`, a detection overlay drawn from the real boxes with each
 piece's brand and price. Each crop runs the same pipeline as `draft` (attributes,
 brand match, comps, price, copy).
+
+### The reference library
+
+`npm run index -- --dir refs` embeds your own photos into a small local library;
+every later draft is matched against it by nearest neighbour (CLIP embeddings,
+no keys, offline). The same cream bag, two outings apart:
+
+<img src="docs/detect-11.svg" alt="Indexing: the cream shoulder bag saved into the reference library as reference 01" width="49%" /> <img src="docs/detect-12.svg" alt="Matched: the same cream shoulder bag recognised against the reference library at 0.91" width="49%" />
 
 Post the eBay listing:
 
