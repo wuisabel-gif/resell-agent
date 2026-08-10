@@ -59,14 +59,14 @@
       <h3>Draft the listing</h3>
       <p>A clean frontal image and the label read best. Add <code class="k">--clean</code> to lift the piece from its background, a cleaner reading, and a squared image ready to list.</p>
       <div class="cmd">npm run draft -- --photos dress.jpg <span class="flag">--clean</span> --notes "worn once"</div>
-      <img class="shot-img" src="./proc-terminal.png" alt="Terminal output of the draft run: attributes read, house not visible, price 90 to 210 dollars from 17 active asks, draft saved" />
+      <img class="shot-img" src="./proc-terminal.png" alt="Terminal output of the draft run: attributes read, the exact piece named Valentino, retail found, priced 1,150 to 2,300 dollars, draft saved" />
       <img class="shot-img" src="./proc-clean.png" alt="Before and after of the clean step: the street photograph beside the cut and squared dress on a white ground" />
     </div></div>
 
     <div class="op"><div class="rn">5</div><div>
       <h3>Review the draft</h3>
-      <p>The considered step. Read <code class="k">draft.md</code> before it goes anywhere and confirm the price, the condition notes, the category, and the titles. For the yellow dress, the sheet flags what it could not read: the house, waiting on the interior tag.</p>
-      <img class="shot-img" src="./proc-draft.png" alt="The draft.md paste sheet: price 90 to 210 dollars, eBay and Poshmark blocks, a note to add the brand from the interior tag" />
+      <p>The considered step. Read <code class="k">draft.md</code> before it goes anywhere and confirm the price, the condition notes, the category, and the titles. For the yellow dress, the sheet names the exact piece, Valentino's embroidered linen midi, links where it sells new, and prices the resale against that, to verify before listing.</p>
+      <img class="shot-img" src="./proc-draft.png" alt="The draft.md paste sheet: the exact Valentino piece named, retail prices, eBay and Poshmark blocks" />
     </div></div>
 
     <div class="op"><div class="rn">6</div><div>
@@ -74,8 +74,8 @@
       <p>Host the images at public URLs (eBay retrieves them), and the category carries from the draft. Poshmark stays by hand, the tool writes a listing to place, and never posts there for you.</p>
       <div class="ex"><span class="exl">Worked example · the placement</span>
         <pre>npm run post -- --draft draft.json --images https://host/dress.clean.png ...
-Category 63861 · Dresses carried from the draft · live on eBay at <b>$145</b>,
-the Poshmark copy pasted by hand, priced a touch warmer at <b>$160</b>.</pre></div>
+Category 63861 · Dresses carried from the draft · live on eBay at <b>$1,650</b>,
+the Poshmark copy pasted by hand, priced a touch warmer at <b>$1,750</b>.</pre></div>
       <img class="shot-img" src="./detect-13.svg" alt="A bow-front mini dress placed live on eBay at 95 dollars, offer and listing ids shown" style="max-width:440px;" />
     </div></div>
 

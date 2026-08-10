@@ -20,6 +20,14 @@ export function renderSheet(bundle: DraftBundle, photos: string[] = []): string 
   if (a.brand && a.brandInferred) {
     out.push(`Brand: ${a.brand} — inferred from the photo, not a visible label. Verify before listing.`, "");
   }
+  if (a.brand && a.productName) {
+    out.push(`Exact piece: ${a.brand} ${a.productName} — recognised from the photo, verify before listing.`, "");
+  }
+  if (bundle.retail.length) {
+    out.push("New at retail:");
+    for (const r of bundle.retail) out.push(`- ${r.retailer}: $${r.price} — ${r.url}`);
+    out.push("");
+  }
 
   if (comparison.length) {
     out.push("Comps by source:");

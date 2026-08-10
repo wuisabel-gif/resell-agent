@@ -3,6 +3,7 @@ export type Platform = "ebay" | "poshmark";
 export interface ItemAttributes {
   brand: string | null;
   brandInferred: boolean; // true = inferred from design signatures, not read off a label
+  productName: string | null; // exact product when identifiable, e.g. "Embroidered Linen Midi Dress"
   category: string;
   titleKeywords: string[];
   size: string | null;
@@ -27,6 +28,14 @@ export interface Comp {
     | "thredup-active"
     | "therealreal-active"
     | "mercari-active";
+}
+
+// A new/retail offer for the same item (like a Google Shopping row).
+export interface RetailListing {
+  retailer: string;
+  price: number;
+  currency: string;
+  url: string;
 }
 
 // One row of the cross-platform price comparison (trimmed stats per source).
@@ -63,5 +72,6 @@ export interface DraftBundle {
   price: PriceSuggestion;
   comps: Comp[];
   comparison: PlatformStat[];
+  retail: RetailListing[]; // where the exact piece sells new, when identified
   listings: ListingDraft[];
 }

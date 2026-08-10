@@ -5,12 +5,13 @@ import type { DraftBundle } from "./types.js";
 
 const bundle: DraftBundle = {
   attributes: {
-    brand: "Patagonia", brandInferred: false, category: "Fleece Jacket", titleKeywords: ["synchilla"],
+    brand: "Patagonia", brandInferred: false, productName: "Synchilla Snap-T", category: "Fleece Jacket", titleKeywords: ["synchilla"],
     size: "M", color: "green", material: "fleece", condition: "good",
     flaws: ["small stain on cuff"], dimensions: "≈ 27 x 24 in (estimate)", originalRetail: 139,
   },
   price: { suggested: 68, low: 55, high: 82, currency: "USD", basis: "median of 21 active asks", sampleSize: 21 },
   comparison: [{ source: "ebay-active", median: 80, low: 72, high: 95, n: 21 }],
+  retail: [{ retailer: "patagonia", price: 139, currency: "USD", url: "https://www.patagonia.com/x" }],
   comps: [],
   listings: [
     { platform: "ebay", title: "Patagonia Synchilla Fleece M Green", description: "Green fleece.", price: 68, condition: "good", categoryId: "57988", itemSpecifics: { Brand: ["Patagonia"], Size: ["M"] } },
@@ -29,6 +30,8 @@ assert.ok(md.includes("Brand: Patagonia"));
 assert.ok(md.includes("front.clean.png"));
 assert.ok(md.includes("small stain on cuff"));
 assert.ok(md.includes("≈ 27 x 24 in (estimate)"), "shows the estimated dimensions");
+assert.ok(md.includes("Exact piece: Patagonia Synchilla Snap-T"), "names the exact piece");
+assert.ok(md.includes("patagonia: $139"), "lists where it sells new");
 
 // No comps -> manual price, no crash.
 const empty = renderSheet({ ...bundle, price: { ...bundle.price, suggested: 0, low: 0, high: 0 }, comparison: [] });

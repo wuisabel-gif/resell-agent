@@ -52,23 +52,23 @@
 
   <section class="section" style="background:var(--surface);"><div class="wrap">
     <div class="sec-head"><span class="eyebrow">Each verb, shown</span><h2>What every command looks like when it runs</h2>
-      <p>The same yellow dress and toy-shop photograph as everywhere else on the site; illustrative outputs, faithful to what the tool prints.</p></div>
+      <p>The same yellow dress and courtyard photograph as elsewhere on the site; illustrative outputs, faithful to what the tool prints.</p></div>
 
     <div class="op"><div class="rn" style="font-size:1.15rem;">draft</div><div>
       <div class="cmd">npm run draft -- --photos dress.jpg <span class="flag">--clean</span> --notes "worn once"</div>
-      <img class="shot-img" src="./proc-terminal.png" alt="Terminal output of the draft run: attributes read, house not visible, price 90 to 210 dollars, draft saved" />
+      <img class="shot-img" src="./proc-terminal.png" alt="Terminal output of the draft run: attributes read, the exact piece named Valentino, retail found, draft saved" />
     </div></div>
 
     <div class="op"><div class="rn" style="font-size:1.15rem;">outfit</div><div>
-      <div class="cmd">npm run outfit -- --photos toyshop.jpg</div>
+      <div class="cmd">npm run outfit -- --photos courtyard.jpg</div>
       <div class="ex"><span class="exl">What it prints</span>
-        <pre>Detecting pieces in toyshop.jpg ...
+        <pre>Detecting pieces in courtyard.jpg ...
 Detected 3 piece(s):
-  1. slip dress, 90-210 USD · <b>Reformation</b> (verify)
-  2. pendant necklace, 1,900-3,200 USD · <b>Van Cleef &amp; Arpels</b> (verify)
+  1. scarf-print maxi dress, 280-650 USD · <b>Etro</b> (verify)
+  2. leather sandals, 60-140 USD
   3. sunglasses, 40-90 USD
 Wrote outfit.svg and 3 sheet(s) (outfit-1.md ...). Review before sharing.</pre></div>
-      <img class="shot-img" src="./detect-08.svg" alt="The outfit.svg overlay: Reformation slip dress, Van Cleef pendant, sunglasses detected in a toy shop" style="max-width:480px;" />
+      <img class="shot-img" src="./detect-10.svg" alt="The outfit.svg overlay: Etro scarf-print maxi dress, leather sandals, sunglasses detected in a courtyard" style="max-width:480px;" />
     </div></div>
 
     <div class="op"><div class="rn" style="font-size:1.15rem;">index</div><div>
@@ -81,7 +81,7 @@ Indexed 3 photos across 3 labels -> <b>brand-index.json</b>. Set ENABLE_BRAND_MA
     <div class="op"><div class="rn" style="font-size:1.15rem;">post</div><div>
       <div class="cmd">npm run post -- --draft draft.json --images https://host/dress.clean.png --location my-loc --fulfillment 1201... --payment 1202... --return 1203...</div>
       <div class="ex"><span class="exl">What it prints</span>
-        <pre>Publishing "Yellow Daisy Applique Guipure Midi Dress A-Line Short Sleeve" at 145 ...
+        <pre>Publishing "Valentino Embroidered Linen Midi Dress Yellow Daisy Applique" at 1650 ...
 <b>Live.</b> offerId=8724531012 listingId=1160245822</pre></div>
     </div></div>
 

@@ -10,6 +10,7 @@ import { getMercariComps } from "./mercari.js";
 import { suggestCategory, getRequiredAspects } from "./ebay/taxonomy.js";
 import { getImageGuess } from "./imagesearch.js";
 import { matchBrand } from "./brandvision.js";
+import { getRetail } from "./retail.js";
 import type { DraftBundle, Platform } from "./types.js";
 
 // photos + notes  ->  attributes  ->  comps  ->  price  ->  listings.
@@ -34,13 +35,14 @@ export async function buildDraft(
 
   // Each scrape source is gated by its own ENABLE_* flag and yields [] when off
   // or blocked, so the draft never depends on them. Only eBay is sanctioned.
-  const [active, sold, poshmark, thredup, realreal, mercari] = await Promise.all([
+  const [active, sold, poshmark, thredup, realreal, mercari, retail] = await Promise.all([
     getActiveComps(attributes),
     getSoldComps(attributes),
     getPoshmarkComps(attributes),
     getThredupComps(attributes),
     getRealRealComps(attributes),
     getMercariComps(attributes),
+    getRetail(attributes), // exact piece at retail, only when a product was named
   ]);
   const comps = [...sold, ...active, ...poshmark, ...thredup, ...realreal, ...mercari];
 
@@ -62,5 +64,5 @@ export async function buildDraft(
     }
   }
 
-  return { attributes, price, comps, comparison, listings };
+  return { attributes, price, comps, comparison, retail, listings };
 }

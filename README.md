@@ -136,7 +136,7 @@ Draft (no posting):
 npm run draft -- --photos front.jpg,back.jpg,tag.jpg --notes "small stain on left cuff"
 ```
 
-<img src="docs/proc-terminal.png" alt="Terminal output of a draft run: attributes read, house not visible, a price range from active asks, draft saved" width="72%" />
+<img src="docs/proc-terminal.png" alt="Terminal output of a draft run: attributes read, the exact piece named Valentino, retail found, a price range, draft saved" width="72%" />
 
 Writes `draft.json` (data) and `draft.md`, a paste sheet with an eBay block and a
 Poshmark block (title, price range, description, item specifics) plus the photo
@@ -206,6 +206,12 @@ Image URLs must be publicly reachable (eBay pulls them). Host them somewhere fir
   stays eBay-anchored (post lists to eBay); other platforms only inform the
   comparison. Add another source behind the same `Comp[]` shape with a new `source`
   value and an `ENABLE_*` gate.
+- When a piece is a specific model the vision step recognises, it names the exact
+  product (`productName`, never invented, always flagged to verify). With
+  `ENABLE_RETAIL=1`, the draft then looks up where that exact piece sells NEW
+  (`src/retail.ts`, an unofficial Google Shopping scrape, same ToS caveats as the
+  other scrapers) and lists retailer, price, and link on the paste sheet, so a
+  Valentino midi prices like a Valentino midi, not like "a yellow dress".
 - Brand is identified from the photo: read off a visible label, or inferred from
   design signatures when there's none (the draft flags an inferred brand to verify).
   Two optional brand-lead sources feed the vision step (both off by default, both a

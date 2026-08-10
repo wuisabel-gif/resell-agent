@@ -29,6 +29,11 @@ inferred it from design rather than a visible mark, false when you read it from 
 Use null only when you genuinely cannot tell. An inferred brand is a lead to verify,
 never a certainty, and never an authentication.
 
+For "productName", name the EXACT product when the piece is identifiable as a specific
+model you recognise (e.g. "Embroidered Linen Midi Dress", "Jackie 1961 Small Hobo",
+"Quick Sneaker"). This enables retail and comp lookups for the exact piece. Use null
+unless you genuinely recognise the specific product; never invent a plausible name.
+
 For "dimensions", ESTIMATE the item's approximate size and return a short string
 like "≈ 15 x 11 x 4 in (estimate)". Base the estimate on the item's type and its
 typical size, refined by its proportions against anything of known size in frame
@@ -40,6 +45,7 @@ Reply with ONLY a JSON object, no prose, matching this shape:
 {
   "brand": string|null,
   "brandInferred": boolean,
+  "productName": string|null,
   "category": string,
   "titleKeywords": string[],
   "size": string|null,
