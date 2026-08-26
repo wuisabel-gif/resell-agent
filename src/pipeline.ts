@@ -18,7 +18,7 @@ import type { DraftBundle, Platform } from "./types.js";
 export async function buildDraft(
   photoPaths: string[],
   notes: string,
-  platforms: Platform[] = ["ebay", "poshmark"],
+  platforms: Platform[] = ["ebay", "poshmark", "depop"],
   imageUrl?: string
 ): Promise<DraftBundle> {
   // Optional brand leads fed into the vision step (both gated, both null when off):

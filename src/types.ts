@@ -1,4 +1,4 @@
-export type Platform = "ebay" | "poshmark";
+export type Platform = "ebay" | "poshmark" | "depop";
 
 export interface ItemAttributes {
   brand: string | null;

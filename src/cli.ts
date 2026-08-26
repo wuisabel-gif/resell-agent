@@ -3,7 +3,10 @@ import { buildDraft } from "./pipeline.js";
 import { renderSheet } from "./sheet.js";
 import { buildConsentUrl, exchangeCode } from "./ebay/auth.js";
 import { publishListing, type PostOptions } from "./ebay/sell.js";
+import { startGui } from "./gui.js";
 import type { DraftBundle, Platform } from "./types.js";
+
+const DEFAULT_PLATFORMS = "ebay,poshmark,depop";
 
 function arg(flag: string): string | undefined {
   const i = process.argv.indexOf(flag);
@@ -13,12 +16,12 @@ function arg(flag: string): string | undefined {
 async function cmdDraft() {
   const photos = (arg("--photos") ?? "").split(",").map((s) => s.trim()).filter(Boolean);
   const notes = arg("--notes") ?? "";
-  const platforms = ((arg("--platforms") ?? "ebay,poshmark").split(",")) as Platform[];
+  const platforms = ((arg("--platforms") ?? DEFAULT_PLATFORMS).split(",").map((s) => s.trim()).filter(Boolean)) as Platform[];
   const out = arg("--out") ?? "draft.json";
   const imageUrl = arg("--image-url"); // public URL for reverse-image brand lookup
 
   if (photos.length === 0) {
-    console.error("Usage: draft --photos a.jpg,b.jpg [--notes '...'] [--platforms ebay,poshmark] [--clean] [--image-url https://...] [--out draft.json]");
+    console.error(`Usage: draft --photos a.jpg,b.jpg [--notes '...'] [--platforms ${DEFAULT_PLATFORMS}] [--clean] [--image-url https://...] [--out draft.json]`);
     process.exit(1);
   }
 
@@ -38,7 +41,7 @@ async function cmdDraft() {
   const bundle = await buildDraft(usePhotos, notes, platforms, imageUrl);
   writeFileSync(out, JSON.stringify(bundle, null, 2));
 
-  // Paste sheet: the artifact you send a friend (eBay + Poshmark blocks).
+  // Paste sheet: the artifact you send a friend (eBay, Poshmark, and Depop blocks).
   const sheetPath = out.replace(/\.json$/i, "") + ".md";
   writeFileSync(sheetPath, renderSheet(bundle, usePhotos));
 
@@ -127,7 +130,7 @@ async function cmdIndex() {
 async function cmdOutfit() {
   const photo = (arg("--photos") ?? arg("--photo") ?? "").split(",")[0]?.trim();
   const outBase = arg("--out") ?? "outfit";
-  const platforms = ((arg("--platforms") ?? "ebay,poshmark").split(",")) as Platform[];
+  const platforms = ((arg("--platforms") ?? DEFAULT_PLATFORMS).split(",").map((s) => s.trim()).filter(Boolean)) as Platform[];
   if (!photo) {
     console.error("Usage: outfit --photos look.jpg [--notes '...'] [--out outfit]");
     process.exit(1);
@@ -152,10 +155,16 @@ async function cmdOutfit() {
   console.log(`\nWrote ${outBase}.svg and ${items.length} sheet(s) (${outBase}-1.md ...). Review before sharing.`);
 }
 
+async function cmdGui() {
+  const port = Number(arg("--port") ?? process.env.GUI_PORT ?? 3000);
+  await startGui(Number.isFinite(port) ? port : 3000);
+}
+
 const cmd = process.argv[2];
 const table: Record<string, () => unknown | Promise<unknown>> = {
   draft: cmdDraft,
   outfit: cmdOutfit,
+  gui: cmdGui,
   post: cmdPost,
   index: cmdIndex,
   "auth-url": cmdAuthUrl,
@@ -164,7 +173,7 @@ const table: Record<string, () => unknown | Promise<unknown>> = {
 
 const fn = table[cmd];
 if (!fn) {
-  console.error("Commands: draft | outfit | post | index | auth-url | auth-exchange");
+  console.error("Commands: draft | outfit | gui | post | index | auth-url | auth-exchange");
   process.exit(1);
 }
 Promise.resolve(fn()).catch((e) => {

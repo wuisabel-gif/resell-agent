@@ -16,6 +16,7 @@ const bundle: DraftBundle = {
   listings: [
     { platform: "ebay", title: "Patagonia Synchilla Fleece M Green", description: "Green fleece.", price: 68, condition: "good", categoryId: "57988", itemSpecifics: { Brand: ["Patagonia"], Size: ["M"] } },
     { platform: "poshmark", title: "Cozy Patagonia fleece 💚", description: "So warm.", price: 68, condition: "good" },
+    { platform: "depop", title: "Patagonia fleece y2k vibe", description: "Vintage-inspired.", price: 68, condition: "good" },
   ],
 };
 
@@ -24,7 +25,7 @@ const md = renderSheet(bundle, ["front.clean.png"]);
 assert.ok(md.includes("$55–$82"), "shows the range");
 assert.ok(md.includes("start around $68"), "frames a starting point");
 // Both platform blocks present with paste-ready fields.
-assert.ok(md.includes("## eBay") && md.includes("## Poshmark"));
+assert.ok(md.includes("## eBay") && md.includes("## Poshmark") && md.includes("## Depop"));
 assert.ok(md.includes("**Category:** 57988"));
 assert.ok(md.includes("Brand: Patagonia"));
 assert.ok(md.includes("front.clean.png"));

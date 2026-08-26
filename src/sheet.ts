@@ -1,6 +1,12 @@
-import type { DraftBundle } from "./types.js";
+import type { DraftBundle, Platform } from "./types.js";
 
-// Per-item paste sheet: an eBay block and a Poshmark block a seller copies
+const PLATFORM_LABEL: Record<Platform, string> = {
+  ebay: "eBay",
+  poshmark: "Poshmark",
+  depop: "Depop",
+};
+
+// Per-item paste sheet: eBay, Poshmark, and Depop blocks a seller copies
 // wholesale into their own account, led by a price RANGE (a starting point,
 // not a fake-precise number) plus the cross-platform comparison.
 export function renderSheet(bundle: DraftBundle, photos: string[] = []): string {
@@ -39,7 +45,7 @@ export function renderSheet(bundle: DraftBundle, photos: string[] = []): string 
   if (photos.length) out.push(`Photos: ${photos.join(", ")}`, "");
 
   for (const l of listings) {
-    out.push(`## ${l.platform === "ebay" ? "eBay" : "Poshmark"}`, "");
+    out.push(`## ${PLATFORM_LABEL[l.platform]}`, "");
     out.push(`**Title:** ${l.title}`);
     if (l.platform === "ebay") {
       if (l.categoryId) out.push(`**Category:** ${l.categoryId}`);

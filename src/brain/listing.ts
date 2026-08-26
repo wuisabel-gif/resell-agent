@@ -8,6 +8,9 @@ const VOICE: Record<Platform, string> = {
   poshmark:
     "Poshmark: warmer, social tone. Shorter title. Description can use a couple of tasteful emojis, " +
     "mention styling, still states condition and flaws honestly.",
+  depop:
+    "Depop: casual and style-forward, but still honest. Keep the title search-friendly, " +
+    "mention fit, vibe, measurements, condition, and flaws plainly. Avoid hype or invented details.",
 };
 
 const SYSTEM = `You write second-hand resale listings. Given item attributes and a target price,

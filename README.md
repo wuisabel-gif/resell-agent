@@ -2,8 +2,8 @@
 
 A resale agent for the pieces worth selling well. Point it at photographs of a
 garment or accessory, it identifies the piece, prices it against the market,
-writes considered listings for eBay and Poshmark, and can place the eBay listing
-for you.
+writes considered listings for eBay, Poshmark, and Depop, and can place the eBay
+listing for you.
 
 Two halves:
 
@@ -13,12 +13,13 @@ Two halves:
   comparison. Only eBay is a sanctioned API, the rest are opt-in, ToS-risky
   scrapers, off unless you set their `ENABLE_*` flag. The suggested price stays
   eBay-anchored, since that's where `post` lists.
-- **Hands** (eBay only for now): publishes a real listing via the eBay Sell API.
+- **Hands** (eBay API + browser-flow adapters): publishes a real listing via the eBay
+  Sell API and can route configured browser-assisted platforms through the GUI.
 
-Poshmark has no public API. The tool writes you a ready-to-paste Poshmark listing
-but does not auto-post there (automating that UI carries account-ban risk, so it's
-left out). The optional Poshmark *price* source above only reads asking prices for
-comparison, and carries the same risk, hence off by default.
+Poshmark and Depop have no public API. The tool writes you ready-to-paste listing
+blocks for both, and browser-assisted posting is opt-in through the GUI when you
+configure it. The optional Poshmark *price* source above only reads asking prices
+for comparison, and carries the same risk, hence off by default.
 
 ## Why
 
@@ -29,7 +30,7 @@ honest market price rather than a lowball, writing a listing that reads as consi
 rather than eager, and placing it where those buyers actually look.
 
 resell·agent does that work. Photograph a piece and it returns a priced, polished
-draft, attributes, comparables, and listing copy for eBay and Poshmark, so the value
+  draft, attributes, comparables, and listing copy for eBay, Poshmark, and Depop, so the value
 in a closet is realised, not stored.
 
 ## The market
@@ -138,8 +139,8 @@ npm run draft -- --photos front.jpg,back.jpg,tag.jpg --notes "small stain on lef
 
 <img src="docs/proc-terminal.png" alt="Terminal output of a draft run: attributes read, the exact piece named Valentino, retail found, a price range, draft saved" width="72%" />
 
-Writes `draft.json` (data) and `draft.md`, a paste sheet with an eBay block and a
-Poshmark block (title, price range, description, item specifics) plus the photo
+Writes `draft.json` (data) and `draft.md`, a paste sheet with eBay, Poshmark, and
+Depop blocks (title, price range, description, item specifics) plus the photo
 references. The price is shown as a **range with a suggested starting point**, not a
 single number, since it's comp-derived. Send the `.md` to whoever's listing the item;
 they copy the block into their own account. Review before sharing.
@@ -167,6 +168,17 @@ crops each region, and drafts them separately, so a full look becomes one paste 
 per piece plus `outfit.svg`, a detection overlay drawn from the real boxes with each
 piece's brand and price. Each crop runs the same pipeline as `draft` (attributes,
 brand match, comps, price, copy).
+
+### The dashboard
+
+```
+npm run gui
+```
+
+Starts a local review-and-publish dashboard on `http://localhost:3000`.
+Upload photos, enter notes, choose the platforms, build a draft, edit the copy,
+then click **Publish all**. eBay publishes through the API; the browser-automation
+hooks for Poshmark and Depop are enabled only when configured.
 
 ### The reference library
 
@@ -232,15 +244,19 @@ Image URLs must be publicly reachable (eBay pulls them). Host them somewhere fir
 - Category and item specifics are resolved at draft time via the Taxonomy API
   (`src/ebay/taxonomy.ts` + `src/brain/aspects.ts`). Best-effort: if eBay can't suggest
   a category, the draft still builds and you pass `--category` on `post`.
-- All the platform-specific eBay posting logic is in `src/ebay/sell.ts`. Swap in a
-  Poshmark automation module later behind the same `ListingDraft` shape if you go there.
+- All the publish routing lives in `src/publish.ts`: eBay uses the API path in
+  `src/ebay/sell.ts`, while non-eBay targets go through the browser-flow adapters in
+  `src/browser-automation.ts` when configured.
 - The brain modules only depend on the Anthropic client, so you can reuse them headless.
 
 ## Layout
 
 ```
 src/
-  cli.ts            command line: draft | post | auth-url | auth-exchange
+  cli.ts            command line: draft | gui | post | auth-url | auth-exchange
+  gui.ts            local dashboard: draft review + publish orchestration
+  publish.ts        publish routing: eBay API + browser-flow adapters
+  browser-automation.ts  optional Playwright flows for non-API platforms
   pipeline.ts       photos -> priced listings
   types.ts
   config.ts         .env loader + eBay endpoint derivation

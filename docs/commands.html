@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>resell·agent, commands</title>
-<meta name="description" content="The four verbs of resell·agent: draft, post, auth-url, auth-exchange." />
+<meta name="description" content="The seven verbs of resell·agent: draft, outfit, gui, post, index, auth-url, auth-exchange." />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23241423'/%3E%3Ccircle cx='16' cy='16' r='4.5' fill='%23c79a4a'/%3E%3C/svg%3E" />
 <meta property="og:image" content="https://wuisabel-gif.github.io/resell-agent/og.jpg" />
 <meta name="twitter:image" content="https://wuisabel-gif.github.io/resell-agent/og.jpg" />
@@ -31,8 +31,8 @@
 <main id="main">
   <section class="page-hero photo" style="background-image:url('./hero-commands.jpg')"><div class="wrap">
     <span class="eyebrow" style="color:var(--gold);">Commands</span>
-    <h1>Six verbs.</h1>
-    <p>Everything up to <em>post</em> only reads. The draft is a file you review before anything is placed.</p>
+    <h1>Seven verbs.</h1>
+    <p>Draft and outfit are read-only, gui gives you a local review-and-publish dashboard, and post places the eBay listing once you've reviewed the draft.</p>
   </div></section>
 
   <section class="section"><div class="wrap">
@@ -41,6 +41,7 @@
       <tbody>
         <tr><td>draft</td><td>Photographs to attributes, comparables, price, and listings. Writes draft.json and a paste sheet. Read-only.</td><td><span class="fl">--photos --notes --platforms --clean --out</span></td></tr>
         <tr><td>outfit</td><td>Detects every sellable piece in one photograph, crops each, and drafts them separately: one paste sheet per piece plus a detection overlay. Read-only.</td><td><span class="fl">--photos --notes --out</span></td></tr>
+        <tr><td>gui</td><td>Starts the local dashboard on localhost so you can review, edit, and publish a draft from one screen.</td><td><span class="fl">--port</span></td></tr>
         <tr><td>index</td><td>Embeds your reference photos (refs/) into brand-index.json for the visual brand match.</td><td><span class="fl">--dir --out</span></td></tr>
         <tr><td>post</td><td>Places the eBay listing from a draft.</td><td><span class="fl">--draft --images --location --fulfillment --payment --return</span></td></tr>
         <tr><td>auth-url</td><td>Prints the eBay consent URL for one-time authorisation.</td><td><span class="fl">None</span></td></tr>
@@ -69,6 +70,13 @@ Detected 3 piece(s):
   3. sunglasses, 40-90 USD
 Wrote outfit.svg and 3 sheet(s) (outfit-1.md ...). Review before sharing.</pre></div>
       <img class="shot-img" src="./detect-10.svg" alt="The outfit.svg overlay: Etro scarf-print maxi dress, leather sandals, sunglasses detected in a courtyard" style="max-width:480px;" />
+    </div></div>
+
+    <div class="op"><div class="rn" style="font-size:1.15rem;">gui</div><div>
+      <div class="cmd">npm run gui</div>
+      <div class="ex"><span class="exl">What it prints</span>
+        <pre>GUI listening on <b>http://localhost:3000</b>
+Open the dashboard, upload photos, review the draft, then click Publish all.</pre></div>
     </div></div>
 
     <div class="op"><div class="rn" style="font-size:1.15rem;">index</div><div>

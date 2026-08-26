@@ -14,7 +14,7 @@ export interface OutfitItem {
 export async function buildOutfit(
   photoPath: string,
   notes = "",
-  platforms: Platform[] = ["ebay", "poshmark"]
+  platforms: Platform[] = ["ebay", "poshmark", "depop"]
 ): Promise<OutfitItem[]> {
   const dets = await detectItems(photoPath);
   const base = photoPath.slice(0, photoPath.length - extname(photoPath).length);

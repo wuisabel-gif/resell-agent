@@ -3,3 +3,4 @@ dist/
 .env
 draft.json
 brand-index.json
+.DS_Store

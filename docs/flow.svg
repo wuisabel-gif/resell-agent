@@ -27,7 +27,7 @@
     <g>
       <rect x="70" y="324" width="620" height="66" rx="6" fill="#f4f1ea" stroke="#dcd6ca" stroke-width="1.5"/>
       <text x="380" y="352" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="20" fill="#241423">Gather comps</text>
-      <text x="380" y="374" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="13" fill="#6f6a5f">eBay · Poshmark · ThredUp · The RealReal · Mercari (gated)</text>
+      <text x="380" y="374" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="13" fill="#6f6a5f">eBay · Poshmark · Depop · ThredUp · The RealReal · Mercari (gated)</text>
       <path d="M380 390 L380 424" stroke="#9a7b3f" stroke-width="2" marker-end="url(#arw)"/>
     </g>
     <g>
@@ -45,7 +45,7 @@
     <g>
       <rect x="70" y="624" width="620" height="66" rx="6" fill="#f4f1ea" stroke="#dcd6ca" stroke-width="1.5"/>
       <text x="380" y="652" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="20" fill="#241423">Compose listings</text>
-      <text x="380" y="674" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="13" fill="#6f6a5f">eBay + Poshmark copy</text>
+      <text x="380" y="674" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="13" fill="#6f6a5f">eBay + Poshmark + Depop copy</text>
       <path d="M380 690 L380 724" stroke="#9a7b3f" stroke-width="2" marker-end="url(#arw)"/>
     </g>
     <g>
