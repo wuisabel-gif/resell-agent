@@ -175,10 +175,75 @@ brand match, comps, price, copy).
 npm run gui
 ```
 
-Starts a local review-and-publish dashboard on `http://localhost:3000`.
-Upload photos, enter notes, choose the platforms, build a draft, edit the copy,
-then click **Publish all**. eBay publishes through the API; the browser-automation
-hooks for Poshmark and Depop are enabled only when configured.
+Starts a local review-and-publish dashboard on `http://127.0.0.1:3000` (the
+printed port follows `GUI_PORT`). Upload photos, enter notes, choose the
+platforms, build a draft, edit the copy, then click **Publish all**. eBay
+publishes through the API; the browser-automation hooks for Poshmark and Depop
+are enabled only when configured. The GUI binds to loopback by default. A
+`GUI_HOST` override is ignored unless `GUI_ALLOW_REMOTE=1` is explicitly set.
+The page receives a private, HttpOnly per-process session cookie automatically;
+there is no token to type into the normal local URL. API and photo routes reject
+requests without that cookie, and state-changing requests also check their
+same-origin `Origin` when a browser supplies one. If remote access is deliberately
+enabled, the server prints a one-time token URL; prefer setting a long
+`GUI_AUTH_TOKEN` instead of exposing the random token in shell history or logs.
+
+The dashboard limits each request to 40 MiB, each upload to 10 MiB, each draft
+to 12 photos and 30 MiB total. Uploaded files are decoded and re-encoded as
+private JPEGs with `sharp`; SVG, HTML, malformed files and non-raster inputs are
+rejected. Draft metadata, edits, photos and per-platform results are kept under
+a private temporary directory (default `GUI_DATA_DIR=$TMPDIR/resell-agent-gui`)
+and expire after 24 hours (`GUI_DRAFT_TTL_MS` can override that value). A draft
+ID is saved in browser local storage so a refresh can recover it. Expired and
+failed-build directories are cleaned up.
+
+The publish endpoint accepts only a stored `draftId`. It merges the reviewable
+title, description, positive finite price, and eBay category into the server's
+stored draft; it does not trust a client-supplied full `DraftBundle`. Select at
+least one of `ebay`, `poshmark`, or `depop`. eBay image URLs must be public
+HTTPS URLs because eBay fetches them. GUI eBay SKUs are stable for a draft
+(derived from its draft ID), successful platform results are persisted, and a
+retry skips those successful targets. The UI reports all/some/none explicitly;
+failed and unknown results remain visible. A browser submit timeout is marked
+possibly published and must be checked before retrying to avoid duplicates.
+
+Useful GUI defaults are `GUI_DEFAULT_SKU` (an optional stable SKU prefix),
+`GUI_DEFAULT_MERCHANT_LOCATION_KEY`, `GUI_DEFAULT_FULFILLMENT_POLICY_ID`,
+`GUI_DEFAULT_PAYMENT_POLICY_ID`, and `GUI_DEFAULT_RETURN_POLICY_ID`; see
+[`.env.example`](.env.example). Do not expose the GUI remotely unless you
+understand the risk and deliberately opt in.
+
+### Optional browser-assisted flows
+
+Poshmark and Depop do not provide a public posting API in this project. Browser
+posting is off unless `ENABLE_BROWSER_AUTOMATION=1` and a per-platform JSON flow
+are configured. Install the browser binary once with:
+
+```
+npx playwright install chromium
+```
+
+Set `POSHMARK_BROWSER_FLOW` and/or `DEPOP_BROWSER_FLOW` (the aliases
+`BROWSER_FLOW_POSHMARK` and `BROWSER_FLOW_DEPOP` also work) to JSON shaped like:
+
+```json
+{
+  "url": "https://poshmark.com/your-configured-page",
+  "titleSelector": "your selector",
+  "descriptionSelector": "your selector",
+  "priceSelector": "your selector",
+  "imageInputSelector": "input[type=file]",
+  "publishSelector": "your selector",
+  "successSelector": "your configured success marker"
+}
+```
+
+Use `successUrlIncludes` instead of `successSelector` when that is the reliable
+verification signal. The configured start and absolute success URLs must stay
+on the expected HTTPS `poshmark.com` or `depop.com` domain. Selectors change
+with the sites and are not hardcoded here; the flow does not submit credentials.
+Use a persistent Playwright profile only for an account you control, and check
+each platform's rules before automating posting.
 
 ### The reference library
 
@@ -257,6 +322,8 @@ src/
   gui.ts            local dashboard: draft review + publish orchestration
   publish.ts        publish routing: eBay API + browser-flow adapters
   browser-automation.ts  optional Playwright flows for non-API platforms
+  gui-validation.ts  GUI boundary validation, editable-field merge, stable SKU
+  env.ts            shared truthy environment-flag parser
   pipeline.ts       photos -> priced listings
   types.ts
   config.ts         .env loader + eBay endpoint derivation
@@ -278,4 +345,4 @@ src/
 - Marketplace Insights for real sold comps
 - Batch mode: a folder of items in, many drafts out
 - Poshmark read-only comps via a scraper, for cross-platform pricing
-- Optional Poshmark Playwright poster (weigh the ToS risk first)
+- Platform-specific browser flows with maintained selectors and verified outcomes

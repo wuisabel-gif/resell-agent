@@ -18,18 +18,25 @@ function ebayConditionEnum(c: ListingDraft["condition"]): string {
 
 async function ebayFetch(path: string, init: RequestInit) {
   const token = await getUserToken();
-  const res = await fetch(`${cfg.apiBase}${path}`, {
-    ...init,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-      "Content-Language": "en-US",
-      ...(init.headers ?? {}),
-    },
-  });
-  const text = await res.text();
-  if (!res.ok) throw new Error(`${path} -> ${res.status} ${text}`);
-  return text ? JSON.parse(text) : {};
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 60_000);
+  try {
+    const res = await fetch(`${cfg.apiBase}${path}`, {
+      ...init,
+      signal: controller.signal,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "Content-Language": "en-US",
+        ...(init.headers ?? {}),
+      },
+    });
+    const text = await res.text();
+    if (!res.ok) throw new Error(`${path} -> ${res.status} ${text}`);
+    return text ? JSON.parse(text) : {};
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 export interface PostOptions {
@@ -43,6 +50,28 @@ export interface PostOptions {
   returnPolicyId: string;
 }
 
+interface ExistingOffer {
+  offerId: string;
+  listingId?: string;
+  status?: string;
+}
+
+async function existingOffers(sku: string): Promise<ExistingOffer[]> {
+  const result = await ebayFetch(`/sell/inventory/v1/offer?sku=${encodeURIComponent(sku)}`, { method: "GET" });
+  const offers = (result as { offers?: unknown })?.offers;
+  if (!Array.isArray(offers)) return [];
+  return offers.flatMap((raw): ExistingOffer[] => {
+    if (!raw || typeof raw !== "object") return [];
+    const offer = raw as Record<string, unknown>;
+    if (typeof offer.offerId !== "string" || !offer.offerId) return [];
+    return [{
+      offerId: offer.offerId,
+      listingId: typeof offer.listingId === "string" ? offer.listingId : undefined,
+      status: typeof offer.status === "string" ? offer.status : undefined,
+    }];
+  });
+}
+
 // Three-step publish: inventory item -> offer -> publish.
 // Assumes you have already created business policies and a merchant location
 // (one-time setup via the Account API or Seller Hub). See README.
@@ -50,6 +79,15 @@ export async function publishListing(
   draft: ListingDraft,
   opts: PostOptions
 ): Promise<{ offerId: string; listingId: string }> {
+  // Stable GUI SKUs make retries detectable. Do not create a second offer when
+  // eBay already has one for this SKU; an operator can inspect/reconcile it.
+  const priorOffers = await existingOffers(opts.sku);
+  const priorPublished = priorOffers.find((offer) => offer.status === "PUBLISHED" && offer.listingId);
+  if (priorPublished?.listingId) return { offerId: priorPublished.offerId, listingId: priorPublished.listingId };
+  if (priorOffers.length) {
+    throw new Error(`eBay already has an offer for SKU ${opts.sku}; inspect it before retrying to avoid a duplicate.`);
+  }
+
   // 1. inventory item (keyed by SKU)
   await ebayFetch(`/sell/inventory/v1/inventory_item/${encodeURIComponent(opts.sku)}`, {
     method: "PUT",

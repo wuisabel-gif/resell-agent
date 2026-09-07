@@ -1,7 +1,7 @@
 // Checks the publish orchestration without hitting live services.
 // Run: npm run build && node dist/publish.test.js
 import assert from "node:assert";
-import { publishDraftBundle } from "./publish.js";
+import { publishDraftBundle, toEbayOptions, validateHttpsImageUrls } from "./publish.js";
 import type { DraftBundle } from "./types.js";
 
 const draft: DraftBundle = {
@@ -62,5 +62,58 @@ assert.equal(result.results.length, 3);
 assert.equal(result.results[0].status, "published");
 assert.equal(result.results[1].status, "published");
 assert.equal(result.results[2].status, "published");
+
+const retryCalls: string[] = [];
+const retry = await publishDraftBundle(
+  {
+    draft,
+    draftId: "123e4567-e89b-12d3-a456-426614174000",
+    photoPaths: ["/tmp/photo1.jpg"],
+    platforms: ["ebay", "depop"],
+    ebay: {
+      imageUrls: ["https://example.com/photo1.jpg"],
+      merchantLocationKey: "loc",
+      fulfillmentPolicyId: "fulfill",
+      paymentPolicyId: "payment",
+      returnPolicyId: "return",
+    },
+    previousResults: [{ platform: "ebay", status: "published", message: "already live", offerId: "o", listingId: "l" }],
+  },
+  {
+    publishEbay: async (_listing, opts) => {
+      retryCalls.push(`ebay:${opts.sku}`);
+      return { offerId: "unexpected", listingId: "unexpected" };
+    },
+    publishBrowser: async (platform) => {
+      retryCalls.push(`browser:${platform}`);
+      return { message: "done" };
+    },
+  }
+);
+assert.equal(retry.results[0].status, "skipped");
+assert.match(retry.results[0].message, /already published/);
+assert.deepEqual(retryCalls, ["browser:depop"]);
+
+const uncertain = await publishDraftBundle(
+  { draft, photoPaths: ["/tmp/photo1.jpg"], platforms: ["depop"] },
+  { publishBrowser: async () => { throw new Error("request timed out after submit"); } }
+);
+assert.equal(uncertain.results[0].status, "unknown");
+assert.match(uncertain.results[0].message, /possibly published|status is unknown/);
+assert.deepEqual(validateHttpsImageUrls(["https://example.com/a.jpg", "https://example.com/a.jpg"]), ["https://example.com/a.jpg"]);
+assert.throws(() => validateHttpsImageUrls(["http://example.com/a.jpg"]), /HTTPS/);
+const guiEbay = toEbayOptions(
+  draft,
+  {
+    imageUrls: ["https://example.com/photo1.jpg"],
+    merchantLocationKey: "loc",
+    fulfillmentPolicyId: "fulfill",
+    paymentPolicyId: "payment",
+    returnPolicyId: "return",
+  },
+  "123e4567-e89b-12d3-a456-426614174000"
+);
+assert.equal(guiEbay.sku, toEbayOptions(draft, { ...guiEbay, sku: "different-prefix" }, "123e4567-e89b-12d3-a456-426614174000").sku);
+assert.match(guiEbay.sku, /^resale-gui-/);
 
 console.log("publish.test ok");

@@ -41,7 +41,7 @@
       <tbody>
         <tr><td>draft</td><td>Photographs to attributes, comparables, price, and listings. Writes draft.json and a paste sheet. Read-only.</td><td><span class="fl">--photos --notes --platforms --clean --out</span></td></tr>
         <tr><td>outfit</td><td>Detects every sellable piece in one photograph, crops each, and drafts them separately: one paste sheet per piece plus a detection overlay. Read-only.</td><td><span class="fl">--photos --notes --out</span></td></tr>
-        <tr><td>gui</td><td>Starts the local dashboard on localhost so you can review, edit, and publish a draft from one screen.</td><td><span class="fl">--port</span></td></tr>
+        <tr><td>gui</td><td>Starts the loopback dashboard so you can review, edit, recover, and publish a stored draft from one screen. It prints a tokenless local URL; API/photo requests are token-protected.</td><td><span class="fl">--port</span> <span class="fl">GUI_HOST + GUI_ALLOW_REMOTE=1 (opt-in)</span></td></tr>
         <tr><td>index</td><td>Embeds your reference photos (refs/) into brand-index.json for the visual brand match.</td><td><span class="fl">--dir --out</span></td></tr>
         <tr><td>post</td><td>Places the eBay listing from a draft.</td><td><span class="fl">--draft --images --location --fulfillment --payment --return</span></td></tr>
         <tr><td>auth-url</td><td>Prints the eBay consent URL for one-time authorisation.</td><td><span class="fl">None</span></td></tr>
@@ -75,8 +75,10 @@ Wrote outfit.svg and 3 sheet(s) (outfit-1.md ...). Review before sharing.</pre><
     <div class="op"><div class="rn" style="font-size:1.15rem;">gui</div><div>
       <div class="cmd">npm run gui</div>
       <div class="ex"><span class="exl">What it prints</span>
-        <pre>GUI listening on <b>http://localhost:3000</b>
-Open the dashboard, upload photos, review the draft, then click Publish all.</pre></div>
+        <pre>GUI listening on <b>http://127.0.0.1:3000</b>
+Open the dashboard, upload photos, review the draft, then click Publish all.
+Drafts and results survive refresh/restart; successful targets are skipped on retry.</pre></div>
+      <p class="muted">The GUI accepts up to 12 raster photos (10 MiB each, 30 MiB total) in a 40 MiB request, keeps them in a private TTL directory, and requires public HTTPS image URLs for eBay. Poshmark/Depop browser flows stay off until <span class="fl">ENABLE_BROWSER_AUTOMATION=1</span> plus a configured JSON flow; install Chromium with <span class="fl">npx playwright install chromium</span>.</p>
     </div></div>
 
     <div class="op"><div class="rn" style="font-size:1.15rem;">index</div><div>

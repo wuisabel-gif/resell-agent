@@ -1,4 +1,5 @@
 import type { ListingDraft, Platform } from "./types.js";
+import { truthy } from "./env.js";
 
 export interface BrowserFlowConfig {
   url: string;
@@ -18,10 +19,7 @@ export interface BrowserAutomationOptions {
 export interface BrowserPublishResult {
   message: string;
   url?: string;
-}
-
-function truthy(value: string | undefined): boolean {
-  return value === "1" || value === "true" || value === "yes";
+  status?: "published" | "unknown";
 }
 
 function browserEnabled(): boolean {
@@ -36,12 +34,39 @@ function readFlowRaw(platform: Exclude<Platform, "ebay">): string | undefined {
   return process.env[platformEnvName(platform)] ?? process.env[`BROWSER_FLOW_${platform.toUpperCase()}`];
 }
 
+function expectedHost(platform: Exclude<Platform, "ebay">): string {
+  return platform === "poshmark" ? "poshmark.com" : "depop.com";
+}
+
+function isExpectedPlatformUrl(platform: Exclude<Platform, "ebay">, value: string): boolean {
+  let parsed: URL;
+  try {
+    parsed = new URL(value);
+  } catch {
+    return false;
+  }
+  const host = parsed.hostname.toLowerCase();
+  const expected = expectedHost(platform);
+  return parsed.protocol === "https:" && !parsed.username && !parsed.password && (host === expected || host.endsWith(`.${expected}`));
+}
+
 function requiredString(flow: Record<string, unknown>, key: string, platform: string): string {
   const value = flow[key];
   if (typeof value !== "string" || !value.trim()) {
     throw new Error(`${platform} browser flow is missing required field ${key}`);
   }
-  return value.trim();
+  const trimmed = value.trim();
+  if (trimmed.length > 2_048) throw new Error(`${platform} browser flow field ${key} is too long`);
+  return trimmed;
+}
+
+function validateSuccessUrl(platform: Exclude<Platform, "ebay">, value: string): string {
+  const trimmed = value.trim();
+  if (trimmed.length > 2_048) throw new Error(`${platform} browser flow field successUrlIncludes is too long`);
+  if (/^https?:\/\//i.test(trimmed) && !isExpectedPlatformUrl(platform, trimmed)) {
+    throw new Error(`${platform} successUrlIncludes must point at the expected ${expectedHost(platform)} domain`);
+  }
+  return trimmed;
 }
 
 function parseFlow(platform: Exclude<Platform, "ebay">): BrowserFlowConfig {
@@ -73,13 +98,19 @@ function parseFlow(platform: Exclude<Platform, "ebay">): BrowserFlowConfig {
     publishSelector: requiredString(flow, "publishSelector", platform),
   };
 
+  if (!isExpectedPlatformUrl(platform, config.url)) {
+    throw new Error(`${platform} browser flow URL must be an HTTPS ${expectedHost(platform)} URL`);
+  }
+
   const successSelector = flow.successSelector;
   if (typeof successSelector === "string" && successSelector.trim()) {
-    config.successSelector = successSelector.trim();
+    const trimmed = successSelector.trim();
+    if (trimmed.length > 2_048) throw new Error(`${platform} browser flow field successSelector is too long`);
+    config.successSelector = trimmed;
   }
   const successUrlIncludes = flow.successUrlIncludes;
   if (typeof successUrlIncludes === "string" && successUrlIncludes.trim()) {
-    config.successUrlIncludes = successUrlIncludes.trim();
+    config.successUrlIncludes = validateSuccessUrl(platform, successUrlIncludes);
   }
 
   if (!config.successSelector && !config.successUrlIncludes) {
@@ -123,6 +154,7 @@ export async function publishViaBrowser(
 
   let browser: any = null;
   let context: any = null;
+  let publishClicked = false;
 
   try {
     if (profileDir) {
@@ -143,20 +175,34 @@ export async function publishViaBrowser(
     await page.locator(flow.titleSelector).fill(listing.title);
     await page.locator(flow.descriptionSelector).fill(listing.description);
     await page.locator(flow.priceSelector).fill(listing.price.toFixed(2));
+    publishClicked = true;
+    const beforePublishUrl = page.url();
     await page.locator(flow.publishSelector).click();
 
     if (flow.successSelector) {
       await page.locator(flow.successSelector).first().waitFor({ state: "visible", timeout: 60_000 });
     } else if (flow.successUrlIncludes) {
-      await page.waitForURL((url: URL) => url.toString().includes(flow.successUrlIncludes!), { timeout: 60_000 });
+      await page.waitForURL(
+        (url: URL) => url.toString() !== beforePublishUrl && url.toString().includes(flow.successUrlIncludes!),
+        { timeout: 60_000 }
+      );
+    }
+
+    if (!isExpectedPlatformUrl(platform, page.url())) {
+      throw new Error(`success verification ended on an unexpected URL (${page.url()})`);
     }
 
     return {
-      message: `${platform} browser flow completed`,
+      message: `${platform} browser flow completed and success was verified at ${page.url()}`,
       url: page.url(),
+      status: "published",
     };
   } catch (error) {
-    throw new Error(`${platform} browser publish failed: ${String(error instanceof Error ? error.message : error)}`);
+    const message = String(error instanceof Error ? error.message : error);
+    if (publishClicked) {
+      throw new Error(`${platform} browser publish status is unknown; the submit may have succeeded. Verify before retrying. ${message}`);
+    }
+    throw new Error(`${platform} browser publish failed before submit: ${message}`);
   } finally {
     try {
       if (context) {
