@@ -1,4 +1,5 @@
-// .env loader + eBay endpoint derivation. Reads process.env once at import.
+// Runtime .env access + eBay endpoint derivation. Values are read lazily so
+// the local GUI can apply credentials to process.env for one running process.
 
 function req(name: string): string {
   const v = process.env[name];
@@ -6,17 +7,20 @@ function req(name: string): string {
   return v;
 }
 
-const env = (process.env.EBAY_ENV ?? "sandbox").toLowerCase();
-const production = env === "production";
-
-// eBay's REST host, OAuth-consent host, and sell scopes differ per environment.
-const apiBase = production ? "https://api.ebay.com" : "https://api.sandbox.ebay.com";
-const authBase = production ? "https://auth.ebay.com" : "https://auth.sandbox.ebay.com";
+function ebayEnvironment(): string {
+  return (process.env.EBAY_ENV ?? "sandbox").trim().toLowerCase() || "sandbox";
+}
 
 export const cfg = {
-  env,
-  apiBase,
-  authBase,
+  get env() {
+    return ebayEnvironment();
+  },
+  get apiBase() {
+    return this.env === "production" ? "https://api.ebay.com" : "https://api.sandbox.ebay.com";
+  },
+  get authBase() {
+    return this.env === "production" ? "https://auth.ebay.com" : "https://auth.sandbox.ebay.com";
+  },
   // Required, but read lazily so unrelated commands (help) don't crash on missing keys.
   get clientId() {
     return req("EBAY_CLIENT_ID");
@@ -25,8 +29,12 @@ export const cfg = {
     return req("EBAY_CLIENT_SECRET");
   },
   // RuName / redirect only needed for the posting flow; empty is fine for pricing.
-  redirectUri: process.env.EBAY_REDIRECT_URI ?? "",
-  userRefreshToken: process.env.EBAY_USER_REFRESH_TOKEN ?? "",
+  get redirectUri() {
+    return process.env.EBAY_REDIRECT_URI ?? "";
+  },
+  get userRefreshToken() {
+    return process.env.EBAY_USER_REFRESH_TOKEN ?? "";
+  },
   sellScopes: [
     "https://api.ebay.com/oauth/api_scope",
     "https://api.ebay.com/oauth/api_scope/sell.inventory",

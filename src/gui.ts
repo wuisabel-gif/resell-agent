@@ -3,11 +3,13 @@ import { randomBytes, randomUUID } from "node:crypto";
 import { chmod, mkdir, readFile, readdir, realpath, rename, rm, stat, writeFile } from "node:fs/promises";
 import { join, resolve, sep } from "node:path";
 import { tmpdir } from "node:os";
+import { buildConsentUrl, exchangeCode } from "./ebay/auth.js";
 import { buildDraft } from "./pipeline.js";
 import { publishDraftBundle, validateHttpsImageUrls, type EbayPublishSettings, type PlatformPublishResult } from "./publish.js";
 import { buildGuiScript, type GuiBootState } from "./gui-client.js";
 import { GUI_PLATFORMS, mergeEditableListingFields, validatePlatformSelection } from "./gui-validation.js";
 import { truthy } from "./env.js";
+import { applyRuntimeSettings, resetRuntimeSettings, RUNTIME_SECRET_KEYS } from "./runtime-settings.js";
 import type { DraftBundle, Platform } from "./types.js";
 
 interface UploadedPhoto {
@@ -214,7 +216,13 @@ function renderPage(boot: GuiBootState): string {
     .brand b { font-family: var(--serif); font-weight: 600; font-size: 1.32rem; color: var(--ink); letter-spacing: 0.02em; }
     .brand span { font-size: 0.6rem; letter-spacing: 0.34em; text-transform: uppercase; color: var(--gold-ink); margin-top: 5px; }
     .pill { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.45rem 0.75rem; border: 1px solid var(--line); border-radius: var(--radius); color: var(--gold-ink); background: var(--surface); font-size: 0.74rem; letter-spacing: 0.1em; text-transform: uppercase; }
-    main { padding: clamp(2.5rem, 6vw, 5.5rem) 0; }
+    main { padding: clamp(1rem, 3vw, 2rem) 0 clamp(3.5rem, 7vw, 7rem); }
+    .steps { display: flex; align-items: center; gap: clamp(1rem, 4vw, 3.5rem); padding: 1rem 0 2.25rem; border-bottom: 1px solid var(--line); color: var(--muted); }
+    .step { display: inline-flex; align-items: center; gap: 0.6rem; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; }
+    .step b { color: var(--gold-ink); font-family: var(--serif); font-size: 1.1rem; font-weight: 600; letter-spacing: 0; }
+    .step.is-active { color: var(--ink); }
+    .step.is-active b { color: var(--plum); }
+    .step + .step::before { content: '—'; color: var(--line-dark); margin-right: clamp(0.35rem, 1vw, 1rem); }
     .grid { display: grid; gap: clamp(1rem, 2vw, 1.5rem); grid-template-columns: 1.1fr 0.9fr; align-items: start; }
     .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(1.2rem, 2.4vw, 2rem); box-shadow: 0 18px 40px -32px oklch(0.2 0.03 312 / 0.35); }
     .grid > .card:first-child { background: var(--aubergine); color: oklch(0.9 0.01 312); border-color: var(--aubergine); box-shadow: 0 30px 60px -36px oklch(0.1 0.04 312 / 0.65); }
@@ -222,13 +230,14 @@ function renderPage(boot: GuiBootState): string {
     .grid > .card:first-child p, .grid > .card:first-child .muted { color: oklch(0.82 0.015 312); }
     #publish-panel { grid-column: 1 / -1; }
     h1 { font-size: clamp(2.2rem, 4vw, 4rem); font-weight: 500; }
+    h1 em { color: var(--gold); font-style: italic; font-weight: 500; }
     h2 { font-size: clamp(1.55rem, 2.5vw, 2.25rem); }
     h3 { font-size: 1.28rem; }
     p { margin: 0.55rem 0 1rem; }
     .eyebrow { display: block; margin-bottom: 0.85rem; color: var(--gold); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; }
     form { display: grid; gap: 1.25rem; }
     label { display: grid; gap: 0.4rem; font-size: 0.88rem; font-weight: 600; letter-spacing: 0.02em; }
-    input[type="text"], input[type="url"], input[type="number"], textarea {
+    input[type="text"], input[type="url"], input[type="number"], input[type="password"], select, textarea {
       width: 100%;
       border: 1px solid var(--line);
       border-radius: var(--radius);
@@ -237,19 +246,37 @@ function renderPage(boot: GuiBootState): string {
       padding: 0.78rem 0.9rem;
       font: inherit;
     }
-    .grid > .card:first-child input[type="text"], .grid > .card:first-child input[type="url"], .grid > .card:first-child input[type="number"], .grid > .card:first-child textarea { background: var(--aubergine-2); color: oklch(0.97 0.01 312); border-color: var(--line-dark); }
+    .grid > .card:first-child input[type="text"], .grid > .card:first-child input[type="url"], .grid > .card:first-child input[type="number"], .grid > .card:first-child input[type="password"], .grid > .card:first-child select, .grid > .card:first-child textarea { background: var(--aubergine-2); color: oklch(0.97 0.01 312); border-color: var(--line-dark); }
     input[readonly] { opacity: 0.82; }
     input[type="file"] { width: 100%; border: 1px dashed var(--gold-ink); border-radius: var(--radius); background: var(--surface); color: var(--ink-soft); padding: 0.72rem; }
     input[type="file"]::file-selector-button { margin-right: 0.7rem; border: 1px solid var(--ink); border-radius: var(--radius); padding: 0.45rem 0.7rem; background: var(--ink); color: var(--bg); font-weight: 600; cursor: pointer; }
+    .dropzone { position: relative; min-height: 168px; display: flex; align-items: center; justify-content: center; text-align: center; border: 1px dashed var(--gold-ink); border-radius: var(--radius); background: color-mix(in oklch, var(--aubergine-2) 76%, var(--aubergine)); overflow: hidden; cursor: pointer; }
+    .dropzone:hover, .dropzone:focus-within { border-color: var(--gold); background: var(--aubergine-2); }
+    .dropzone input[type="file"] { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+    .dropzone-copy { position: relative; z-index: 1; display: grid; gap: 0.25rem; pointer-events: none; }
+    .dropzone-mark { color: var(--gold); font-family: var(--serif); font-size: 2.5rem; line-height: 1; }
+    .dropzone-title { color: oklch(0.97 0.01 312); font-family: var(--serif); font-size: 1.25rem; }
+    .dropzone-note { color: oklch(0.78 0.02 312); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .field-help { color: oklch(0.75 0.02 312); font-size: 0.78rem; font-weight: 400; letter-spacing: 0; }
     textarea { resize: vertical; }
     fieldset { border: 1px solid var(--line-dark); border-radius: var(--radius); padding: 1rem; margin: 0; display: grid; gap: 0.7rem; }
     legend { padding: 0 0.4rem; color: var(--gold); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; }
+    .settings-panel { border-top: 1px solid var(--line-dark); border-bottom: 1px solid var(--line-dark); padding: 0.8rem 0; }
+    .settings-panel summary { color: var(--gold); cursor: pointer; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; list-style-position: inside; text-transform: uppercase; }
+    .settings-panel summary span { color: oklch(0.73 0.02 312); font-size: 0.72rem; font-weight: 400; letter-spacing: 0; text-transform: none; }
+    .settings-body { display: grid; gap: 0.8rem; padding-top: 1rem; }
+    .settings-note { color: oklch(0.78 0.02 312); font-size: 0.78rem; font-weight: 400; letter-spacing: 0; }
+    .settings-note strong { color: var(--gold-soft); }
+    .auth-tools { display: grid; gap: 0.7rem; border-top: 1px solid var(--line-dark); padding-top: 0.8rem; }
+    .auth-tools .actions { gap: 0.55rem; }
+    .auth-link { color: var(--gold); font-size: 0.8rem; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
     .checks { display: flex; flex-wrap: wrap; gap: 0.65rem 1.25rem; }
     .check { display: inline-flex; align-items: center; gap: 0.5rem; color: inherit; font-size: 0.92rem; font-weight: 500; }
     .check input { width: 1rem; height: 1rem; accent-color: var(--gold); }
     .two-col { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
     .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
     button { border: 1px solid transparent; border-radius: var(--radius); padding: 0.82rem 1.45rem; background: var(--gold-ink); color: oklch(0.99 0.01 90); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.35s var(--ease); }
+    button.small { padding: 0.55rem 0.75rem; font-size: 0.68rem; }
     button:hover { background: var(--ink); }
     button.secondary { background: transparent; color: var(--ink); border-color: var(--ink); }
     button.secondary:hover { background: var(--ink); color: var(--bg); }
@@ -283,44 +310,88 @@ function renderPage(boot: GuiBootState): string {
     .publish-status[data-kind="skipped"] { border-color: var(--blue); color: var(--blue); }
     .listing-card details { border-top: 1px solid var(--line); padding-top: 0.65rem; }
     .listing-card pre { margin: 0.5rem 0 0; white-space: pre-wrap; word-break: break-word; font-size: 0.84rem; color: var(--muted); }
+    .copy-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 0.65rem; }
+    .copy-status { color: var(--muted); font-size: 0.76rem; }
+    .copy-status[data-kind="success"] { color: var(--green); }
+    .copy-status[data-kind="error"] { color: var(--red); }
     .results { display: grid; gap: 0.55rem; margin-top: 1rem; }
     .result { border-left: 3px solid var(--line); padding: 0.7rem 0.8rem; background: var(--surface-2); }
     .result.published { border-color: var(--green); }
     .result.error, .result.unknown { border-color: var(--red); }
     .result.skipped { border-color: var(--blue); }
     .form-note { border: 1px dashed var(--gold-ink); border-radius: var(--radius); padding: 1rem; margin-top: 1.25rem; background: var(--surface-2); }
+    .copy-mode-note { border-color: var(--blue); }
     #publish-panel[hidden] { display: none; }
     #draft-meta { margin-bottom: 1rem; color: var(--muted); font-size: 0.9rem; }
-    @media (max-width: 960px) { .grid { grid-template-columns: 1fr; } #publish-panel { grid-column: auto; } .two-col { grid-template-columns: 1fr; } }
+    @media (max-width: 960px) { .grid { grid-template-columns: 1fr; } #publish-panel { grid-column: auto; } .two-col { grid-template-columns: 1fr; } .steps { gap: 0.8rem; justify-content: space-between; } .step { font-size: 0.62rem; letter-spacing: 0.08em; } .step + .step::before { display: none; } }
+    @media (max-width: 560px) { .steps { align-items: flex-start; } .step { flex-direction: column; gap: 0.2rem; text-align: center; } }
   </style>
 </head>
 <body>
   <header>
     <div class="wrap topbar">
       <div class="brand">
-        <b>resell·agent GUI</b>
-        <span>Draft once, review, then publish with a single button.</span>
+        <b>resell·agent</b>
+        <span>Resale, considered</span>
       </div>
       <div class="pill">Browser automation: ${boot.browserAutomationEnabled ? "enabled" : "disabled"}</div>
     </div>
   </header>
   <main>
+    <div class="wrap">
+      <nav class="steps" aria-label="Listing workflow">
+        <span class="step is-active"><b>01</b> Read</span>
+        <span class="step"><b>02</b> Consider</span>
+        <span class="step"><b>03</b> Place</span>
+      </nav>
+    </div>
     <div class="wrap grid">
       <section class="card">
         <span class="eyebrow">Resale, considered</span>
-        <h1>New draft</h1>
-        <p>Photograph the piece. Receive the listing.</p>
-        <form id="draft-form">
-          <div class="two-col">
-            <label>
-              Photos
-              <input id="photos" name="photos" type="file" accept="image/*" multiple />
-            </label>
-            <label>
-              Reverse-image URL
-              <input id="referenceImageUrl" name="referenceImageUrl" type="url" placeholder="https://..." />
-            </label>
+        <h1>Photograph the piece.<br><em>Receive the listing.</em></h1>
+        <p>Read the item once, then carry its considered listing wherever its buyers already are.</p>
+        <details id="settings-panel" class="settings-panel">
+          <summary>Settings <span>Anthropic gateway / native API and eBay account</span></summary>
+          <div class="settings-body">
+            <p class="settings-note"><strong>Private runtime settings.</strong> Values are sent only over this protected local GUI API for draft/publish, applied to <code>process.env</code> in memory, and never saved in a draft, response, or browser storage. Blank fields leave the process-start environment unchanged. Do not deploy this HTTP GUI publicly; use a private HTTPS server for remote access.</p>
+            <div class="two-col">
+              <label>Anthropic auth token<input id="setting-anthropic-auth-token" type="password" autocomplete="off" placeholder="gateway bearer token" /></label>
+              <label>Anthropic API key <span class="field-help">optional native mode</span><input id="setting-anthropic-api-key" type="password" autocomplete="off" placeholder="sk-ant-..." /></label>
+            </div>
+            <div class="two-col">
+              <label>Anthropic base URL<input id="setting-anthropic-base-url" type="url" placeholder="https://api.anthropic.com" /></label>
+              <label>Anthropic model<input id="setting-anthropic-model" type="text" placeholder="claude-sonnet-5" /></label>
+            </div>
+            <div class="two-col">
+              <label>eBay client ID<input id="setting-ebay-client-id" type="text" autocomplete="off" /></label>
+              <label>eBay client secret<input id="setting-ebay-client-secret" type="password" autocomplete="off" /></label>
+            </div>
+            <div class="two-col">
+              <label>eBay environment<select id="setting-ebay-env"><option value="">Use process environment</option><option value="sandbox">Sandbox</option><option value="production">Production</option></select></label>
+              <label>eBay redirect / RuName <span class="field-help">optional for auth flow</span><input id="setting-ebay-redirect-uri" type="text" placeholder="Your eBay RuName" /></label>
+            </div>
+            <div class="auth-tools">
+              <div class="actions">
+                <button id="ebay-auth-url" class="secondary small" type="button">Create eBay sign-in link</button>
+                <a id="ebay-auth-link" class="auth-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Open eBay authorization</a>
+              </div>
+              <label>eBay authorization code <span class="field-help">paste the code from the redirect</span><input id="ebay-auth-code" type="text" autocomplete="off" placeholder="code..." /></label>
+              <button id="ebay-exchange" class="secondary small" type="button">Exchange code for refresh token</button>
+            </div>
+            <label>eBay user refresh token <span class="field-help">optional if already configured in .env</span><input id="setting-ebay-user-refresh-token" type="password" autocomplete="off" /></label>
+            <div class="actions"><button id="clear-runtime-settings" class="secondary small" type="button">Clear in-memory settings</button><span class="settings-note">Restores process-start values; nothing is written to disk.</span></div>
           </div>
+        </details>
+        <form id="draft-form">
+          <label class="dropzone">
+            <span class="dropzone-copy">
+              <span class="dropzone-mark">+</span>
+              <span class="dropzone-title">Drop photographs here</span>
+              <span class="dropzone-note">or choose files · jpeg · png · webp</span>
+              <span class="field-help">The vision model reads the uploaded photos directly.</span>
+            </span>
+            <input id="photos" name="photos" type="file" accept="image/*" multiple />
+          </label>
           <label>
             Seller notes
             <textarea id="notes" name="notes" rows="6" placeholder="Flaws, fit notes, measurements, condition, anything to call out."></textarea>
@@ -330,6 +401,7 @@ function renderPage(boot: GuiBootState): string {
             <div class="checks">
               ${platformChecks}
             </div>
+            <p id="platform-mode-note" class="field-help">Choose eBay to use eBay pricing and publishing. Without eBay, this is copy/paste mode for the selected marketplaces.</p>
           </fieldset>
           <div class="actions">
             <button id="build-draft" type="submit">Build draft</button>
@@ -339,18 +411,22 @@ function renderPage(boot: GuiBootState): string {
       </section>
 
       <section class="card">
+        <span class="eyebrow">02 / Evidence</span>
         <h2>Photos</h2>
         <div id="photo-preview" class="photo-strip"><p class="muted">No photos selected yet.</p></div>
       </section>
 
       <section class="card">
+        <span class="eyebrow">02 / Market</span>
         <h2>Draft summary</h2>
         <div id="summary"><p class="muted">Build a draft to see pricing and comparisons.</p></div>
       </section>
 
       <section id="publish-panel" class="card" hidden>
+        <span class="eyebrow">03 / Place</span>
         <h2>Review and publish</h2>
         <div id="draft-meta"></div>
+        <div id="copy-mode-note" class="form-note copy-mode-note" hidden><strong>Copy/paste mode.</strong> eBay was not selected, so no eBay credentials or eBay comps were used. Set a price manually if needed, then use each platform's <strong>Copy listing</strong> button to paste the title, description, price, and condition into its marketplace.</div>
         <div id="listing-cards" class="listing-grid"></div>
         <section id="ebay-section" class="form-note" hidden>
           <h3>eBay publish settings</h3>
@@ -397,7 +473,14 @@ function sendJson(res: ServerResponse, status: number, payload: unknown, extra: 
     "Content-Type": "application/json; charset=utf-8",
     ...extra,
   });
-  res.end(JSON.stringify(payload, null, 2));
+  let body = JSON.stringify(payload, null, 2) ?? "null";
+  // A provider error should not be able to reflect a credential back to the
+  // browser if it happens to include request details in its response text.
+  for (const key of RUNTIME_SECRET_KEYS) {
+    const value = process.env[key]?.trim();
+    if (value) body = body.split(value).join("[redacted]");
+  }
+  res.end(body);
 }
 
 function sendText(
@@ -570,24 +653,30 @@ async function draftIdToRecord(draftId: string): Promise<DraftRecord | null> {
   return drafts.get(draftId) ?? null;
 }
 
-function validateReferenceUrl(value: string): string {
-  if (!value) return "";
-  if (value.length > 2_048) throw new HttpError(400, "Reference image URL is too long.");
-  let parsed: URL;
-  try {
-    parsed = new URL(value);
-  } catch {
-    throw new HttpError(400, "Reference image URL is invalid.");
-  }
-  if (parsed.protocol !== "https:" || parsed.username || parsed.password) throw new HttpError(400, "Reference image URL must use HTTPS without embedded credentials.");
-  return parsed.toString();
-}
-
 function validateClientPlatforms(value: unknown): Platform[] {
   try {
     return validatePlatformSelection(value);
   } catch (error) {
     throw new HttpError(400, String(error instanceof Error ? error.message : error));
+  }
+}
+
+function applyGuiRuntimeSettings(value: unknown): void {
+  try {
+    applyRuntimeSettings(value);
+  } catch (error) {
+    throw new HttpError(400, String(error instanceof Error ? error.message : error));
+  }
+}
+
+function parseGuiRuntimeSettings(value: unknown): unknown {
+  if (value === undefined || value === null || value === "") return {};
+  if (typeof value !== "string") throw new HttpError(400, "settings must be JSON text.");
+  if (value.length > 30_000) throw new HttpError(413, "settings are too large.");
+  try {
+    return JSON.parse(value);
+  } catch {
+    throw new HttpError(400, "settings must be valid JSON.");
   }
 }
 
@@ -654,11 +743,44 @@ function defaultEbaySettings(boot: GuiBootState): EbayPublishSettings {
   };
 }
 
-async function handleDraft(req: IncomingMessage, boot: GuiBootState, res: ServerResponse): Promise<void> {
+function authorizationCode(value: unknown): string {
+  if (typeof value !== "string") throw new HttpError(400, "eBay authorization code must be text.");
+  const candidate = value.trim();
+  if (!candidate || candidate.length > 8_192 || /[\u0000-\u001f\u007f]/.test(candidate)) {
+    throw new HttpError(400, "eBay authorization code is invalid.");
+  }
+  try {
+    const parsed = new URL(candidate);
+    const code = parsed.searchParams.get("code");
+    if (code) return code;
+  } catch {
+    // The normal input is the raw code; a full redirect URL is accepted too.
+  }
+  return decodeURIComponent(candidate);
+}
+
+async function handleEbayAuthUrl(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  const body = await parseJsonBody(req);
+  applyGuiRuntimeSettings(body.settings);
+  const url = buildConsentUrl();
+  sendJson(res, 200, { url });
+}
+
+async function handleEbayExchange(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  const body = await parseJsonBody(req);
+  applyGuiRuntimeSettings(body.settings);
+  const token = await exchangeCode(authorizationCode(body.code));
+  // Keep the refresh token available to the current GUI process without
+  // returning or persisting the short-lived access token.
+  applyGuiRuntimeSettings({ EBAY_USER_REFRESH_TOKEN: token.refresh_token });
+  sendJson(res, 200, { refreshToken: token.refresh_token });
+}
+
+async function handleDraft(req: IncomingMessage, res: ServerResponse): Promise<void> {
   const form = await parseFormData(req);
   const notes = String(form.get("notes") ?? "");
   if (notes.length > 20_000) throw new HttpError(400, "Seller notes are too long.");
-  const referenceImageUrl = validateReferenceUrl(String(form.get("referenceImageUrl") ?? "").trim());
+  applyGuiRuntimeSettings(parseGuiRuntimeSettings(form.get("settings")));
   const platforms = validateClientPlatforms(form.getAll("platforms").map((value) => String(value).trim()));
   const files = form.getAll("photos").filter((value): value is File => value instanceof File);
   if (!files.length) throw new HttpError(400, "Choose at least one photo before building a draft.");
@@ -680,7 +802,7 @@ async function handleDraft(req: IncomingMessage, boot: GuiBootState, res: Server
       photos.push(photo);
     }
     const photoPaths = photos.map((photo) => photo.path);
-    const draft = await buildDraft(photoPaths, notes, platforms, referenceImageUrl || undefined);
+    const draft = await buildDraft(photoPaths, notes, platforms);
     const now = new Date().toISOString();
     const record: DraftRecord = {
       draftId,
@@ -741,6 +863,7 @@ function mergedPublishResults(previous: PlatformPublishResult[], current: Platfo
 
 async function handlePublish(req: IncomingMessage, boot: GuiBootState, res: ServerResponse): Promise<void> {
   const body = await parseJsonBody(req);
+  applyGuiRuntimeSettings(body.settings);
   if (typeof body.draftId !== "string" || !body.draftId.trim()) throw new HttpError(400, "A stored draftId is required.");
   const draftId = body.draftId.trim();
   const record = await draftIdToRecord(draftId);
@@ -752,12 +875,17 @@ async function handlePublish(req: IncomingMessage, boot: GuiBootState, res: Serv
   activePublishes.add(draftId);
   try {
     const platforms = validateClientPlatforms(body.platforms);
+    const includesEbay = platforms.includes("ebay");
     const edits = body.edits === undefined ? [] : body.edits;
     const merged = mergeClientEdits(record.draft, edits);
-    const ebay = body.ebay === undefined ? (record.ebay ?? defaultEbaySettings(boot)) : normalizedEbaySettings(body.ebay);
+    const ebay = includesEbay
+      ? (body.ebay === undefined ? (record.ebay ?? defaultEbaySettings(boot)) : normalizedEbaySettings(body.ebay))
+      : undefined;
     record.draft = merged;
-    record.ebay = ebay;
-    record.guiSkuPrefix ??= boot.ebayDefaults.sku;
+    if (ebay) {
+      record.ebay = ebay;
+      record.guiSkuPrefix ??= boot.ebayDefaults.sku;
+    }
     record.updatedAt = new Date().toISOString();
     await persistDraft(record);
 
@@ -920,8 +1048,22 @@ export async function startGui(port = Number(process.env.GUI_PORT ?? "3000")): P
         sendJson(res, 200, { ok: true, browserAutomationEnabled: boot.browserAutomationEnabled, drafts: drafts.size });
         return;
       }
+      if (method === "POST" && url.pathname === "/api/settings/clear") {
+        await parseJsonBody(req);
+        resetRuntimeSettings();
+        sendJson(res, 200, { ok: true, message: "GUI runtime settings cleared from process memory." });
+        return;
+      }
+      if (method === "POST" && url.pathname === "/api/ebay/auth-url") {
+        await handleEbayAuthUrl(req, res);
+        return;
+      }
+      if (method === "POST" && url.pathname === "/api/ebay/exchange") {
+        await handleEbayExchange(req, res);
+        return;
+      }
       if (method === "POST" && url.pathname === "/api/draft") {
-        await handleDraft(req, boot, res);
+        await handleDraft(req, res);
         return;
       }
       if (method === "POST" && url.pathname === "/api/publish") {
