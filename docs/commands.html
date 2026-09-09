@@ -32,7 +32,7 @@
   <section class="page-hero photo" style="background-image:url('./hero-commands.jpg')"><div class="wrap">
     <span class="eyebrow" style="color:var(--gold);">Commands</span>
     <h1>Seven verbs.</h1>
-    <p>Draft and outfit are read-only, gui gives you a local review-and-publish dashboard, and post places the eBay listing once you've reviewed the draft.</p>
+    <p>Draft and outfit are read-only, gui gives you a local review-and-publish dashboard, and post places the eBay listing once you've reviewed the draft. This static GitHub Pages site is documentation only; it never handles credentials or connects to your local GUI.</p>
   </div></section>
 
   <section class="section"><div class="wrap">
@@ -41,14 +41,18 @@
       <tbody>
         <tr><td>draft</td><td>Photographs to attributes, comparables, price, and listings. Writes draft.json and a paste sheet. Read-only.</td><td><span class="fl">--photos --notes --platforms --clean --out</span></td></tr>
         <tr><td>outfit</td><td>Detects every sellable piece in one photograph, crops each, and drafts them separately: one paste sheet per piece plus a detection overlay. Read-only.</td><td><span class="fl">--photos --notes --out</span></td></tr>
-        <tr><td>gui</td><td>Starts the loopback dashboard so you can review, edit, recover, and publish a stored draft from one screen. It prints a tokenless local URL; API/photo requests are token-protected.</td><td><span class="fl">--port</span> <span class="fl">GUI_HOST + GUI_ALLOW_REMOTE=1 (opt-in)</span></td></tr>
+        <tr><td>gui</td><td>Starts the loopback dashboard so you can review, edit, recover, and publish a stored draft from one screen. It prints a tokenless local URL; API/photo requests are token-protected. Uncheck eBay for Poshmark/Depop copy-paste mode.</td><td><span class="fl">--port</span> <span class="fl">GUI_HOST + GUI_ALLOW_REMOTE=1 (opt-in)</span></td></tr>
         <tr><td>index</td><td>Embeds your reference photos (refs/) into brand-index.json for the visual brand match.</td><td><span class="fl">--dir --out</span></td></tr>
         <tr><td>post</td><td>Places the eBay listing from a draft.</td><td><span class="fl">--draft --images --location --fulfillment --payment --return</span></td></tr>
         <tr><td>auth-url</td><td>Prints the eBay consent URL for one-time authorisation.</td><td><span class="fl">None</span></td></tr>
         <tr><td>auth-exchange</td><td>Exchanges the returned code for a refresh token.</td><td><span class="fl">&lt;code&gt;</span></td></tr>
       </tbody>
     </table></div>
-    <div style="margin-top:3rem;"><a class="btn btn--ghost" href="./procedure.html">See the full procedure</a></div>
+    <div style="margin-top:3rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center;">
+      <a class="btn btn--ghost" href="./procedure.html">See the full procedure</a>
+      <a class="btn btn--ghost" href="http://127.0.0.1:3000" target="_blank" rel="noopener">Open local studio</a>
+      <span class="dnote">Start <code class="k">npm run gui</code> first.</span>
+    </div>
   </div></section>
 
   <section class="section" style="background:var(--surface);"><div class="wrap">
@@ -76,9 +80,9 @@ Wrote outfit.svg and 3 sheet(s) (outfit-1.md ...). Review before sharing.</pre><
       <div class="cmd">npm run gui</div>
       <div class="ex"><span class="exl">What it prints</span>
         <pre>GUI listening on <b>http://127.0.0.1:3000</b>
-Open the dashboard, upload photos, review the draft, then click Publish all.
+Open this local URL, upload photos, review the draft, then publish or copy listings.
 Drafts and results survive refresh/restart; successful targets are skipped on retry.</pre></div>
-      <p class="muted">The GUI accepts up to 12 raster photos (10 MiB each, 30 MiB total) in a 40 MiB request, keeps them in a private TTL directory, and requires public HTTPS image URLs for eBay. Poshmark/Depop browser flows stay off until <span class="fl">ENABLE_BROWSER_AUTOMATION=1</span> plus a configured JSON flow; install Chromium with <span class="fl">npx playwright install chromium</span>.</p>
+      <p class="muted">The GUI accepts up to 12 raster photos (10 MiB each, 30 MiB total) in a 40 MiB request, keeps them in a private TTL directory, and requires public HTTPS image URLs for eBay. If eBay is not selected, no eBay active/sold comps or eBay credentials are needed; each card has a Copy listing button. Its collapsed Settings panel keeps credentials in process memory only. Poshmark/Depop browser flows stay off until <span class="fl">ENABLE_BROWSER_AUTOMATION=1</span> plus a configured JSON flow; install Chromium with <span class="fl">npx playwright install chromium</span>. This local HTTP URL is not a public deployment: remote use needs a public HTTPS server and authentication.</p>
     </div></div>
 
     <div class="op"><div class="rn" style="font-size:1.15rem;">index</div><div>

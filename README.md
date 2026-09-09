@@ -109,15 +109,40 @@ screenshots into.
 
 1. Install and build: `npm install && npm run build` (rebuild after any code change)
 2. `cp .env.example .env` and fill in:
-   - `EBAY_CLIENT_ID`, `EBAY_CLIENT_SECRET` from developer.ebay.com to My Account to Application Keys
-   - `ANTHROPIC_API_KEY`
+   - `EBAY_CLIENT_ID`, `EBAY_CLIENT_SECRET` from developer.ebay.com to My Account to Application Keys when using eBay
+   - `ANTHROPIC_API_KEY` (or an Anthropic-compatible gateway using
+     `ANTHROPIC_AUTH_TOKEN` and `ANTHROPIC_BASE_URL`)
    - keep `EBAY_ENV=sandbox` until you are ready to list for real
+
+For GUI drafts that select only Poshmark and/or Depop, eBay client credentials
+are not needed: uncheck eBay and use copy/paste mode. The GUI Settings panel can
+provide runtime credentials for a local process instead of putting them in `.env`.
 
 ### For pricing only
 
 Nothing else needed. The Browse API uses an app token that the tool fetches
 automatically. You do need production Browse access approved on your eBay app if you
 set `EBAY_ENV=production`.
+
+### Using an Anthropic-compatible gateway
+
+The app uses the Anthropic Messages API directly. A third-party gateway can be
+used if it supports `POST /v1/messages`, Anthropic message/image blocks, and the
+response shape `{ "content": [{ "text": "..." }] }`. Put the gateway settings in
+the project `.env`; Claude Code's `~/.claude/settings.json` is not read by this
+Node app:
+
+```
+ANTHROPIC_AUTH_TOKEN=your-gateway-token
+ANTHROPIC_BASE_URL=https://api.example.com
+ANTHROPIC_MODEL=your-supported-claude-model
+```
+
+The gateway URL may include `/v1`; the app avoids adding that path twice. Do not
+paste the token into chat or commit `.env`. Confirm that the provider supports
+image input because the photo-to-attributes step sends base64 image blocks. A
+third-party gateway also has its own privacy, reliability, billing, and terms-of-
+service implications.
 
 ### For posting (one-time)
 
@@ -179,7 +204,9 @@ Starts a local review-and-publish dashboard on `http://127.0.0.1:3000` (the
 printed port follows `GUI_PORT`). Upload photos, enter notes, choose the
 platforms, build a draft, edit the copy, then click **Publish all**. eBay
 publishes through the API; the browser-automation hooks for Poshmark and Depop
-are enabled only when configured. The GUI binds to loopback by default. A
+are enabled only when configured. If eBay is unchecked, the pipeline skips eBay
+active and sold comps and the review becomes copy/paste mode: set a manual price
+and use each listing's **Copy listing** button. The GUI binds to loopback by default. A
 `GUI_HOST` override is ignored unless `GUI_ALLOW_REMOTE=1` is explicitly set.
 The page receives a private, HttpOnly per-process session cookie automatically;
 there is no token to type into the normal local URL. API and photo routes reject
@@ -187,6 +214,23 @@ requests without that cookie, and state-changing requests also check their
 same-origin `Origin` when a browser supplies one. If remote access is deliberately
 enabled, the server prints a one-time token URL; prefer setting a long
 `GUI_AUTH_TOKEN` instead of exposing the random token in shell history or logs.
+
+The website in `docs/` is a static guide for GitHub Pages; it is not the GUI and
+must not receive credentials. Run `npm run gui` separately and open the printed
+`http://127.0.0.1:<port>` URL. The GUI's collapsed Settings panel accepts
+Anthropic gateway/native values and eBay account values for that process only.
+They are sent to the protected local API on draft and publish, applied in memory,
+and are never put in `draft.json`, DraftRecord, API responses, or localStorage.
+Remote GUI access requires a deliberately configured public server, HTTPS, and
+real authentication; the loopback HTTP server is intended for local use only.
+
+To obtain the eBay refresh token without leaving the GUI: enter the eBay client ID,
+client secret, environment, and registered redirect/RuName in Settings; click
+**Create eBay sign-in link**, approve access in eBay, paste the returned code, then
+click **Exchange code for refresh token**. The refresh token is placed in the
+current process's memory and is not written to disk. You still need an eBay
+Developer account, an app keyset, and a registered RuName. For copy/paste-only
+drafts, uncheck eBay and none of those eBay credentials are needed.
 
 The dashboard limits each request to 40 MiB, each upload to 10 MiB, each draft
 to 12 photos and 30 MiB total. Uploaded files are decoded and re-encoded as
@@ -198,7 +242,8 @@ ID is saved in browser local storage so a refresh can recover it. Expired and
 failed-build directories are cleaned up.
 
 The publish endpoint accepts only a stored `draftId`. It merges the reviewable
-title, description, positive finite price, and eBay category into the server's
+title, description, finite price (a positive price is required for external
+publishing), and eBay category into the server's
 stored draft; it does not trust a client-supplied full `DraftBundle`. Select at
 least one of `ebay`, `poshmark`, or `depop`. eBay image URLs must be public
 HTTPS URLs because eBay fetches them. GUI eBay SKUs are stable for a draft

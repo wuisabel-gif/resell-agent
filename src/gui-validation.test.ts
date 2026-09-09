@@ -40,6 +40,8 @@ assert.equal(merged.listings[0].price, 41.25);
 assert.equal(merged.listings[0].categoryId, "456");
 assert.equal((merged.listings[0] as unknown as Record<string, unknown>).ignored, undefined);
 assert.equal(draft.listings[0].title, "Original");
+const manualPrice = mergeEditableListingFields(draft, [{ platform: "depop", price: 0 }]);
+assert.equal(manualPrice.listings[1].price, 0);
 assert.throws(() => mergeEditableListingFields(draft, [{ platform: "ebay", price: Number.NaN }]), /finite positive/);
 assert.throws(() => mergeEditableListingFields(draft, [{ platform: "depop", categoryId: "123" }]), /Only eBay/);
 assert.match(stableGuiSku("123e4567-e89b-12d3-a456-426614174000"), /^resale-gui-/);

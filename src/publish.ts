@@ -182,6 +182,15 @@ export async function publishDraftBundle(
       continue;
     }
 
+    if (platform !== "ebay" && (!Number.isFinite(listing.price) || listing.price <= 0)) {
+      results.push({
+        platform,
+        status: "error",
+        message: `${platform} needs a positive price before publishing; set it manually or use Copy listing.`,
+      });
+      continue;
+    }
+
     let externalPublishAttempted = false;
     try {
       if (platform === "ebay") {

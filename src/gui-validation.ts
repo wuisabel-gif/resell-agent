@@ -46,9 +46,12 @@ function editableText(value: unknown, name: string, maxLength: number): string {
   return result;
 }
 
-function editablePrice(value: unknown): number {
-  if (typeof value !== "number" || !Number.isFinite(value) || value <= 0 || value > 1_000_000) {
-    throw new Error("Price must be a finite positive number no greater than 1,000,000.");
+function editablePrice(value: unknown, allowZero: boolean): number {
+  const minimum = allowZero ? 0 : Number.MIN_VALUE;
+  if (typeof value !== "number" || !Number.isFinite(value) || value < minimum || value > 1_000_000) {
+    throw new Error(allowZero
+      ? "Price must be a finite non-negative number no greater than 1,000,000."
+      : "Price must be a finite positive number no greater than 1,000,000.");
   }
   return Math.round(value * 100) / 100;
 }
@@ -84,7 +87,7 @@ export function mergeEditableListingFields(
     if (Object.hasOwn(input, "description")) {
       listing.description = editableText(input.description, `${input.platform} description`, MAX_DESCRIPTION_LENGTH);
     }
-    if (Object.hasOwn(input, "price")) listing.price = editablePrice(input.price);
+    if (Object.hasOwn(input, "price")) listing.price = editablePrice(input.price, input.platform !== "ebay");
     if (Object.hasOwn(input, "categoryId")) {
       if (input.platform !== "ebay") throw new Error("Only eBay may set categoryId.");
       if (typeof input.categoryId !== "string") throw new Error("eBay categoryId must be text.");
