@@ -8,7 +8,7 @@ import { buildDraft } from "./pipeline.js";
 import { publishDraftBundle, validateHttpsImageUrls, type EbayPublishSettings, type PlatformPublishResult } from "./publish.js";
 import { buildGuiScript, type GuiBootState } from "./gui-client.js";
 import { GUI_PLATFORMS, mergeEditableListingFields, validatePlatformSelection } from "./gui-validation.js";
-import { loadApiKeyFile, truthy } from "./env.js";
+import { truthy } from "./env.js";
 import { applyRuntimeSettings, resetRuntimeSettings, RUNTIME_SECRET_KEYS } from "./runtime-settings.js";
 import type { DraftBundle, Platform } from "./types.js";
 
@@ -1000,7 +1000,6 @@ export interface GuiHandle {
 }
 
 export async function startGui(port = Number(process.env.GUI_PORT ?? "3000")): Promise<GuiHandle> {
-  loadApiKeyFile();
   const allowRemote = process.env.GUI_ALLOW_REMOTE?.trim() === "1";
   const configuredHost = process.env.GUI_HOST?.trim();
   if (configuredHost && /[\r\n]/.test(configuredHost)) throw new Error("GUI_HOST contains invalid control characters.");
