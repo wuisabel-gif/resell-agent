@@ -1,6 +1,6 @@
 // Runnable check for the pricing math. Run: npm run build && node dist/brain/price.test.js
 import assert from "node:assert";
-import { priceFromComps } from "./price.js";
+import { priceFromAnchors, priceFromComps, resolvePrice } from "./price.js";
 import type { Comp } from "../types.js";
 
 const active = (p: number): Comp => ({
@@ -26,5 +26,25 @@ assert.match(s.basis, /sold comps/);
 const a = priceFromComps([active(100), active(100), active(100), sold(999)]);
 assert.equal(a.suggested, 85);
 assert.match(a.basis, /active asks/);
+
+const fromPhoto = priceFromAnchors(
+  { condition: "good", originalRetail: null, resaleLow: 75, resaleHigh: 180 },
+  [],
+);
+assert.equal(fromPhoto?.low, 75);
+assert.equal(fromPhoto?.high, 180);
+assert.equal(fromPhoto?.suggested, 128);
+
+const fromRetail = priceFromAnchors(
+  { condition: "good", originalRetail: null },
+  [{ price: 200 }],
+);
+assert.equal(fromRetail?.low, 44);
+assert.equal(fromRetail?.high, 96);
+
+const resolved = resolvePrice([], { condition: "fair", originalRetail: 100, resaleLow: 20, resaleHigh: 40 });
+assert.equal(resolved.low, 20);
+assert.equal(resolved.high, 40);
+assert.equal(resolved.suggested, 30);
 
 console.log("price.test ok");

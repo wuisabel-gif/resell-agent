@@ -13,6 +13,8 @@ export interface ItemAttributes {
   flaws: string[];
   dimensions: string | null; // estimated size, e.g. "≈ 15 x 11 x 4 in (estimate)"
   originalRetail: number | null;
+  resaleLow?: number | null;
+  resaleHigh?: number | null;
 }
 
 export interface Comp {

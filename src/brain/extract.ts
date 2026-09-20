@@ -41,6 +41,11 @@ typical size, refined by its proportions against anything of known size in frame
 Use null only when size truly can't be inferred — e.g. clothing/shoe SIZING, which
 needs the garment's own label, not a visual guess. Never present an estimate as exact.
 
+For "resaleLow" and "resaleHigh", ALWAYS give a conservative USD secondhand asking
+range for this piece in this condition, as photographed. Integers, high above low,
+never 0. This is resale, not new retail. Wider if uncertain. originalRetail stays
+the new-price estimate when you know one.
+
 Reply with ONLY a JSON object, no prose, matching this shape:
 {
   "brand": string|null,
@@ -54,7 +59,9 @@ Reply with ONLY a JSON object, no prose, matching this shape:
   "condition": "NWT"|"like-new"|"good"|"fair",
   "flaws": string[],
   "dimensions": string|null,
-  "originalRetail": number|null
+  "originalRetail": number|null,
+  "resaleLow": number,
+  "resaleHigh": number
 }`;
 
 export async function extractAttributes(
