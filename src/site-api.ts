@@ -1,13 +1,13 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { randomUUID } from "node:crypto";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildDraft } from "./pipeline.js";
 import { generateListing } from "./brain/listing.js";
 import { clientKey, corsOrigin, createRateLimiter, parseAllowedOrigins } from "./site-api-policy.js";
-import { renderSitePage } from "./site-page.js";
+import { publicFileType, resolvePublicFile } from "./site-static.js";
 import type { Platform } from "./types.js";
 
 const MAX_REQUEST_BYTES = 8 * 1024 * 1024;
@@ -69,17 +69,6 @@ async function parseFormData(req: IncomingMessage): Promise<FormData> {
   }
 }
 
-function sendHtml(res: ServerResponse, status: number, body: string): void {
-  res.writeHead(status, {
-    "Content-Type": "text/html; charset=utf-8",
-    "Cache-Control": "no-store",
-    "X-Content-Type-Options": "nosniff",
-    "Referrer-Policy": "no-referrer",
-    "Content-Security-Policy": "default-src 'self'; img-src 'self' blob:; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'unsafe-inline'; connect-src 'self'",
-  });
-  res.end(body);
-}
-
 function sendJson(res: ServerResponse, status: number, body: unknown, extra: Record<string, string> = {}): void {
   res.writeHead(status, {
     "Content-Type": "application/json; charset=utf-8",
@@ -128,6 +117,7 @@ export async function startSiteApi(port = Number(process.env.PORT ?? process.env
   const inFlight = new Set<string>();
   const host = process.env.SITE_API_HOST?.trim() || "0.0.0.0";
   const listenPort = Number.isInteger(port) && port >= 0 && port <= 65_535 ? port : 8787;
+  const docsRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..", "docs");
 
   const corsHeaders = (origin: string | null): Record<string, string> => {
     if (!origin) return {};
@@ -149,10 +139,6 @@ export async function startSiteApi(port = Number(process.env.PORT ?? process.env
       if (method === "OPTIONS") {
         res.writeHead(origin ? 204 : 403, cors);
         res.end();
-        return;
-      }
-      if (method === "GET" && (url.pathname === "/" || url.pathname === "/index.html")) {
-        sendHtml(res, 200, renderSitePage());
         return;
       }
       if (method === "GET" && url.pathname === "/api/health") {
@@ -188,6 +174,20 @@ export async function startSiteApi(port = Number(process.env.PORT ?? process.env
           await rm(dir, { recursive: true, force: true });
         }
         return;
+      }
+      if (method === "GET") {
+        const file = resolvePublicFile(docsRoot, url.pathname);
+        if (file) {
+          const body = await readFile(file);
+          res.writeHead(200, {
+            "Content-Type": publicFileType(file),
+            "Cache-Control": "public, max-age=300",
+            "X-Content-Type-Options": "nosniff",
+            "Referrer-Policy": "no-referrer",
+          });
+          res.end(body);
+          return;
+        }
       }
       sendJson(res, 404, { error: "Not found" }, cors);
     } catch (error) {
