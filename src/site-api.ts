@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import { buildDraft } from "./pipeline.js";
 import { generateListing } from "./brain/listing.js";
 import { clientKey, corsOrigin, createRateLimiter, parseAllowedOrigins } from "./site-api-policy.js";
+import { renderSitePage } from "./site-page.js";
 import type { Platform } from "./types.js";
 
 const MAX_REQUEST_BYTES = 8 * 1024 * 1024;
@@ -66,6 +67,17 @@ async function parseFormData(req: IncomingMessage): Promise<FormData> {
   } catch {
     throw new HttpError(400, "Malformed upload.");
   }
+}
+
+function sendHtml(res: ServerResponse, status: number, body: string): void {
+  res.writeHead(status, {
+    "Content-Type": "text/html; charset=utf-8",
+    "Cache-Control": "no-store",
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "no-referrer",
+    "Content-Security-Policy": "default-src 'self'; img-src 'self' blob:; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'unsafe-inline'; connect-src 'self'",
+  });
+  res.end(body);
 }
 
 function sendJson(res: ServerResponse, status: number, body: unknown, extra: Record<string, string> = {}): void {
@@ -129,7 +141,7 @@ export async function startSiteApi(port = Number(process.env.PORT ?? process.env
   };
 
   const server = createServer(async (req, res) => {
-    const origin = corsOrigin(req.headers.origin, allowed);
+    const origin = corsOrigin(req.headers.origin, allowed, req.headers.host);
     const cors = corsHeaders(origin);
     try {
       const url = new URL(req.url ?? "/", "http://localhost");
@@ -137,6 +149,10 @@ export async function startSiteApi(port = Number(process.env.PORT ?? process.env
       if (method === "OPTIONS") {
         res.writeHead(origin ? 204 : 403, cors);
         res.end();
+        return;
+      }
+      if (method === "GET" && (url.pathname === "/" || url.pathname === "/index.html")) {
+        sendHtml(res, 200, renderSitePage());
         return;
       }
       if (method === "GET" && url.pathname === "/api/health") {
