@@ -1,6 +1,14 @@
-import type { Comp, PlatformStat, PriceSuggestion } from "../types.js";
+import type { Comp, ItemAttributes, PlatformStat, PriceSuggestion, RetailListing } from "../types.js";
 
 const round = (x: number) => Math.round(x * 100) / 100;
+const dollars = (x: number) => Math.max(1, Math.round(x));
+
+const RESALE_OF_NEW: Record<ItemAttributes["condition"], { lo: number; hi: number }> = {
+  NWT: { lo: 0.5, hi: 0.8 },
+  "like-new": { lo: 0.35, hi: 0.65 },
+  good: { lo: 0.22, hi: 0.48 },
+  fair: { lo: 0.1, hi: 0.28 },
+};
 
 function median(xs: number[]): number {
   const s = [...xs].sort((a, b) => a - b);
@@ -82,4 +90,52 @@ export function priceFromComps(comps: Comp[]): PriceSuggestion {
       : `No sold data; median of ${active.length} active asks, discounted 15%.`,
     sampleSize: pool.length,
   };
+}
+
+/** Resale band from the photo estimate, or a haircut of new/original retail. */
+export function priceFromAnchors(
+  attrs: Pick<ItemAttributes, "condition" | "originalRetail" | "resaleLow" | "resaleHigh">,
+  retail: Pick<RetailListing, "price">[] = [],
+): PriceSuggestion | null {
+  const extractedLow = Number(attrs.resaleLow);
+  const extractedHigh = Number(attrs.resaleHigh);
+  if (extractedLow > 0 && extractedHigh >= extractedLow) {
+    const low = dollars(extractedLow);
+    const high = dollars(extractedHigh);
+    return {
+      suggested: dollars((low + high) / 2),
+      low,
+      high,
+      currency: "USD",
+      basis: "Estimated resale range from the photographs; no sold comps.",
+      sampleSize: 0,
+    };
+  }
+
+  const news = retail.map((row) => row.price).filter((price) => price > 0);
+  const anchor = news.length ? median(news) : attrs.originalRetail;
+  if (!anchor || anchor <= 0) return null;
+  const { lo, hi } = RESALE_OF_NEW[attrs.condition];
+  const low = dollars(anchor * lo);
+  const high = Math.max(low + 1, dollars(anchor * hi));
+  return {
+    suggested: dollars((low + high) / 2),
+    low,
+    high,
+    currency: "USD",
+    basis: news.length
+      ? `Estimated from ${news.length} new-retail asks (median $${dollars(median(news))}); no sold comps.`
+      : `Estimated from original retail ($${dollars(anchor)}); no sold comps.`,
+    sampleSize: 0,
+  };
+}
+
+export function resolvePrice(
+  comps: Comp[],
+  attrs: Pick<ItemAttributes, "condition" | "originalRetail" | "resaleLow" | "resaleHigh">,
+  retail: Pick<RetailListing, "price">[] = [],
+): PriceSuggestion {
+  const fromComps = priceFromComps(comps);
+  if (fromComps.suggested > 0) return fromComps;
+  return priceFromAnchors(attrs, retail) ?? fromComps;
 }

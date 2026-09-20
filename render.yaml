@@ -13,14 +13,16 @@ services:
         value: "1"
       - key: SITE_ALLOWED_ORIGINS
         value: https://wuisabel-gif.github.io
-      - key: ANTHROPIC_BASE_URL
-        value: https://api.chr1.com
-      - key: ANTHROPIC_MODEL
-        value: "[xy2-按量计费]claude-sonnet-4-6"
-      - key: ANTHROPIC_AUTH_TOKEN
+      - key: ANTHROPIC_API_KEY
         sync: false
       - key: YOU_API_KEY
         sync: false
+      - key: EBAY_CLIENT_ID
+        sync: false
+      - key: EBAY_CLIENT_SECRET
+        sync: false
+      - key: EBAY_ENV
+        value: production
       - key: BING_VISUAL_SEARCH_KEY
         sync: false
       - key: BING_VISUAL_SEARCH_ENDPOINT

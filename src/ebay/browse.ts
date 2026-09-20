@@ -20,6 +20,10 @@ function buildQuery(a: ItemAttributes): string {
     .trim();
 }
 
+function ebayBrowseReady(): boolean {
+  return Boolean(process.env.EBAY_CLIENT_ID?.trim() && process.env.EBAY_CLIENT_SECRET?.trim());
+}
+
 // Active-listing comps via the Browse API. This is the app-token path that
 // works as soon as you have production Browse access.
 //
@@ -30,45 +34,51 @@ export async function getActiveComps(
   a: ItemAttributes,
   limit = 25
 ): Promise<Comp[]> {
-  const token = await getAppToken();
-  const q = buildQuery(a);
-  const params = new URLSearchParams({
-    q,
-    limit: String(limit),
-    filter: `conditionIds:{${conditionFilter(a.condition)}}`,
-    sort: "price",
-  });
+  if (!ebayBrowseReady()) return [];
+  try {
+    const token = await getAppToken();
+    const q = buildQuery(a);
+    const params = new URLSearchParams({
+      q,
+      limit: String(limit),
+      filter: `conditionIds:{${conditionFilter(a.condition)}}`,
+      sort: "price",
+    });
 
-  const res = await fetch(
-    `${cfg.apiBase}/buy/browse/v1/item_summary/search?${params.toString()}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "X-EBAY-C-MARKETPLACE-ID": "EBAY_US",
-      },
-    }
-  );
-  if (!res.ok) throw new Error(`browse search failed: ${res.status} ${await res.text()}`);
+    const res = await fetch(
+      `${cfg.apiBase}/buy/browse/v1/item_summary/search?${params.toString()}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "X-EBAY-C-MARKETPLACE-ID": "EBAY_US",
+        },
+      }
+    );
+    if (!res.ok) throw new Error(`browse search failed: ${res.status} ${await res.text()}`);
 
-  const j = (await res.json()) as {
-    itemSummaries?: Array<{
-      title: string;
-      price?: { value: string; currency: string };
-      condition?: string;
-      itemWebUrl: string;
-    }>;
-  };
+    const j = (await res.json()) as {
+      itemSummaries?: Array<{
+        title: string;
+        price?: { value: string; currency: string };
+        condition?: string;
+        itemWebUrl: string;
+      }>;
+    };
 
-  return (j.itemSummaries ?? [])
-    .filter((it) => it.price)
-    .map((it) => ({
-      title: it.title,
-      price: Number(it.price!.value),
-      currency: it.price!.currency,
-      condition: it.condition ?? null,
-      url: it.itemWebUrl,
-      source: "ebay-active" as const,
-    }));
+    return (j.itemSummaries ?? [])
+      .filter((it) => it.price)
+      .map((it) => ({
+        title: it.title,
+        price: Number(it.price!.value),
+        currency: it.price!.currency,
+        condition: it.condition ?? null,
+        url: it.itemWebUrl,
+        source: "ebay-active" as const,
+      }));
+  } catch (e) {
+    console.warn(`eBay active comps unavailable (${String(e)}); skipping.`);
+    return [];
+  }
 }
 
 // Sold comps via the Marketplace Insights API. This code is complete but DORMANT:
@@ -79,38 +89,43 @@ export async function getActiveComps(
 const INSIGHTS_SCOPE = "https://api.ebay.com/oauth/api_scope/buy.marketplace.insights";
 
 export async function getSoldComps(a: ItemAttributes, limit = 25): Promise<Comp[]> {
-  if (!process.env.EBAY_INSIGHTS) return [];
+  if (!process.env.EBAY_INSIGHTS || !ebayBrowseReady()) return [];
 
-  const token = await getAppToken(INSIGHTS_SCOPE);
-  const params = new URLSearchParams({
-    q: buildQuery(a),
-    limit: String(limit),
-    filter: `conditionIds:{${conditionFilter(a.condition)}}`,
-  });
+  try {
+    const token = await getAppToken(INSIGHTS_SCOPE);
+    const params = new URLSearchParams({
+      q: buildQuery(a),
+      limit: String(limit),
+      filter: `conditionIds:{${conditionFilter(a.condition)}}`,
+    });
 
-  const res = await fetch(
-    `${cfg.apiBase}/buy/marketplace_insights/v1_beta/item_sales/search?${params.toString()}`,
-    { headers: { Authorization: `Bearer ${token}`, "X-EBAY-C-MARKETPLACE-ID": "EBAY_US" } }
-  );
-  if (!res.ok) throw new Error(`insights search failed: ${res.status} ${await res.text()}`);
+    const res = await fetch(
+      `${cfg.apiBase}/buy/marketplace_insights/v1_beta/item_sales/search?${params.toString()}`,
+      { headers: { Authorization: `Bearer ${token}`, "X-EBAY-C-MARKETPLACE-ID": "EBAY_US" } }
+    );
+    if (!res.ok) throw new Error(`insights search failed: ${res.status} ${await res.text()}`);
 
-  const j = (await res.json()) as {
-    itemSales?: Array<{
-      title: string;
-      lastSoldPrice?: { value: string; currency: string };
-      condition?: string;
-      itemWebUrl: string;
-    }>;
-  };
+    const j = (await res.json()) as {
+      itemSales?: Array<{
+        title: string;
+        lastSoldPrice?: { value: string; currency: string };
+        condition?: string;
+        itemWebUrl: string;
+      }>;
+    };
 
-  return (j.itemSales ?? [])
-    .filter((it) => it.lastSoldPrice)
-    .map((it) => ({
-      title: it.title,
-      price: Number(it.lastSoldPrice!.value),
-      currency: it.lastSoldPrice!.currency,
-      condition: it.condition ?? null,
-      url: it.itemWebUrl,
-      source: "ebay-sold" as const,
-    }));
+    return (j.itemSales ?? [])
+      .filter((it) => it.lastSoldPrice)
+      .map((it) => ({
+        title: it.title,
+        price: Number(it.lastSoldPrice!.value),
+        currency: it.lastSoldPrice!.currency,
+        condition: it.condition ?? null,
+        url: it.itemWebUrl,
+        source: "ebay-sold" as const,
+      }));
+  } catch (e) {
+    console.warn(`eBay sold comps unavailable (${String(e)}); skipping.`);
+    return [];
+  }
 }

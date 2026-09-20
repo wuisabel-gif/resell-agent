@@ -1,5 +1,5 @@
 import { extractAttributes } from "./brain/extract.js";
-import { priceFromComps, compareByPlatform } from "./brain/price.js";
+import { resolvePrice, compareByPlatform } from "./brain/price.js";
 import { generateListing } from "./brain/listing.js";
 import { fillAspects } from "./brain/aspects.js";
 import { getActiveComps, getSoldComps } from "./ebay/browse.js";
@@ -9,6 +9,8 @@ import { getRealRealComps } from "./therealreal.js";
 import { getMercariComps } from "./mercari.js";
 import { suggestCategory, getRequiredAspects } from "./ebay/taxonomy.js";
 import { getImageGuess } from "./imagesearch.js";
+import { getGoogleVisionGuess } from "./google-vision.js";
+import { getBingVisualGuess } from "./bing-visual.js";
 import { matchBrand } from "./brandvision.js";
 import { getRetail } from "./retail.js";
 import type { Comp, ItemAttributes, DraftBundle, Platform } from "./types.js";
@@ -67,13 +69,17 @@ export async function buildDraft(
   platforms: Platform[] = ["ebay", "poshmark", "depop"],
   imageUrl?: string
 ): Promise<DraftBundle> {
-  // Optional brand leads fed into the vision step (both gated, both null when off):
-  // a local CLIP visual match, and an unofficial reverse-image search (CLI only).
-  const [urlGuess, clip] = await Promise.all([
+  // Optional brand leads fed into the vision step (all gated, null when off):
+  // local CLIP, official Google Vision web detection, unofficial URL scrape.
+  const [urlGuess, googleGuess, bingGuess, clip] = await Promise.all([
     imageUrl ? getImageGuess(imageUrl) : Promise.resolve(null),
+    getGoogleVisionGuess(photoPaths[0]),
+    getBingVisualGuess(photoPaths[0]),
     matchBrand(photoPaths[0]),
   ]);
   const leads = [
+    bingGuess ? `Bing reverse-image: "${bingGuess.label}"` : null,
+    googleGuess ? `Google reverse-image: "${googleGuess.label}"` : null,
     urlGuess ? `reverse-image search: "${urlGuess}"` : null,
     clip ? `visual brand match: ${clip.brand} (${Math.round(clip.score * 100)}%)` : null,
   ].filter(Boolean);
@@ -81,10 +87,10 @@ export async function buildDraft(
 
   const [comps, retail] = await Promise.all([
     gatherComps(attributes, platforms),
-    getRetail(attributes), // exact piece at retail, only when a product was named
+    getRetail(attributes),
   ]);
 
-  const price = priceFromComps(comps);
+  const price = resolvePrice(comps, attributes, retail);
   const comparison = compareByPlatform(comps);
 
   const listings = await Promise.all(
