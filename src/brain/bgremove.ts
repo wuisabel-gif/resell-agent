@@ -1,6 +1,5 @@
 import { writeFileSync } from "node:fs";
 import { extname } from "node:path";
-import { removeBackground } from "@imgly/background-removal-node";
 
 // Strip the background from a product photo. Outputs a transparent PNG, which is
 // what eBay wants — its product view composites onto white, so no white-fill step
@@ -8,10 +7,23 @@ import { removeBackground } from "@imgly/background-removal-node";
 // Transparent padding kept around the item after cropping, in pixels.
 const PAD = 24;
 
+async function loadRemoveBackground(): Promise<(input: string) => Promise<Blob>> {
+  try {
+    const specifier = "@imgly/background-removal-node" as string;
+    const mod = (await import(specifier)) as { removeBackground: (input: string) => Promise<Blob> };
+    return mod.removeBackground;
+  } catch (e) {
+    throw new Error(
+      `Background removal is not installed (${e instanceof Error ? e.message : e}). ` +
+        "It is optional. Omit --clean, or install @imgly/background-removal-node locally.",
+    );
+  }
+}
+
 export async function cleanPhoto(path: string, outPath = cleanPath(path)): Promise<string> {
   let blob: Blob;
   try {
-    blob = await removeBackground(path);
+    blob = await (await loadRemoveBackground())(path);
   } catch (e) {
     // Almost always the native deps (sharp/onnxruntime-node) not built or the
     // first-run model download failing — not a bug in this code. Say so plainly.
