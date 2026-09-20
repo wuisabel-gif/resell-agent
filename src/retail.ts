@@ -7,7 +7,10 @@ import { UA } from "./sources.js";
 // the query is specific enough to mean the same piece, not just similar ones.
 
 export async function getRetail(a: ItemAttributes, limit = 6): Promise<RetailListing[]> {
-  if (!process.env.ENABLE_RETAIL || !a.brand || !a.productName) return [];
+  if (!a.brand || !a.productName) return [];
+  const fromYou = await getYouRetail(a, limit);
+  if (fromYou.length) return fromYou;
+  if (!process.env.ENABLE_RETAIL) return [];
   const q = `${a.brand} ${a.productName}`;
   const url = `https://www.google.com/search?q=${encodeURIComponent(q)}&tbm=shop&hl=en`;
   try {
@@ -16,6 +19,45 @@ export async function getRetail(a: ItemAttributes, limit = 6): Promise<RetailLis
     return parseShopping(await res.text()).slice(0, limit);
   } catch (e) {
     console.warn(`retail lookup unavailable (${String(e)}); skipping. Unofficial/ToS-risky and often blocked.`);
+    return [];
+  }
+}
+
+async function getYouRetail(a: ItemAttributes, limit: number): Promise<RetailListing[]> {
+  const key = process.env.YOU_API_KEY?.trim();
+  if (!key) return [];
+  try {
+    const res = await fetch("https://ydc-index.io/v1/search", {
+      method: "POST",
+      headers: { "X-API-Key": key, "Content-Type": "application/json" },
+      body: JSON.stringify({ query: `${a.brand} ${a.productName} buy`, count: 8 }),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status} ${await res.text()}`);
+    const web = (await res.json() as { results?: { web?: Array<{ title?: string; url?: string; description?: string; snippets?: string[] }> } }).results?.web ?? [];
+    const out: RetailListing[] = [];
+    const seen = new Set<string>();
+    for (const hit of web) {
+      if (!hit.url) continue;
+      const blob = [hit.title, hit.description, ...(hit.snippets ?? [])].filter(Boolean).join(" ");
+      const match = blob.match(/\$(\d{2,5}(?:,\d{3})*(?:\.\d{2})?)/);
+      if (!match) continue;
+      const price = Number(match[1].replace(/,/g, ""));
+      if (!Number.isFinite(price) || price <= 0) continue;
+      let retailer: string;
+      try {
+        retailer = new URL(hit.url).hostname.replace(/^www\./, "").split(".")[0] ?? "retailer";
+      } catch {
+        continue;
+      }
+      const keySeen = `${retailer}:${price}`;
+      if (seen.has(keySeen)) continue;
+      seen.add(keySeen);
+      out.push({ retailer, price, currency: "USD", url: hit.url });
+      if (out.length >= limit) break;
+    }
+    return out;
+  } catch (e) {
+    console.warn(`You.com search unavailable (${String(e)}); skipping.`);
     return [];
   }
 }

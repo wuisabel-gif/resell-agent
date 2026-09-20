@@ -18,6 +18,9 @@ export const RUNTIME_SETTING_KEYS = [
   "EBAY_ENV",
   "EBAY_REDIRECT_URI",
   "EBAY_USER_REFRESH_TOKEN",
+  "GOOGLE_VISION_API_KEY",
+  "BING_VISUAL_SEARCH_KEY",
+  "YOU_API_KEY",
 ] as const;
 
 export const RUNTIME_SECRET_KEYS = [
@@ -25,6 +28,9 @@ export const RUNTIME_SECRET_KEYS = [
   "ANTHROPIC_API_KEY",
   "EBAY_CLIENT_SECRET",
   "EBAY_USER_REFRESH_TOKEN",
+  "GOOGLE_VISION_API_KEY",
+  "BING_VISUAL_SEARCH_KEY",
+  "YOU_API_KEY",
 ] as const;
 
 export type RuntimeSettingKey = (typeof RUNTIME_SETTING_KEYS)[number];
@@ -40,6 +46,9 @@ const MAX_VALUE_LENGTH: Record<RuntimeSettingKey, number> = {
   EBAY_ENV: 32,
   EBAY_REDIRECT_URI: 2_048,
   EBAY_USER_REFRESH_TOKEN: 8_192,
+  GOOGLE_VISION_API_KEY: 8_192,
+  BING_VISUAL_SEARCH_KEY: 8_192,
+  YOU_API_KEY: 8_192,
 };
 
 const startupEnvironment = new Map<RuntimeSettingKey, string | undefined>(
