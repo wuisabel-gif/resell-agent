@@ -554,6 +554,10 @@ code.k{font-family:var(--sans);background:var(--surface-2);color:var(--gold-ink)
 .live-status[data-kind=warn]{color:var(--gold-ink);}
 .live-status[data-kind=error]{color:#8a2f2f;}
 .live-summary{margin:1.2rem 0 0.6rem;color:var(--ink);}
+.live-retail{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--gold-soft);}
+.live-retail h3{text-transform:none;margin:0 0 0.45rem;font-size:var(--step-0);}
+.live-retail-list{margin:0;padding-left:1.1rem;}
+.live-retail-list a{color:var(--gold-ink);font-weight:600;}
 .live-listing{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--gold-soft);}
 .live-listing h3{text-transform:capitalize;margin:0 0 0.35rem;}
 .live-price{color:var(--gold-ink);font-weight:600;margin:0 0 0.6rem;}

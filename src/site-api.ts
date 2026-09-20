@@ -5,7 +5,6 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildDraft } from "./pipeline.js";
-import { generateListing } from "./brain/listing.js";
 import { clientKey, corsOrigin, createRateLimiter, parseAllowedOrigins } from "./site-api-policy.js";
 import { publicFileType, resolvePublicFile } from "./site-static.js";
 import type { Platform } from "./types.js";
@@ -161,13 +160,13 @@ export async function startSiteApi(port = Number(process.env.PORT ?? process.env
           if (!(photo instanceof File)) throw new HttpError(400, "Choose a photo first.");
           const notes = String(form.get("notes") ?? "").trim().slice(0, MAX_NOTES);
           const path = await savePhoto(photo, dir);
-          const platforms: Platform[] = ["poshmark", "depop"];
+          const platforms: Platform[] = ["ebay", "poshmark", "depop"];
           const draft = await buildDraft([path], notes, platforms);
-          const ebay = await generateListing(draft.attributes, draft.price, "ebay");
           sendJson(res, 200, {
             attributes: draft.attributes,
             price: draft.price,
-            listings: [ebay, ...draft.listings],
+            retail: draft.retail,
+            listings: draft.listings,
           }, cors);
         } finally {
           inFlight.delete(key);

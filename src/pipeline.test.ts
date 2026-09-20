@@ -45,3 +45,15 @@ assert.equal(activeCalls, 1);
 assert.equal(soldCalls, 1);
 
 console.log("pipeline.test ok");
+
+const { getActiveComps } = await import("./ebay/browse.js");
+const savedEbay = {
+  EBAY_CLIENT_ID: process.env.EBAY_CLIENT_ID,
+  EBAY_CLIENT_SECRET: process.env.EBAY_CLIENT_SECRET,
+};
+delete process.env.EBAY_CLIENT_ID;
+delete process.env.EBAY_CLIENT_SECRET;
+assert.deepEqual(await getActiveComps(attrs), []);
+if (savedEbay.EBAY_CLIENT_ID) process.env.EBAY_CLIENT_ID = savedEbay.EBAY_CLIENT_ID;
+if (savedEbay.EBAY_CLIENT_SECRET) process.env.EBAY_CLIENT_SECRET = savedEbay.EBAY_CLIENT_SECRET;
+console.log("ebay browse skip-without-keys ok");
