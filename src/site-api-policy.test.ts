@@ -1,11 +1,17 @@
 import assert from "node:assert";
 import { clientKey, corsOrigin, createRateLimiter, parseAllowedOrigins } from "./site-api-policy.js";
 
-assert.deepEqual(parseAllowedOrigins(""), ["https://wuisabel-gif.github.io"]);
+assert.deepEqual(parseAllowedOrigins(""), [
+  "https://wuisabel-gif.github.io",
+  "https://resell-agent.onrender.com",
+]);
 assert.ok(parseAllowedOrigins("https://example.test").includes("https://example.test"));
 
 assert.equal(corsOrigin("https://wuisabel-gif.github.io", parseAllowedOrigins()), "https://wuisabel-gif.github.io");
+assert.equal(corsOrigin("https://resell-agent.onrender.com", parseAllowedOrigins()), "https://resell-agent.onrender.com");
 assert.equal(corsOrigin("https://evil.example", parseAllowedOrigins()), null);
+assert.equal(corsOrigin("https://evil.example", parseAllowedOrigins(), "resell-agent.onrender.com"), null);
+assert.equal(corsOrigin("https://resell-agent.onrender.com", [], "resell-agent.onrender.com"), "https://resell-agent.onrender.com");
 assert.equal(corsOrigin("http://127.0.0.1:4173", parseAllowedOrigins()), "http://127.0.0.1:4173");
 assert.equal(corsOrigin("http://localhost:5500", parseAllowedOrigins()), "http://localhost:5500");
 

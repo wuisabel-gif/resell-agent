@@ -2,14 +2,20 @@
 
 export const DEFAULT_SITE_ORIGINS = [
   "https://wuisabel-gif.github.io",
+  "https://resell-agent.onrender.com",
 ];
 
 export function parseAllowedOrigins(raw = process.env.SITE_ALLOWED_ORIGINS): string[] {
   const extra = (raw ?? "").split(",").map((value) => value.trim()).filter(Boolean);
-  return [...new Set([...DEFAULT_SITE_ORIGINS, ...extra])];
+  const render = (process.env.RENDER_EXTERNAL_URL ?? "").trim().replace(/\/+$/, "");
+  return [...new Set([...DEFAULT_SITE_ORIGINS, ...extra, render].filter(Boolean))];
 }
 
-export function corsOrigin(origin: string | undefined, allowed: readonly string[]): string | null {
+export function corsOrigin(
+  origin: string | undefined,
+  allowed: readonly string[],
+  hostHeader?: string,
+): string | null {
   if (!origin) return null;
   if (allowed.includes(origin)) return origin;
   try {
@@ -17,6 +23,8 @@ export function corsOrigin(origin: string | undefined, allowed: readonly string[
     if (parsed.protocol === "http:" && (parsed.hostname === "127.0.0.1" || parsed.hostname === "localhost")) {
       return origin;
     }
+    const host = (hostHeader ?? "").split(",")[0]?.trim();
+    if (host && (parsed.host === host || parsed.hostname === host.split(":")[0])) return origin;
   } catch {
     return null;
   }
