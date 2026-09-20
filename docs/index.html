@@ -39,7 +39,7 @@
       <h1 data-load="2">Photograph the piece. Receive the <em>listing</em>.</h1>
       <p class="lede" data-load="3">resell·agent reads a garment or accessory from its photographs, prices it against the market, and composes finished listings for eBay, Poshmark, and Depop, so the value in a wardrobe is realised, not stored.</p>
       <div class="hero-cta" data-load="4">
-        <a class="btn btn--gold" href="./live.html">Try the live model</a>
+        <a class="btn btn--gold" href="#live">Try the live model</a>
         <a class="btn btn--on-dark" href="./procedure.html">How it runs</a>
         <a class="btn btn--on-dark" href="http://127.0.0.1:3000" target="_blank" rel="noopener">Open local studio</a>
       </div>
@@ -60,6 +60,26 @@
     <ul class="trust-row" style="display:flex;flex-wrap:wrap;gap:1.4rem 2.4rem;list-style:none;">
       <li>Reads only</li><li>Reads the piece</li><li>Real comparables</li><li>eBay, Poshmark &amp; Depop copy</li>
     </ul>
+  </div></section>
+
+  <section id="live" class="section" style="padding-block:clamp(2rem,5vw,3.5rem);"><div class="wrap">
+    <div class="live-panel" data-live>
+      <span class="eyebrow">Live draft</span>
+      <h2 style="margin:0.8rem 0 0.8rem;">Photograph a piece. Draft it here.</h2>
+      <p>Same site, same listing voice. Upload a photo; you get attributes plus eBay, Poshmark, and Depop copy to review before placing. First request after idle can take a minute.</p>
+      <form class="live-form">
+        <label class="live-file">Photo
+          <input type="file" name="photo" accept="image/jpeg,image/png,image/webp" required />
+        </label>
+        <label class="live-notes">Notes
+          <textarea name="notes" rows="3" maxlength="2000" placeholder="stain on the left cuff, original dust bag"></textarea>
+        </label>
+        <button class="btn btn--gold" type="submit">Draft with the live model</button>
+      </form>
+      <div class="live-preview" data-live-preview></div>
+      <p class="live-status" data-live-status>Checking the live model…</p>
+      <div class="live-result" data-live-result></div>
+    </div>
   </div></section>
 
   <section id="how" class="section"><div class="wrap">
@@ -197,5 +217,6 @@
 </div></footer>
 
 <script src="./main.js"></script>
+<script src="./live.js"></script>
 </body>
 </html>

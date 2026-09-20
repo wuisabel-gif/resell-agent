@@ -4,7 +4,8 @@
   if (!root) return;
 
   const stored = localStorage.getItem("resell-agent-api") || "";
-  const apiBase = (root.getAttribute("data-api") || stored || "https://resell-agent.onrender.com").replace(/\/+$/, "");
+  const hosted = /\.onrender\.com$/i.test(location.hostname);
+  const apiBase = (hosted ? "" : root.getAttribute("data-api") || stored || "https://resell-agent.onrender.com").replace(/\/+$/, "");
   const form = root.querySelector("form");
   const photo = root.querySelector('input[type="file"]');
   const notes = root.querySelector("textarea");
