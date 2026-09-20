@@ -208,6 +208,25 @@ are enabled only when configured. If eBay is unchecked, the pipeline skips eBay
 active and sold comps and the review becomes copy/paste mode: set a manual price
 and use each listing's **Copy listing** button. The GUI binds to loopback by default. A
 `GUI_HOST` override is ignored unless `GUI_ALLOW_REMOTE=1` is explicitly set.
+
+Double-clickable apps:
+
+```
+npm run desktop
+npm run desktop:dist
+```
+
+`desktop` opens the dashboard in a window. `desktop:dist` builds a macOS `.dmg`
+on a Mac, or a Windows installer plus portable `.exe` on a Windows machine.
+GitHub Actions (`Desktop` workflow) can build both. The installers are unsigned,
+so macOS Gatekeeper and Windows SmartScreen will warn on first open. They do not
+include `.env`; use the in-app Settings panel, or put a `.env` in the app data
+folder (`~/Library/Application Support/Resell Agent/` on macOS,
+`%APPDATA%\Resell Agent\` on Windows). Native modules such as `sharp` are built
+per OS, so a Windows `.exe` should be produced on Windows (or CI), not copied
+out of a Mac build. The packaged app keeps draft/publish and eBay API posting;
+it does not bundle Playwright, background removal, or local CLIP brand matching.
+
 The page receives a private, HttpOnly per-process session cookie automatically;
 there is no token to type into the normal local URL. API and photo routes reject
 requests without that cookie, and state-changing requests also check their
@@ -362,6 +381,8 @@ Image URLs must be publicly reachable (eBay pulls them). Host them somewhere fir
 ## Layout
 
 ```
+desktop/
+  main.mjs          Electron shell that opens the local GUI in a window
 src/
   cli.ts            command line: draft | gui | post | auth-url | auth-exchange
   gui.ts            local dashboard: draft review + publish orchestration

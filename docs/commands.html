@@ -78,11 +78,13 @@ Wrote outfit.svg and 3 sheet(s) (outfit-1.md ...). Review before sharing.</pre><
 
     <div class="op"><div class="rn" style="font-size:1.15rem;">gui</div><div>
       <div class="cmd">npm run gui</div>
+      <div class="cmd">npm run desktop</div>
+      <div class="cmd">npm run desktop:dist</div>
       <div class="ex"><span class="exl">What it prints</span>
         <pre>GUI listening on <b>http://127.0.0.1:3000</b>
 Open this local URL, upload photos, review the draft, then publish or copy listings.
 Drafts and results survive refresh/restart; successful targets are skipped on retry.</pre></div>
-      <p class="muted">The GUI accepts up to 12 raster photos (10 MiB each, 30 MiB total) in a 40 MiB request, keeps them in a private TTL directory, and requires public HTTPS image URLs for eBay. If eBay is not selected, no eBay active/sold comps or eBay credentials are needed; each card has a Copy listing button. Its collapsed Settings panel keeps credentials in process memory only. Poshmark/Depop browser flows stay off until <span class="fl">ENABLE_BROWSER_AUTOMATION=1</span> plus a configured JSON flow; install Chromium with <span class="fl">npx playwright install chromium</span>. This local HTTP URL is not a public deployment: remote use needs a public HTTPS server and authentication.</p>
+      <p class="muted">The GUI accepts up to 12 raster photos (10 MiB each, 30 MiB total) in a 40 MiB request, keeps them in a private TTL directory, and requires public HTTPS image URLs for eBay. If eBay is not selected, no eBay active/sold comps or eBay credentials are needed; each card has a Copy listing button. Its collapsed Settings panel keeps credentials in process memory only. <code class="k">npm run desktop</code> opens the same dashboard in a window; <code class="k">npm run desktop:dist</code> builds a macOS DMG or a Windows installer on that OS. Poshmark/Depop browser flows stay off until <span class="fl">ENABLE_BROWSER_AUTOMATION=1</span> plus a configured JSON flow; install Chromium with <span class="fl">npx playwright install chromium</span>. This local HTTP URL is not a public deployment: remote use needs a public HTTPS server and authentication.</p>
     </div></div>
 
     <div class="op"><div class="rn" style="font-size:1.15rem;">index</div><div>

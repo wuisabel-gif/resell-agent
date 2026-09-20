@@ -2,12 +2,19 @@
   "name": "resell-agent",
   "version": "0.1.0",
   "private": true,
+  "description": "Local resale listing studio for eBay, Poshmark, and Depop",
+  "author": "resell-agent",
   "type": "module",
+  "main": "desktop/main.mjs",
   "scripts": {
     "build": "tsc",
     "draft": "node --env-file=.env dist/cli.js draft",
     "outfit": "node --env-file=.env dist/cli.js outfit",
     "gui": "node --env-file-if-exists=.env dist/cli.js gui",
+    "desktop": "npm run build && electron .",
+    "desktop:dist": "npm run build && electron-builder --publish never",
+    "desktop:dist:mac": "npm run build && electron-builder --mac --publish never",
+    "desktop:dist:win": "npm run build && electron-builder --win --publish never",
     "index": "node --env-file=.env dist/cli.js index",
     "post": "node --env-file=.env dist/cli.js post",
     "auth-url": "node --env-file=.env dist/cli.js auth-url",
@@ -17,15 +24,80 @@
     "node": ">=22.0.0"
   },
   "dependencies": {
-    "@imgly/background-removal-node": "^1.4.5",
-    "playwright": "^1.62.1",
     "sharp": "^0.32.6"
   },
   "optionalDependencies": {
-    "@xenova/transformers": "^2.17.2"
+    "@imgly/background-removal-node": "^1.4.5",
+    "@xenova/transformers": "^2.17.2",
+    "playwright": "^1.62.1"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "electron": "^37.2.6",
+    "electron-builder": "^26.0.12",
     "typescript": "^5.6.0"
+  },
+  "build": {
+    "appId": "gif.wuisabel.resellagent",
+    "productName": "Resell Agent",
+    "copyright": "Copyright © resell·agent",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "package.json",
+      "dist/**/*.js",
+      "!dist/**/*.test.js",
+      "desktop/main.mjs",
+      "desktop/icon.png",
+      "!node_modules/@imgly/**",
+      "!node_modules/@xenova/**",
+      "!node_modules/@huggingface/**",
+      "!node_modules/playwright/**",
+      "!node_modules/playwright-core/**",
+      "!node_modules/onnxruntime-node/**",
+      "!node_modules/onnxruntime-web/**",
+      "!node_modules/onnxruntime-common/**",
+      "!node_modules/onnx-proto/**",
+      "!node_modules/@types/**"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "**/node_modules/sharp/**",
+      "**/*.node"
+    ],
+    "npmRebuild": true,
+    "electronLanguages": [
+      "en"
+    ],
+    "mac": {
+      "category": "public.app-category.lifestyle",
+      "icon": "desktop/icon.png",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false,
+      "identity": null
+    },
+    "dmg": {
+      "title": "Resell Agent"
+    },
+    "win": {
+      "icon": "desktop/icon.png",
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-portable.exe"
+    }
   }
 }

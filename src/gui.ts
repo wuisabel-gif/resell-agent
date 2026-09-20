@@ -988,7 +988,14 @@ function originAllowed(req: IncomingMessage, host: string, port: number): boolea
   return expected.has(parsed.origin);
 }
 
-export async function startGui(port = Number(process.env.GUI_PORT ?? "3000")): Promise<void> {
+export interface GuiHandle {
+  url: string;
+  port: number;
+  host: string;
+  close(): Promise<void>;
+}
+
+export async function startGui(port = Number(process.env.GUI_PORT ?? "3000")): Promise<GuiHandle> {
   const allowRemote = process.env.GUI_ALLOW_REMOTE?.trim() === "1";
   const configuredHost = process.env.GUI_HOST?.trim();
   if (configuredHost && /[\r\n]/.test(configuredHost)) throw new Error("GUI_HOST contains invalid control characters.");
@@ -1028,7 +1035,7 @@ export async function startGui(port = Number(process.env.GUI_PORT ?? "3000")): P
         }
         sendText(res, 200, renderPage(boot), "text/html; charset=utf-8", {
           "Set-Cookie": `gui_token=${apiToken}; Path=/; HttpOnly; SameSite=Strict`,
-          "Content-Security-Policy": "default-src 'self'; img-src 'self' blob:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; frame-ancestors 'none'",
+          "Content-Security-Policy": "default-src 'self'; img-src 'self' blob:; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'",
         });
         return;
       }
@@ -1112,8 +1119,26 @@ export async function startGui(port = Number(process.env.GUI_PORT ?? "3000")): P
     void cleanupExpiredDrafts().catch(() => undefined);
   }, 60 * 60 * 1000);
   cleanupTimer.unref();
+  let closed = false;
+  const close = async (): Promise<void> => {
+    if (closed) return;
+    closed = true;
+    if (cleanupTimer) {
+      clearInterval(cleanupTimer);
+      cleanupTimer = undefined;
+    }
+    process.off("SIGINT", shutdown);
+    process.off("SIGTERM", shutdown);
+    if (typeof server.closeAllConnections === "function") server.closeAllConnections();
+    await new Promise<void>((resolveClose, rejectClose) => {
+      server.close((error) => {
+        if (error) rejectClose(error);
+        else resolveClose();
+      });
+    });
+  };
   const shutdown = () => {
-    void server.close();
+    void close().catch(() => undefined);
   };
   process.once("SIGINT", shutdown);
   process.once("SIGTERM", shutdown);
@@ -1129,4 +1154,5 @@ export async function startGui(port = Number(process.env.GUI_PORT ?? "3000")): P
     ? `http://${urlHost(host)}:${actualPort}/?gui_token=${encodeURIComponent(apiToken)}`
     : `http://${urlHost(host)}:${actualPort}`;
   console.log(`GUI listening on ${accessUrl}`);
+  return { url: accessUrl, port: actualPort, host, close };
 }
