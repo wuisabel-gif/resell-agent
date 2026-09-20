@@ -8,7 +8,7 @@ import { buildDraft } from "./pipeline.js";
 import { publishDraftBundle, validateHttpsImageUrls, type EbayPublishSettings, type PlatformPublishResult } from "./publish.js";
 import { buildGuiScript, type GuiBootState } from "./gui-client.js";
 import { GUI_PLATFORMS, mergeEditableListingFields, validatePlatformSelection } from "./gui-validation.js";
-import { truthy } from "./env.js";
+import { loadApiKeyFile, truthy } from "./env.js";
 import { applyRuntimeSettings, resetRuntimeSettings, RUNTIME_SECRET_KEYS } from "./runtime-settings.js";
 import type { DraftBundle, Platform } from "./types.js";
 
@@ -223,19 +223,19 @@ function renderPage(boot: GuiBootState): string {
     .step.is-active { color: var(--ink); }
     .step.is-active b { color: var(--plum); }
     .step + .step::before { content: '—'; color: var(--line-dark); margin-right: clamp(0.35rem, 1vw, 1rem); }
-    .grid { display: grid; gap: clamp(1rem, 2vw, 1.5rem); grid-template-columns: 1.1fr 0.9fr; align-items: start; }
-    .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(1.2rem, 2.4vw, 2rem); box-shadow: 0 18px 40px -32px oklch(0.2 0.03 312 / 0.35); }
+    .grid { display: grid; gap: clamp(1rem, 2vw, 1.5rem); grid-template-columns: minmax(0, 1.15fr) minmax(17rem, 0.85fr); align-items: start; }
+    .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(1.05rem, 2vw, 1.55rem); box-shadow: 0 18px 40px -32px oklch(0.2 0.03 312 / 0.35); }
     .grid > .card:first-child { background: var(--aubergine); color: oklch(0.9 0.01 312); border-color: var(--aubergine); box-shadow: 0 30px 60px -36px oklch(0.1 0.04 312 / 0.65); }
     .grid > .card:first-child h1, .grid > .card:first-child h2, .grid > .card:first-child h3 { color: oklch(0.97 0.01 312); }
     .grid > .card:first-child p, .grid > .card:first-child .muted { color: oklch(0.82 0.015 312); }
     #publish-panel { grid-column: 1 / -1; }
-    h1 { font-size: clamp(2.2rem, 4vw, 4rem); font-weight: 500; }
+    h1 { font-size: clamp(1.65rem, 2.4vw, 2.45rem); font-weight: 500; }
     h1 em { color: var(--gold); font-style: italic; font-weight: 500; }
     h2 { font-size: clamp(1.55rem, 2.5vw, 2.25rem); }
     h3 { font-size: 1.28rem; }
     p { margin: 0.55rem 0 1rem; }
     .eyebrow { display: block; margin-bottom: 0.85rem; color: var(--gold); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; }
-    form { display: grid; gap: 1.25rem; }
+    form { display: grid; gap: 0.95rem; }
     label { display: grid; gap: 0.4rem; font-size: 0.88rem; font-weight: 600; letter-spacing: 0.02em; }
     input[type="text"], input[type="url"], input[type="number"], input[type="password"], select, textarea {
       width: 100%;
@@ -250,13 +250,16 @@ function renderPage(boot: GuiBootState): string {
     input[readonly] { opacity: 0.82; }
     input[type="file"] { width: 100%; border: 1px dashed var(--gold-ink); border-radius: var(--radius); background: var(--surface); color: var(--ink-soft); padding: 0.72rem; }
     input[type="file"]::file-selector-button { margin-right: 0.7rem; border: 1px solid var(--ink); border-radius: var(--radius); padding: 0.45rem 0.7rem; background: var(--ink); color: var(--bg); font-weight: 600; cursor: pointer; }
-    .dropzone { position: relative; min-height: 168px; display: flex; align-items: center; justify-content: center; text-align: center; border: 1px dashed var(--gold-ink); border-radius: var(--radius); background: color-mix(in oklch, var(--aubergine-2) 76%, var(--aubergine)); overflow: hidden; cursor: pointer; }
+    .photo-block { display: grid; gap: 0.65rem; }
+    .dropzone { position: relative; min-height: 7.25rem; display: flex; align-items: center; justify-content: center; text-align: center; border: 1px dashed var(--gold-ink); border-radius: var(--radius); background: color-mix(in oklch, var(--aubergine-2) 76%, var(--aubergine)); overflow: hidden; cursor: pointer; }
+    .dropzone.has-files { min-height: 4.5rem; }
     .dropzone:hover, .dropzone:focus-within { border-color: var(--gold); background: var(--aubergine-2); }
     .dropzone input[type="file"] { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-    .dropzone-copy { position: relative; z-index: 1; display: grid; gap: 0.25rem; pointer-events: none; }
-    .dropzone-mark { color: var(--gold); font-family: var(--serif); font-size: 2.5rem; line-height: 1; }
-    .dropzone-title { color: oklch(0.97 0.01 312); font-family: var(--serif); font-size: 1.25rem; }
-    .dropzone-note { color: oklch(0.78 0.02 312); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .dropzone-copy { position: relative; z-index: 1; display: grid; gap: 0.15rem; pointer-events: none; }
+    .dropzone-mark { color: var(--gold); font-family: var(--serif); font-size: 1.7rem; line-height: 1; }
+    .dropzone.has-files .dropzone-mark { display: none; }
+    .dropzone-title { color: oklch(0.97 0.01 312); font-family: var(--serif); font-size: 1.1rem; }
+    .dropzone-note { color: oklch(0.78 0.02 312); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
     .field-help { color: oklch(0.75 0.02 312); font-size: 0.78rem; font-weight: 400; letter-spacing: 0; }
     textarea { resize: vertical; }
     fieldset { border: 1px solid var(--line-dark); border-radius: var(--radius); padding: 1rem; margin: 0; display: grid; gap: 0.7rem; }
@@ -287,10 +290,11 @@ function renderPage(boot: GuiBootState): string {
     #global-status[data-kind="success"] { color: var(--gold); }
     #global-status[data-kind="error"] { color: oklch(0.78 0.12 25); }
     #global-status[data-kind="info"] { color: oklch(0.82 0.015 312); }
-    .photo-strip { display: grid; gap: 0.8rem; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); align-items: start; }
-    .thumb { margin: 0; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--surface-2); }
-    .thumb img { width: 100%; height: 132px; object-fit: cover; display: block; }
-    .thumb figcaption { padding: 0.45rem 0.6rem; font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold-ink); }
+    .photo-strip { display: grid; gap: 0.45rem; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); }
+    .photo-strip[hidden] { display: none; }
+    .thumb { margin: 0; border: 1px solid var(--line-dark); border-radius: var(--radius); overflow: hidden; background: var(--aubergine-2); }
+    .thumb img { width: 100%; aspect-ratio: 1; height: auto; object-fit: cover; display: block; }
+    .thumb figcaption { padding: 0.28rem 0.4rem; font-size: 0.62rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold); }
     .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 0.65rem; margin-bottom: 1.25rem; }
     .summary-item { border-top: 1px solid var(--line); padding: 0.7rem 0; display: grid; gap: 0.2rem; }
     .summary-item span { color: var(--muted); font-size: 0.76rem; letter-spacing: 0.08em; text-transform: uppercase; }
@@ -323,7 +327,8 @@ function renderPage(boot: GuiBootState): string {
     .copy-mode-note { border-color: var(--blue); }
     #publish-panel[hidden] { display: none; }
     #draft-meta { margin-bottom: 1rem; color: var(--muted); font-size: 0.9rem; }
-    @media (max-width: 960px) { .grid { grid-template-columns: 1fr; } #publish-panel { grid-column: auto; } .two-col { grid-template-columns: 1fr; } .steps { gap: 0.8rem; justify-content: space-between; } .step { font-size: 0.62rem; letter-spacing: 0.08em; } .step + .step::before { display: none; } }
+    .grid > .card:nth-child(2) { position: sticky; top: 5.6rem; }
+    @media (max-width: 960px) { .grid { grid-template-columns: 1fr; } #publish-panel { grid-column: auto; } .two-col { grid-template-columns: 1fr; } .steps { gap: 0.8rem; justify-content: space-between; } .step { font-size: 0.62rem; letter-spacing: 0.08em; } .step + .step::before { display: none; } .grid > .card:nth-child(2) { position: static; } }
     @media (max-width: 560px) { .steps { align-items: flex-start; } .step { flex-direction: column; gap: 0.2rem; text-align: center; } }
   </style>
 </head>
@@ -379,22 +384,27 @@ function renderPage(boot: GuiBootState): string {
               <button id="ebay-exchange" class="secondary small" type="button">Exchange code for refresh token</button>
             </div>
             <label>eBay user refresh token <span class="field-help">optional if already configured in .env</span><input id="setting-ebay-user-refresh-token" type="password" autocomplete="off" /></label>
+            <label>Google Vision API key <span class="field-help">optional reverse-image</span><input id="setting-google-vision-api-key" type="password" autocomplete="off" placeholder="AIza..." /></label>
+            <label>Bing Visual Search key <span class="field-help">optional reverse-image</span><input id="setting-bing-visual-search-key" type="password" autocomplete="off" /></label>
+            <label>You.com API key <span class="field-help">web lookup after the piece is named</span><input id="setting-you-api-key" type="password" autocomplete="off" /></label>
             <div class="actions"><button id="clear-runtime-settings" class="secondary small" type="button">Clear in-memory settings</button><span class="settings-note">Restores process-start values; nothing is written to disk.</span></div>
           </div>
         </details>
         <form id="draft-form">
-          <label class="dropzone">
-            <span class="dropzone-copy">
-              <span class="dropzone-mark">+</span>
-              <span class="dropzone-title">Drop photographs here</span>
-              <span class="dropzone-note">or choose files · jpeg · png · webp</span>
-              <span class="field-help">The vision model reads the uploaded photos directly.</span>
-            </span>
-            <input id="photos" name="photos" type="file" accept="image/*" multiple />
-          </label>
+          <div class="photo-block">
+            <label class="dropzone">
+              <span class="dropzone-copy">
+                <span class="dropzone-mark">+</span>
+                <span class="dropzone-title">Drop photographs here</span>
+                <span class="dropzone-note">or choose files · jpeg · png · webp</span>
+              </span>
+              <input id="photos" name="photos" type="file" accept="image/*" multiple />
+            </label>
+            <div id="photo-preview" class="photo-strip" hidden></div>
+          </div>
           <label>
             Seller notes
-            <textarea id="notes" name="notes" rows="6" placeholder="Flaws, fit notes, measurements, condition, anything to call out."></textarea>
+            <textarea id="notes" name="notes" rows="3" placeholder="Flaws, fit notes, measurements, condition."></textarea>
           </label>
           <fieldset>
             <legend>Platforms</legend>
@@ -408,12 +418,6 @@ function renderPage(boot: GuiBootState): string {
           </div>
         </form>
         <div id="global-status" data-kind="info">Choose photos to begin.</div>
-      </section>
-
-      <section class="card">
-        <span class="eyebrow">02 / Evidence</span>
-        <h2>Photos</h2>
-        <div id="photo-preview" class="photo-strip"><p class="muted">No photos selected yet.</p></div>
       </section>
 
       <section class="card">
@@ -996,6 +1000,7 @@ export interface GuiHandle {
 }
 
 export async function startGui(port = Number(process.env.GUI_PORT ?? "3000")): Promise<GuiHandle> {
+  loadApiKeyFile();
   const allowRemote = process.env.GUI_ALLOW_REMOTE?.trim() === "1";
   const configuredHost = process.env.GUI_HOST?.trim();
   if (configuredHost && /[\r\n]/.test(configuredHost)) throw new Error("GUI_HOST contains invalid control characters.");

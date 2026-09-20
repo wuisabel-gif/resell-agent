@@ -19,3 +19,9 @@ services:
         value: "[xy2-按量计费]claude-sonnet-4-6"
       - key: ANTHROPIC_AUTH_TOKEN
         sync: false
+      - key: YOU_API_KEY
+        sync: false
+      - key: BING_VISUAL_SEARCH_KEY
+        sync: false
+      - key: BING_VISUAL_SEARCH_ENDPOINT
+        value: https://api.bing.microsoft.com/v7.0/images/visualsearch
