@@ -108,10 +108,10 @@ screenshots into.
 ## Setup
 
 1. Install and build: `npm install && npm run build` (rebuild after any code change)
-2. `cp .env.example .env` and fill in:
-   - `EBAY_CLIENT_ID`, `EBAY_CLIENT_SECRET` from developer.ebay.com to My Account to Application Keys when using eBay
-   - `ANTHROPIC_API_KEY` (or an Anthropic-compatible gateway using
-     `ANTHROPIC_AUTH_TOKEN` and `ANTHROPIC_BASE_URL`)
+2. `cp .env.example .env` and fill in host/model and any eBay keys.
+   Put the gateway secret alone in `.api` (copy `.api.example`). The app
+   reads `.api` at startup; do not put the key in `.env`.
+   - `EBAY_CLIENT_ID`, `EBAY_CLIENT_SECRET` from developer.ebay.com when using eBay
    - keep `EBAY_ENV=sandbox` until you are ready to list for real
 
 For GUI drafts that select only Poshmark and/or Depop, eBay client credentials
@@ -128,18 +128,20 @@ set `EBAY_ENV=production`.
 
 The app uses the Anthropic Messages API directly. A third-party gateway can be
 used if it supports `POST /v1/messages`, Anthropic message/image blocks, and the
-response shape `{ "content": [{ "text": "..." }] }`. Put the gateway settings in
-the project `.env`; Claude Code's `~/.claude/settings.json` is not read by this
-Node app:
+response shape `{ "content": [{ "text": "..." }] }`. Put the host and model in
+`.env`. Put only the secret in `.api`. Claude Code's `~/.claude/settings.json`
+is not read by this Node app:
 
 ```
-ANTHROPIC_AUTH_TOKEN=your-gateway-token
-ANTHROPIC_BASE_URL=https://api.example.com
-ANTHROPIC_MODEL=your-supported-claude-model
+# .env
+ANTHROPIC_BASE_URL=https://api.chr1.com
+ANTHROPIC_MODEL=[xy8-按量计费]claude-sonnet-5
+
+# .api  (one line: the key only)
 ```
 
 The gateway URL may include `/v1`; the app avoids adding that path twice. Do not
-paste the token into chat or commit `.env`. Confirm that the provider supports
+paste the token into chat or commit `.env` or `.api`. Confirm that the provider supports
 image input because the photo-to-attributes step sends base64 image blocks. A
 third-party gateway also has its own privacy, reliability, billing, and terms-of-
 service implications.
@@ -200,6 +202,8 @@ brand match, comps, price, copy).
 npm run gui
 ```
 
+<img src="docs/gui-demo1.gif" alt="GUI demo: upload a photo, draft the listing, review copy for eBay, Poshmark, and Depop" width="72%" />
+
 Starts a local review-and-publish dashboard on `http://127.0.0.1:3000` (the
 printed port follows `GUI_PORT`). Upload photos, enter notes, choose the
 platforms, build a draft, edit the copy, then click **Publish all**. eBay
@@ -234,8 +238,17 @@ same-origin `Origin` when a browser supplies one. If remote access is deliberate
 enabled, the server prints a one-time token URL; prefer setting a long
 `GUI_AUTH_TOKEN` instead of exposing the random token in shell history or logs.
 
-The website in `docs/` is a static guide for GitHub Pages; it is not the GUI and
-must not receive credentials. Run `npm run gui` separately and open the printed
+The website in `docs/` is a static GitHub Pages guide. It can call a hosted
+live-draft API so a visitor can upload a photo without putting the model key in
+the browser. Deploy `render.yaml` on Render. Host and model are already in that
+file (`https://api.chr1.com` and the Claude sonnet channel). In the Render
+dashboard, set only `ANTHROPIC_AUTH_TOKEN` (the chr1 key). Keep
+`SITE_ALLOWED_ORIGINS=https://wuisabel-gif.github.io`.
+Local check: `npm run site-api`, then open `docs/example.html#live`. The sample
+page talks to `https://resell-agent.onrender.com` unless you set
+`localStorage.resell-agent-api` to your service URL.
+
+The website must not receive credentials. Run `npm run gui` separately and open the printed
 `http://127.0.0.1:<port>` URL. The GUI's collapsed Settings panel accepts
 Anthropic gateway/native values and eBay account values for that process only.
 They are sent to the protected local API on draft and publish, applied in memory,
