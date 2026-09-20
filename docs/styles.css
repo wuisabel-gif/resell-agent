@@ -541,3 +541,20 @@ code.k{font-family:var(--sans);background:var(--surface-2);color:var(--gold-ink)
 
 /* ── procedure screenshots ───────────────────────────────────────────────── */
 .shot-img{width:100%;max-width:660px;display:block;margin-top:1rem;border-radius:10px;box-shadow:0 24px 50px -32px oklch(0.2 0.03 312 / 0.55);}
+
+/* ── live website draft ───────────────────────────────────────────────────── */
+.live-panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:clamp(1.4rem,3vw,2.2rem);}
+.live-form{display:grid;gap:1rem;margin-top:1.4rem;max-width:36rem;}
+.live-form label{display:grid;gap:0.4rem;font-size:var(--step--1);font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:var(--gold-ink);}
+.live-form input[type=file],.live-form textarea{padding:0.7rem 0.8rem;border:1px solid var(--line);border-radius:4px;background:var(--bg);text-transform:none;letter-spacing:0;font-weight:400;color:var(--ink);}
+.live-preview{margin-top:1.2rem;max-width:220px;}
+.live-preview img{width:100%;border-radius:6px;}
+.live-status{margin-top:1rem;font-size:var(--step--1);color:var(--muted);}
+.live-status[data-kind=ok]{color:var(--plum);}
+.live-status[data-kind=warn]{color:var(--gold-ink);}
+.live-status[data-kind=error]{color:#8a2f2f;}
+.live-summary{margin:1.2rem 0 0.6rem;color:var(--ink);}
+.live-listing{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--gold-soft);}
+.live-listing h3{text-transform:capitalize;margin:0 0 0.35rem;}
+.live-price{color:var(--gold-ink);font-weight:600;margin:0 0 0.6rem;}
+.live-copy{white-space:pre-wrap;font-size:var(--step--1);color:var(--ink-soft);max-width:68ch;}

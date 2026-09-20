@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: resell-agent
+    runtime: node
+    plan: free
+    buildCommand: npm ci --omit=optional && npm run build
+    startCommand: node dist/site-api.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: ELECTRON_SKIP_BINARY_DOWNLOAD
+        value: "1"
+      - key: SITE_ALLOWED_ORIGINS
+        value: https://wuisabel-gif.github.io
+      - key: ANTHROPIC_BASE_URL
+        value: https://api.chr1.com
+      - key: ANTHROPIC_MODEL
+        value: "[xy2-按量计费]claude-sonnet-4-6"
+      - key: ANTHROPIC_AUTH_TOKEN
+        sync: false
